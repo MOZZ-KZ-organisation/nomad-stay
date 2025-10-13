@@ -107,7 +107,7 @@ class DatabaseSeeder extends Seeder
                     'description' => 'Просторный номер с видом на город. Удобства включают кондиционер, Wi-Fi и мини-бар.',
                     'capacity' => rand(2, 4),
                     'price' => $hotel->min_price + rand(20000, 100000),
-                    'available_count' => rand(2, 10),
+                    'stock' => rand(2, 10),
                 ]);
                 $room->images()->create([
                     'path' => 'https://images.unsplash.com/photo-1600585154204-527bdc8fa283',
