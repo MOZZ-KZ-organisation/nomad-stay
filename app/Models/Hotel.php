@@ -17,4 +17,13 @@ class Hotel extends Model
     public function amenities() { return $this->belongsToMany(Amenity::class); }
     public function images() { return $this->hasMany(HotelImage::class); }
     public function reviews() { return $this->hasMany(Review::class); }
+
+    protected static function booted()
+    {
+        static::saving(function ($hotel) {
+            if (empty($hotel->slug)) {
+                $hotel->slug = \Str::slug($hotel->title);
+            }
+        });
+    }
 }
