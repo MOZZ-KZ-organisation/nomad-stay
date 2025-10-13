@@ -12,4 +12,13 @@ class Amenity extends Model
     {
         return $this->belongsToMany(Hotel::class);
     }
+
+    protected static function booted()
+    {
+        static::saving(function ($amenity) {
+            if (empty($amenity->slug)) {
+                $amenity->slug = \Str::slug($amenity->name);
+            }
+        });
+    }
 }
