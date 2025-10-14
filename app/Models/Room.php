@@ -11,17 +11,8 @@ class Room extends Model
 
     public function hotel(){ return $this->belongsTo(Hotel::class); }
     public function images(){ return $this->hasMany(RoomImage::class); }
-    public function getPicsAttribute($value)
+        public function getImageUrlsAttribute()
     {
-        if (empty($value)) {
-            return [];
-        }
-        $decoded = json_decode(html_entity_decode($value), true);
-        if (is_array($decoded)) {
-            return array_map(function ($img) {
-                return Voyager::image($img);
-            }, $decoded);
-        }
-        return [Voyager::image($value)];
+        return $this->images->map(fn($img) => Voyager::image($img->path))->toArray();
     }
 }
