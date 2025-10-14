@@ -1,8 +1,9 @@
 @php
     $images = $data->images ?? [];
     if (is_string($images)) {
+        $images = html_entity_decode($images);
         $decoded = json_decode($images, true);
-        $images = is_array($decoded) ? $decoded : [];
+        $images = is_array($decoded) ? $decoded : [$images];
     }
     if ($images instanceof \Illuminate\Support\Collection) {
         $images = $images->pluck('path')->toArray();
