@@ -13,12 +13,4 @@ class RoomImage extends Model
     {
         return $this->belongsTo(Room::class);
     }
-
-    public function getUrlAttribute()
-    {
-        if (is_array($this->path)) {
-            return array_map(fn($p) => Voyager::image($p), $this->path);
-        }
-        return [Voyager::image($this->path)];
-    }
 }

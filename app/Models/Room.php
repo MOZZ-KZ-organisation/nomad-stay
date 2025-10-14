@@ -11,10 +11,4 @@ class Room extends Model
 
     public function hotel(){ return $this->belongsTo(Hotel::class); }
     public function images(){ return $this->hasMany(RoomImage::class); }
-    public function getImageUrlsAttribute()
-    {
-        return $this->images
-            ->flatMap(fn($img) => $img->url) 
-            ->toArray();
-    }
 }
