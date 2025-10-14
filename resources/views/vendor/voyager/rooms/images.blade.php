@@ -1,6 +1,6 @@
-@if(!empty($data->imagess))
+@if(!empty($data->pics))
     <div style="display:flex; gap:5px; flex-wrap:wrap;">
-        @foreach($data->imagess as $img)
+        @foreach($data->pics as $img)
             <img src="{{ $img }}" width="100" height="70" style="object-fit:cover; border-radius:8px;">
         @endforeach
     </div>
