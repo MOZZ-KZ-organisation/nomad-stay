@@ -1,12 +1,15 @@
 @php
     $images = $data->images ?? [];
     if (is_string($images)) {
-        $decoded = json_decode($images, true);
+        $decoded = json_decode(html_entity_decode($images), true);
         $images = is_array($decoded) ? $decoded : [];
     }
     if ($images instanceof \Illuminate\Support\Collection) {
         $images = $images->pluck('path')->toArray();
     }
+    $images = array_map(function ($img) {
+        return preg_replace('#/{2,}#', '/', trim($img, '"'));
+    }, $images);
 @endphp
 @if(!empty($images))
     <div style="display:flex; gap:5px; flex-wrap:wrap;">
