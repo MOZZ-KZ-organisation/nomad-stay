@@ -11,7 +11,7 @@ class Room extends Model
 
     public function hotel(){ return $this->belongsTo(Hotel::class); }
     public function images(){ return $this->hasMany(RoomImage::class); }
-    public function getImagesAttribute($value)
+    public function getImagessAttribute($value)
     {
         if (empty($value)) {
             return [];
