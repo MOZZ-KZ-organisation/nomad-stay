@@ -1,11 +1,12 @@
-@if($data->rooms->count())
-    <div style="display:flex; flex-direction:column; gap:4px;">
-        @foreach($data->rooms as $room)
-            <a href="{{ route('voyager.rooms.edit', $room->id) }}" class="text-primary" style="text-decoration:none;">
-                {{ \Illuminate\Support\Str::limit($room->title, 50) }}
-            </a>
-        @endforeach
-    </div>
+@php
+    $count = $data->rooms->count();
+    $url = route('voyager.rooms.index', ['hotel_id' => $data->id]);
+@endphp
+
+@if($count > 0)
+    <a href="{{ $url }}" class="text-primary">
+        {{ $count }} {{ Str::plural('номер', $count) }}
+    </a>
 @else
     <span class="text-muted">Нет номеров</span>
 @endif
