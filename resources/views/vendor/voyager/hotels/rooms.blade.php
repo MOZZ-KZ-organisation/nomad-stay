@@ -18,9 +18,8 @@
         {{-- В режиме деталей (read/show) показываем список номеров --}}
         <div style="display:flex; flex-direction:column; gap:4px;">
             @foreach($data->rooms as $room)
-                <a href="{{ route('voyager.rooms.index', ['hotel_id' => $data->id]) }}"
-                   style="text-decoration:none; color:#1f2937;">
-                    <p style="margin:0;">{{ \Illuminate\Support\Str::limit($room->title, 30) }}</p>
+                <a href="{{ route('voyager.rooms.show', $room->id) }}" style="text-decoration:none; color:#2aa0ad;">>
+                    {{ \Illuminate\Support\Str::limit($room->title, 50) }}
                 </a>
             @endforeach
         </div>
