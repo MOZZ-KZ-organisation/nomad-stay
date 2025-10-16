@@ -2,7 +2,7 @@
     // Определяем текущее действие (browse или read)
     $isBrowse = request()->routeIs('voyager.hotels.index');
     $isRead = request()->routeIs('voyager.hotels.show') || request()->routeIs('voyager.hotels.read');
-
+    $data = $data ?? $dataTypeContent ?? null;
     $roomTitles = $data->rooms->pluck('title')->toArray();
     $titlesString = implode(', ', $roomTitles);
     $shortText = \Illuminate\Support\Str::limit($titlesString, 30);
