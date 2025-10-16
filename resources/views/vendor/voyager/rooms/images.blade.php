@@ -1,6 +1,9 @@
-@if(!empty($data->images))
+@php
+    $item = $data ?? $dataTypeContent;
+@endphp
+@if(!empty($item->images))
     <div style="display:flex; gap:5px; flex-wrap:wrap;">
-        @foreach($data->images as $img)
+        @foreach($item->images as $img)
             <img src="{{ Voyager::image($img->path) }}" width="100" height="70" style="object-fit:cover; border-radius:8px;">
         @endforeach
     </div>
