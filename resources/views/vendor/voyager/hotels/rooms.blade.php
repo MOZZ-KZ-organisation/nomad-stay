@@ -19,7 +19,7 @@
         <div style="display:flex; flex-direction:column; gap:4px;">
             @foreach($data->rooms as $room)
                 <a href="{{ route('voyager.rooms.show', $room->id) }}" style="text-decoration:none; color:#208590;">
-                    {{ \Illuminate\Support\Str::limit($room->title, 50) }}
+                    <p style="margin:0;">{{ \Illuminate\Support\Str::limit($room->title, 50) }}</p>
                 </a>
             @endforeach
         </div>
