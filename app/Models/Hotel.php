@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HandlesImages;
 use Illuminate\Database\Eloquent\Model;
 
 class Hotel extends Model
 {
+    use HandlesImages;
     protected $fillable = [
         'title','slug','description','address','city','country',
         'latitude','longitude','stars','is_active','min_price','type'
