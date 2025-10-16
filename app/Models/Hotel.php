@@ -14,7 +14,10 @@ class Hotel extends Model
     protected $casts = ['is_active' => 'boolean'];
 
     public function rooms() { return $this->hasMany(Room::class); }
-    public function amenities() { return $this->belongsToMany(Amenity::class); }
+    public function amenities()
+    {
+        return $this->belongsToMany(Amenity::class, 'amenity_hotel', 'hotel_id', 'amenity_id');
+    }
     public function images() { return $this->hasMany(HotelImage::class); }
     public function reviews() { return $this->hasMany(Review::class); }
 

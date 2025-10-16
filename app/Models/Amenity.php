@@ -10,7 +10,7 @@ class Amenity extends Model
 
     public function hotels()
     {
-        return $this->belongsToMany(Hotel::class);
+        return $this->belongsToMany(Hotel::class, 'amenity_hotel', 'amenity_id', 'hotel_id');
     }
 
     protected static function booted()
