@@ -10,7 +10,7 @@ class Hotel extends Model
         'title','slug','description','address','city','country',
         'latitude','longitude','stars','is_active','min_price','type'
     ];
-
+    protected $appends = ['location'];
     protected $casts = ['is_active' => 'boolean'];
 
     public function rooms() { return $this->hasMany(Room::class); }
@@ -25,5 +25,10 @@ class Hotel extends Model
                 $hotel->slug = \Str::slug($hotel->title);
             }
         });
+    }
+
+    public function getLocationAttribute()
+    {
+        return trim("{$this->city}, {$this->country}", ', ');
     }
 }
