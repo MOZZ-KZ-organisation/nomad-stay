@@ -11,14 +11,14 @@
     @if($isBrowse)
         {{-- В режиме списка (browse) показываем короткий текст --}}
         <a href="{{ route('voyager.rooms.index', ['hotel_id' => $data->id]) }}"
-           style="text-decoration:none; color:#2aa0ad;">
+           style="text-decoration:none; color:#208590;">
             <p style="margin:0;">{{ $shortText }}</p>
         </a>
     @elseif($isRead)
         {{-- В режиме деталей (read/show) показываем список номеров --}}
         <div style="display:flex; flex-direction:column; gap:4px;">
             @foreach($data->rooms as $room)
-                <a href="{{ route('voyager.rooms.show', $room->id) }}" style="text-decoration:none; color:#2aa0ad;">>
+                <a href="{{ route('voyager.rooms.show', $room->id) }}" style="text-decoration:none; color:#208590;">
                     {{ \Illuminate\Support\Str::limit($room->title, 50) }}
                 </a>
             @endforeach
