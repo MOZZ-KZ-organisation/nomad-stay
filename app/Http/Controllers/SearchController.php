@@ -13,13 +13,10 @@ class SearchController extends Controller
     {
         $data = $request->validated();
         $page = $request->get('page', 1);
-
         // cache key depends on all filter params + page
         $cacheKey = 'search:' . md5(json_encode(array_merge($data, ['page' => $page])));
-
         $hotels = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($data) {
             $q = Hotel::query()->where('is_active', true);
-
             if (!empty($data['city'])) { $q->where('city', $data['city']); }
             if (!empty($data['country'])) { $q->where('country', $data['country']); }
             if (!empty($data['type'])) { $q->where('type', $data['type']); }

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use TCG\Voyager\Facades\Voyager;
 
 class HotelListResource extends JsonResource
 {
@@ -20,7 +21,9 @@ class HotelListResource extends JsonResource
             'price_for_period' => $this->min_price, // mobile will compute price_for_nights * nights
             'discount_percent' => $this->when(isset($this->discount_percent), $this->discount_percent),
             'is_favorite' => false, // подставлять если авторизован
-            'main_image' => $this->images->first()?->path,
+            'main_image' => $this->images->first()?->path
+                ? Voyager::image($this->images->first()->path)
+                : Voyager::image($this->images()->first()->path ?? ''),
         ];
     }
 }

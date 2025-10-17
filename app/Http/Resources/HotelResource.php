@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use TCG\Voyager\Facades\Voyager;
 
 class HotelResource extends JsonResource
 {
@@ -20,7 +21,7 @@ class HotelResource extends JsonResource
             'stars' => $this->stars,
             'rating' => round($this->reviews()->avg('rating') ?? 0, 2),
             'reviews_count' => $this->reviews()->count(),
-            'images' => $this->images->map(fn($i) => $i->path),
+            'images' => $this->images->map(fn($i) => Voyager::image($i->path)),
             'amenities' => $this->amenities->pluck('name'),
             'rooms' => RoomResource::collection($this->whenLoaded('rooms')),
             'nearby' => [

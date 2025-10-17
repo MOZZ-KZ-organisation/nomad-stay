@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use TCG\Voyager\Facades\Voyager;
 
 class RoomResource extends JsonResource
 {
@@ -17,7 +18,7 @@ class RoomResource extends JsonResource
             'capacity' => $this->capacity,
             'bathrooms' => $this->bathrooms,
             'stock' => $this->stock,
-            'images' => $this->images->map(fn($i) => $i->path),
+            'images' => $this->images->map(fn($i) => Voyager::image($i->path))
         ];
     }
 }
