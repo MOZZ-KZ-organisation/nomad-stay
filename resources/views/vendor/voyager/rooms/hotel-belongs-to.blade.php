@@ -20,7 +20,7 @@
     {{-- В режиме добавления/редактирования --}}
     @php($hotels = Hotel::all(['id','title']))
     <select class="form-control select2" name="hotel_id" id="hotel_id">
-        <option value="">— Выберите отель —</option>
+        <option value="">Выберите отель</option>
         @foreach($hotels as $hotel)
             <option value="{{ $hotel->id }}" {{ $hotel->id == $currentHotelId ? 'selected' : '' }}>
                 {{ $hotel->title }}
