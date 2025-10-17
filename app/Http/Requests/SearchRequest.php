@@ -19,6 +19,7 @@ class SearchRequest extends FormRequest
             'guests' => 'nullable|integer|min:1',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'flexibility' => 'nullable|integer|in:0,1,2', // дни запаса в обе стороны
             'type' => 'nullable|in:hotel,apartment,hostel,other',
             'price_min' => 'nullable|integer|min:0',
             'price_max' => 'nullable|integer|min:0',
