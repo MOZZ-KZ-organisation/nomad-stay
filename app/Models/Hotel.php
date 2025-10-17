@@ -9,7 +9,7 @@ class Hotel extends Model
 {
     use HandlesImages;
     protected $fillable = [
-        'title','slug','description','address','city','country',
+        'title','slug','description','address','city_id',
         'latitude','longitude','stars','is_active','min_price','type'
     ];
     protected $appends = ['location'];
@@ -55,8 +55,15 @@ class Hotel extends Model
         });
     }
 
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
     public function getLocationAttribute()
     {
-        return trim("{$this->city}, {$this->country}", ', ');
+        return optional($this->city)->name
+            ? "{$this->city->name}, {$this->city->country->name}"
+            : null;
     }
 }
