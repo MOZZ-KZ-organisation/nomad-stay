@@ -30,6 +30,17 @@ class Hotel extends Model
                 $hotel->slug = \Str::slug($hotel->title);
             }
         });
+        static::deleting(function ($hotel) {
+            $hotel->images()->each(function ($image) {
+                if ($image->path) {
+                    $filePath = public_path('storage/' . $image->path);
+                    if (file_exists($filePath)) {
+                        @unlink($filePath);
+                    }
+                }
+                $image->delete();
+            });
+        });
     }
 
     public function getLocationAttribute()

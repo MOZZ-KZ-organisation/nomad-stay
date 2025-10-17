@@ -19,4 +19,23 @@ class Room extends Model
             $query->where('hotel_id', request('hotel_id'));
         }
     }
+    protected static function booted()
+    {
+        static::saving(function ($room) {
+            if (empty($room->slug)) {
+                $room->slug = \Str::slug($room->title);
+            }
+        });
+        static::deleting(function ($room) {
+            $room->images()->each(function ($image) {
+                if ($image->path) {
+                    $filePath = public_path('storage/' . $image->path);
+                    if (file_exists($filePath)) {
+                        @unlink($filePath);
+                    }
+                }
+                $image->delete();
+            });
+        });
+    }
 }
