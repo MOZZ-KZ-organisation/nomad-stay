@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CityController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoomController;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::get('/cities', [CityController::class, 'index']);
 Route::get('search', [SearchController::class, 'index']);
 Route::get('hotels/{hotel}', [HotelController::class, 'show']);
 Route::get('rooms/{room}', [RoomController::class, 'show']);

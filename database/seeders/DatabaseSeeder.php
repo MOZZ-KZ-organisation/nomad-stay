@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Amenity;
+use App\Models\City;
+use App\Models\Country;
 use App\Models\Hotel;
 use App\Models\HotelImage;
 use Illuminate\Support\Str;
@@ -12,6 +14,19 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        Country::insert([
+            ['name' => 'Казахстан'],
+            ['name' => 'Польша'],
+            ['name' => 'США'],
+        ]);
+        $cities = [
+            ['country_id' => 1, 'name' => 'Алматы'],
+            ['country_id' => 1, 'name' => 'Астана'],
+            ['country_id' => 2, 'name' => 'Варшава'],
+            ['country_id' => 2, 'name' => 'Краков'],
+            ['country_id' => 3, 'name' => 'Лос Анжелес']
+        ];
+        City::insert($cities);
         $amenities = [
             'Кондиционер',
             'Бесплатный Wi-Fi',
