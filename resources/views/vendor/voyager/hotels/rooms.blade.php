@@ -1,13 +1,13 @@
 @php
-    // Определяем текущее действие (browse или read)
     $isBrowse = request()->routeIs('voyager.hotels.index');
     $isRead = request()->routeIs('voyager.hotels.show') || request()->routeIs('voyager.hotels.read');
     $data = $data ?? $dataTypeContent ?? null;
-    $roomTitles = $data->rooms->pluck('title')->toArray();
+
+    $roomTitles = $data?->rooms?->pluck('title')->toArray() ?? [];
     $titlesString = implode(', ', $roomTitles);
     $shortText = \Illuminate\Support\Str::limit($titlesString, 30);
 @endphp
-@if($data->rooms->count())
+@if($data && $data->rooms->count())
     @if($isBrowse)
         {{-- В режиме списка (browse) показываем короткий текст --}}
         <a href="{{ route('voyager.rooms.index', ['hotel_id' => $data->id]) }}"
@@ -23,7 +23,24 @@
                 </a>
             @endforeach
         </div>
+        {{-- Кнопка добавления нового номера --}}
+        <div style="margin-top:8px;">
+            <a href="{{ route('voyager.rooms.create', ['hotel_id' => $data->id]) }}"
+               class="btn btn-sm btn-success">
+               + Добавить номер
+            </a>
+        </div>
     @endif
 @else
     <span class="text-muted">Нет номеров</span>
+
+    {{-- Если это read/show (страница отеля), позволяем добавить номер --}}
+    @if($isRead && $data)
+        <div style="margin-top:8px;">
+            <a href="{{ route('voyager.rooms.create', ['hotel_id' => $data->id]) }}"
+               class="btn btn-sm btn-success">
+               + Добавить номер
+            </a>
+        </div>
+    @endif
 @endif
