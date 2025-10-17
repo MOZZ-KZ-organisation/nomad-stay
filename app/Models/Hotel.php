@@ -31,6 +31,18 @@ class Hotel extends Model
             }
         });
         static::deleting(function ($hotel) {
+            $hotel->rooms()->each(function ($room) {
+                $room->images()->each(function ($image) {
+                    if ($image->path) {
+                        $filePath = public_path('storage/' . $image->path);
+                        if (file_exists($filePath)) {
+                            @unlink($filePath);
+                        }
+                    }
+                    $image->delete();
+                });
+                $room->delete();
+            });
             $hotel->images()->each(function ($image) {
                 if ($image->path) {
                     $filePath = public_path('storage/' . $image->path);
