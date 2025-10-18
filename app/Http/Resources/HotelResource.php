@@ -26,7 +26,7 @@ class HotelResource extends JsonResource
             'nearby' => [
                 'metro' => $this->nearby?->metro,
                 'station' => $this->nearby?->station,
-                'park' => $this->nearby?->park,
+                'attractions' => $this->nearby?->park,
                 'airport' => $this->nearby?->airport,
             ]
         ];
