@@ -13,16 +13,16 @@ class HotelListResource extends JsonResource
     {
         $start = $request->input('start_date');
         $end = $request->input('end_date');
-        \Log::info('HotelListResource dates:', [
-            'start_date' => $start,
-            'end_date' => $end,
-            'request_all' => $request->all(),
-        ]);
         // Количество ночей, если даты переданы
         $nights = null;
         if ($start && $end) {
             $nights = Carbon::parse($end)->diffInDays(Carbon::parse($start));
         }
+        \Log::info('Hotel price debug', [
+            'min_price' => $this->min_price,
+            'nights' => $nights,
+            'result' => $this->min_price * $nights
+        ]);
         return [
             'id' => $this->id,
             'title' => $this->title,
