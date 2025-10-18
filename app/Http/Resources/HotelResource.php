@@ -24,8 +24,10 @@ class HotelResource extends JsonResource
             'amenities' => $this->amenities->pluck('name'),
             'rooms' => RoomResource::collection($this->whenLoaded('rooms')),
             'nearby' => [
-                'metro' => 'Abay, 2 km',
-                'station' => 'Central, 7 km'
+                'metro' => $this->nearby->metro ? "{$this->nearby->metro}" : null,
+                'station' => $this->nearby->station ? "{$this->nearby->station}" : null,
+                'park' => $this->nearby->park ? "{$this->nearby->park}" : null,
+                'airport' => $this->nearby->airport ? "{$this->nearby->airport}" : null,
             ],
         ];
     }

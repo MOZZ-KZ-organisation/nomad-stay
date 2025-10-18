@@ -21,6 +21,10 @@ class Hotel extends Model
         return $this->belongsToMany(Amenity::class, 'amenity_hotel', 'hotel_id', 'amenity_id');
     }
     public function images() { return $this->hasMany(HotelImage::class); }
+    public function nearby()
+    {
+        return $this->hasOne(HotelNearby::class);
+    }
     public function reviews() { return $this->hasMany(Review::class); }
 
     protected static function booted()
