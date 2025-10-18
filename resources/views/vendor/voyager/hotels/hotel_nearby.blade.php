@@ -7,9 +7,9 @@
     }
     $nearby = $hotel->nearby ?? null;
 @endphp
-<div class="panel-body">
+<div>
     @if(!$nearby)
-        <p>Нет данных о близлежащих объектах.</p>
+        <p>Нет данных.</p>
         <a href="{{ route('voyager.hotel-nearbies.create', ['hotel_id' => $hotel->id]) }}"
            class="btn btn-sm btn-success">
             <i class="voyager-plus"></i> Добавить
