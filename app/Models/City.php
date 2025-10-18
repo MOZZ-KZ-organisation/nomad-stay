@@ -20,6 +20,6 @@ class City extends Model
 
     public function getLocationAttribute()
     {
-        return "{$this->city->name}, {$this->country->name}";
+        return "{$this->name}, {$this->country->name}";
     }
 }
