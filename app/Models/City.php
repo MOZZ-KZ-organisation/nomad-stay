@@ -17,4 +17,9 @@ class City extends Model
     {
         return $this->hasMany(Hotel::class);
     }
+
+    public function getLocationAttribute()
+    {
+        return "{$this->city->name}, {$this->country->name}";
+    }
 }

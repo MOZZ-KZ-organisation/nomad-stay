@@ -59,11 +59,4 @@ class Hotel extends Model
     {
         return $this->belongsTo(City::class);
     }
-
-    public function getLocationAttribute()
-    {
-        return optional($this->city)->name
-            ? "{$this->city->name}, {$this->city->country->name}"
-            : null;
-    }
 }
