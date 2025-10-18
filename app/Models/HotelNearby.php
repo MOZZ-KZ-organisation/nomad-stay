@@ -12,4 +12,11 @@ class HotelNearby extends Model
     {
         return $this->belongsTo(Hotel::class);
     }
+
+    public function scopeFilterByHotel($query)
+    {
+        if (request()->has('hotel_id')) {
+            $query->where('hotel_id', request('hotel_id'));
+        }
+    }
 }

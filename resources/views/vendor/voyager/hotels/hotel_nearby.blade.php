@@ -9,18 +9,30 @@
 @endphp
 <div>
     @if(!$nearby)
-        <p>Нет данных.</p>
+        <p>Нет данных</p>
         <a href="{{ route('voyager.hotel-nearbies.create', ['hotel_id' => $hotel->id]) }}"
            class="btn btn-sm btn-success">
             Добавить
         </a>
     @else
-        <ul>
-            <li>Метро: {{ $nearby->metro ?? '—' }}</li>
-            <li>Станция: {{ $nearby->station ?? '—' }}</li>
-            <li>Парк: {{ $nearby->park ?? '—' }}</li>
-            <li>Аэропорт: {{ $nearby->airport ?? '—' }}</li>
-        </ul>
+        @php
+            $fields = [
+                'Метро' => $nearby->metro,
+                'Станция' => $nearby->station,
+                'Парк' => $nearby->park,
+                'Аэропорт' => $nearby->airport,
+            ];
+            $filled = array_filter($fields, fn($value) => !empty($value));
+        @endphp
+        @if(count($filled))
+            <div style="margin-bottom:10px;">
+                @foreach($filled as $label => $value)
+                    <div><strong>{{ $label }}:</strong> {{ $value }}</div>
+                @endforeach
+            </div>
+        @else
+            <p>Нет данных</p>
+        @endif
         <a href="{{ route('voyager.hotel-nearbies.edit', $nearby->id) }}"
            class="btn btn-sm btn-primary">
             Изменить
