@@ -13,8 +13,7 @@ class SearchRequest extends FormRequest
 
     public function rules(): array {
         return [
-            'city' => 'required|string|max:255',
-            'country' => 'required|string|max:255',
+            'city_id' => 'required|integer|exists:cities,id',
             'guests' => 'required|integer|min:1',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',

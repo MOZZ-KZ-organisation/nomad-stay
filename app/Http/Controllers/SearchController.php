@@ -16,8 +16,9 @@ class SearchController extends Controller
         $cacheKey = 'search:' . md5(json_encode(array_merge($data, ['page' => $page])));
         $hotels = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($data) {
             $q = Hotel::query()->where('is_active', true);
-            if (!empty($data['city'])) $q->where('city', $data['city']);
-            if (!empty($data['country'])) $q->where('country', $data['country']);
+            if (!empty($data['city_id'])) {
+                $q->where('city_id', $data['city_id']);
+            }
             if (!empty($data['type'])) $q->where('type', $data['type']);
             if (!empty($data['price_min'])) $q->where('min_price', '>=', $data['price_min']);
             if (!empty($data['price_max'])) $q->where('min_price', '<=', $data['price_max']);
@@ -50,7 +51,7 @@ class SearchController extends Controller
                 });
             }
             return $q->with(['images' => fn($iq) => $iq->where('is_main', true)])
-                    ->select(['id','title','slug','city','country','stars','min_price'])
+                    ->select(['id','title','slug','city_id','stars','min_price'])
                     ->orderBy('min_price','asc')
                     ->simplePaginate(20);
         });

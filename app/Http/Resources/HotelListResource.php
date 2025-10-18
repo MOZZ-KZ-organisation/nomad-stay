@@ -21,8 +21,7 @@ class HotelListResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'city' => $this->city,
-            'country' => $this->country,
+            'location' => "{$this->city->name}, {$this->city->country->name}",
             'stars' => $this->stars,
             'rating' => round($this->reviews()->avg('rating') ?? 0, 2),
             'reviews_count' => $this->reviews()->count(),
