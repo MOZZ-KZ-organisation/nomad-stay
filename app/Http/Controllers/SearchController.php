@@ -30,7 +30,7 @@ class SearchController extends Controller
             //     );
             // }
             // гибкие даты
-            $flexibility = $data['flexibility'] ?? 0;
+            $flexibility = (int)($data['flexibility'] ?? 0);
             if (!empty($data['start_date']) && !empty($data['end_date'])) {
                 $start = \Carbon\Carbon::parse($data['start_date'])->subDays($flexibility);
                 $end = \Carbon\Carbon::parse($data['end_date'])->addDays($flexibility);
