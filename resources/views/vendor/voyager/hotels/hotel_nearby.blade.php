@@ -12,7 +12,7 @@
         <p>Нет данных.</p>
         <a href="{{ route('voyager.hotel-nearbies.create', ['hotel_id' => $hotel->id]) }}"
            class="btn btn-sm btn-success">
-            <i class="voyager-plus"></i> Добавить
+            Добавить
         </a>
     @else
         <ul>
@@ -23,7 +23,7 @@
         </ul>
         <a href="{{ route('voyager.hotel-nearbies.edit', $nearby->id) }}"
            class="btn btn-sm btn-primary">
-            <i class="voyager-edit"></i> Изменить
+            Изменить
         </a>
     @endif
 </div>
