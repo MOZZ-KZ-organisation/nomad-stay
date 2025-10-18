@@ -8,7 +8,7 @@
     <div class="panel-body">
         @if(!$nearby)
             <p>Для этого отеля еще не добавлены данные о близлежащих объектах.</p>
-            <a href="{{ route('voyager.hotel-nearby.create', ['hotel_id' => $dataTypeContent->id]) }}" 
+            <a href="{{ route('voyager.hotel-nearbies.create', ['hotel_id' => $dataTypeContent->id]) }}" 
                class="btn btn-primary">
                 <i class="voyager-plus"></i> Добавить
             </a>
@@ -31,7 +31,7 @@
                     <td>{{ $nearby->attractions ?? '—' }}</td>
                 </tr>
             </table>
-            <a href="{{ route('voyager.hotel-nearby.edit', $nearby->id) }}" 
+            <a href="{{ route('voyager.hotel-nearbies.edit', $nearby->id) }}" 
                class="btn btn-warning">
                 <i class="voyager-edit"></i> Изменить
             </a>
