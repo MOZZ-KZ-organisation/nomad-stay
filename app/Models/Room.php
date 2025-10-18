@@ -26,6 +26,16 @@ class Room extends Model
                 $room->slug = \Str::slug($room->title);
             }
         });
+        static::saved(function ($room) {
+            $room->hotel?->update([
+                'min_price' => $room->hotel->rooms()->min('price')
+            ]);
+        });
+        static::deleted(function ($room) {
+            $room->hotel?->update([
+                'min_price' => $room->hotel->rooms()->min('price')
+            ]);
+        });
         static::deleting(function ($room) {
             $room->images()->each(function ($image) {
                 if ($image->path) {
