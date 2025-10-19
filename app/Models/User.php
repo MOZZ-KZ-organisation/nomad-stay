@@ -49,6 +49,8 @@ class User extends \TCG\Voyager\Models\User
 
     public function favorites()
     {
-        return $this->belongsToMany(Hotel::class, 'favorites')->withTimestamps();
+        return $this->belongsToMany(Hotel::class, 'favorites')
+            ->withPivot(['start_date', 'end_date', 'guests'])
+            ->withTimestamps();
     }
 }

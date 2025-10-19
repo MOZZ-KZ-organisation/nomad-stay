@@ -2,27 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreFavoriteRequest;
+use App\Http\Resources\HotelListResource;
 use App\Models\Hotel;
 use Illuminate\Http\Request;
 
 class FavoriteController extends Controller
 {
-    public function toggle(Request $request, Hotel $hotel)
+    public function toggle(StoreFavoriteRequest $request)
     {
+        $data = $request->validated();
         $user = $request->user();
-        if ($user->favorites()->where('hotel_id', $hotel->id)->exists()) {
-            $user->favorites()->detach($hotel->id);
-            return response()->json(['message' => 'Removed from favorites']);
+        $hotelId = $data['hotel_id'];
+        $isFavorite = $user->favorites()->where('hotel_id', $hotelId)->exists();
+        if ($isFavorite) {
+            // Удаляем, если уже в избранном
+            $user->favorites()->detach($hotelId);
+            return response()->json([
+                'message' => 'Удалено из избранного',
+                'is_favorite' => false
+            ]);
         }
-        $user->favorites()->attach($hotel->id);
-        return response()->json(['message' => 'Added to favorites']);
+        // Добавляем, если ещё нет
+        $user->favorites()->attach($hotelId, [
+            'start_date' => $data['start_date'] ?? null,
+            'end_date' => $data['end_date'] ?? null,
+            'guests' => $data['guests'] ?? null
+        ]);
+        return response()->json([
+            'message' => 'Добавлено в избранное',
+            'is_favorite' => true
+        ]);
     }
 
     public function index(Request $request)
     {
         $favorites = $request->user()->favorites()
-            ->with(['images' => fn($q) => $q->where('is_main', true)])
-            ->get(['id', 'title', 'slug', 'city_id', 'stars', 'min_price']);
-        return response()->json($favorites);
+            ->with(['images' => fn($q) => $q->where('is_main', true), 'city.country'])
+            ->select('hotels.id', 'hotels.title', 'hotels.slug', 'hotels.city_id', 'hotels.stars', 'hotels.min_price')
+            ->get();
+        return HotelListResource::collection($favorites);
     }
 }
