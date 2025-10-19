@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use TCG\Voyager\Facades\Voyager;
 
-class HotelListResource extends JsonResource
+class HotelFavListResource extends JsonResource
 {
     public function toArray(Request $request): array
     {

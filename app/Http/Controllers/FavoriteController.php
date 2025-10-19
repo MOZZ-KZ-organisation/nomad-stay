@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreFavoriteRequest;
 use App\Http\Resources\HotelFavListResource;
-use App\Http\Resources\HotelListResource;
 use App\Models\Hotel;
 use Illuminate\Http\Request;
 
