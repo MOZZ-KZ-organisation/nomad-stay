@@ -14,12 +14,10 @@ class StoreBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'hotel_id' => 'required|exists:hotels,id',
             'room_id' => 'required|exists:rooms,id',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'guests' => 'required|integer|min:1',
-            'price' => 'required|integer|min:0'
+            'end_date' => 'required|date|after:start_date',
+            'guests' => 'required|integer|min:1'
         ];
     }
 }
