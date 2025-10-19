@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreFavoriteRequest;
+use App\Http\Resources\HotelFavListResource;
 use App\Http\Resources\HotelListResource;
 use App\Models\Hotel;
 use Illuminate\Http\Request;
@@ -38,9 +39,13 @@ class FavoriteController extends Controller
     public function index(Request $request)
     {
         $favorites = $request->user()->favorites()
-            ->with(['images' => fn($q) => $q->where('is_main', true), 'city.country'])
+            ->with([
+                'images' => fn($q) => $q->where('is_main', true),
+                'city.country'
+            ])
+            ->withPivot(['start_date', 'end_date', 'guests'])
             ->select('hotels.id', 'hotels.title', 'hotels.slug', 'hotels.city_id', 'hotels.stars', 'hotels.min_price')
             ->get();
-        return HotelListResource::collection($favorites);
+        return HotelFavListResource::collection($favorites);
     }
 }
