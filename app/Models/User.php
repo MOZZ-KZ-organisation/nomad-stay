@@ -46,4 +46,9 @@ class User extends \TCG\Voyager\Models\User
             'password' => 'hashed',
         ];
     }
+
+    public function favorites()
+    {
+        return $this->belongsToMany(Hotel::class, 'favorites')->withTimestamps();
+    }
 }
