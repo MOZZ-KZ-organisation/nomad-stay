@@ -27,7 +27,7 @@ Route::get('hotels/{hotel}/reviews', function (Hotel $hotel) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index']);
-    Route::post('/favorites/{hotel}', [FavoriteController::class, 'toggle']);
+    Route::post('/favorites', [FavoriteController::class, 'toggle']);
     Route::post('bookings', [BookingController::class, 'store']);
     Route::get('user/bookings', [BookingController::class, 'userBookings']);
     Route::post('reviews', [ReviewController::class, 'store']);
