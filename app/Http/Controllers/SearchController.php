@@ -17,7 +17,7 @@ class SearchController extends Controller
         $page = $request->get('page', 1);
         $start = Carbon::parse($data['start_date']);
         $end = Carbon::parse($data['end_date']);
-        $nights = $end->diffInDays($start);
+        $nights = $start->diffInDays($end);
         $cacheKey = 'search:' . md5(json_encode(array_merge($data, ['page' => $page])));
         $hotels = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($data, $start, $end) {
             $q = Hotel::query()

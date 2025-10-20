@@ -21,7 +21,7 @@ class HotelListResource extends JsonResource
             'price_per_night' => $this->min_price,
             'price_for_period' => $this->min_price * $this->nights,
             'discount_percent' => $this->when(isset($this->discount_percent), $this->discount_percent),
-            'is_favorite' => (bool) ($this->is_favorite ?? false),
+            'is_favorite' => $this->is_favorite,
             'main_image' => $this->images->first()?->path
                 ? Voyager::image($this->images->first()->path)
                 : Voyager::image($this->images()->first()->path ?? ''),
