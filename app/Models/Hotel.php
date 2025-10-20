@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HandlesImages;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Hotel extends Model
 {
@@ -34,7 +35,11 @@ class Hotel extends Model
                 $hotel->slug = \Str::slug($hotel->title);
             }
         });
-        static::deleting(function ($hotel) {
+        static::saved(function ($hotel) {
+            Cache::tags(['hotels'])->flush();
+        });
+        static::deleted(function ($hotel) {
+            Cache::tags(['hotels'])->flush();
             $hotel->rooms()->each(function ($room) {
                 $room->images()->each(function ($image) {
                     if ($image->path) {

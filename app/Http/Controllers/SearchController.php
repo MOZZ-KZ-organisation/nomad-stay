@@ -19,7 +19,7 @@ class SearchController extends Controller
         $end = Carbon::parse($data['end_date']);
         $nights = $start->diffInDays($end);
         $cacheKey = 'search:' . md5(json_encode(array_merge($data, ['page' => $page])));
-        $hotels = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($data, $start, $end) {
+        $hotels = Cache::tags(['hotels'])->remember($cacheKey, now()->addMinutes(10), function () use ($data, $start, $end) {
             $q = Hotel::query()
                 ->where('is_active', true)
                 ->select(['id', 'title', 'slug', 'city_id', 'stars', 'min_price'])
@@ -29,7 +29,6 @@ class SearchController extends Controller
             if (!empty($data['price_min'])) $q->where('min_price', '>=', $data['price_min']);
             if (!empty($data['price_max'])) $q->where('min_price', '<=', $data['price_max']);
             if (!empty($data['stars'])) $q->whereIn('stars', $data['stars']);
-            // Проверка на доступность хотя бы одной комнаты
             $q->whereHas('rooms', function ($roomQuery) use ($start, $end, $data) {
                 if (!empty($data['guests'])) {
                     $roomQuery->where('capacity', '>=', $data['guests']);
@@ -46,7 +45,10 @@ class SearchController extends Controller
             });
             return $q->orderBy('min_price', 'asc')->simplePaginate(10);
         });
-        $favoritesIds = $user ? $user->favorites()->pluck('hotel_id')->toArray() : [];
+        $favoritesIds = [];
+        if ($user) {
+            $favoritesIds = $user->favorites()->pluck('hotel_id')->toArray();
+        }
         $hotels->getCollection()->transform(function (Hotel $hotel) use ($favoritesIds, $nights) {
             $hotel->is_favorite = in_array($hotel->id, $favoritesIds);
             $hotel->nights = $nights;
