@@ -19,7 +19,7 @@ class SearchController extends Controller
         $end = Carbon::parse($data['end_date']);
         $nights = $start->diffInDays($end);
         $cacheKey = 'search:' . md5(json_encode(array_merge($data, ['page' => $page])));
-        $hotels = Cache::tags(['hotels'])->remember($cacheKey, now()->addMinutes(10), function () use ($data, $start, $end) {
+        $hotels = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($data, $start, $end) {
             $q = Hotel::query()
                 ->where('is_active', true)
                 ->select(['id', 'title', 'slug', 'city_id', 'stars', 'min_price'])

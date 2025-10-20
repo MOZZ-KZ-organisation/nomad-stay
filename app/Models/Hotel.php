@@ -36,10 +36,10 @@ class Hotel extends Model
             }
         });
         static::saved(function ($hotel) {
-            Cache::tags(['hotels'])->flush();
+            Cache::flush();
         });
         static::deleted(function ($hotel) {
-            Cache::tags(['hotels'])->flush();
+            Cache::flush();
             $hotel->rooms()->each(function ($room) {
                 $room->images()->each(function ($image) {
                     if ($image->path) {
