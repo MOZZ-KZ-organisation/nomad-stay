@@ -16,16 +16,15 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/cities', [CityController::class, 'index']);
-Route::get('search', [SearchController::class, 'index']);
-Route::get('hotels/{hotel}', [HotelController::class, 'show']);
 Route::get('rooms/{room}', [RoomController::class, 'show']);
-
 // Public reviews listing
 Route::get('hotels/{hotel}/reviews', function (Hotel $hotel) {
     return ReviewResource::collection($hotel->reviews()->latest()->paginate(10));
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('search', [SearchController::class, 'index']);
+    Route::get('hotels/{hotel}', [HotelController::class, 'show']);
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'toggle']);
     Route::post('bookings', [BookingController::class, 'store']);
