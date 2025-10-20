@@ -28,7 +28,8 @@ class HotelResource extends JsonResource
                 'station' => $this->nearby?->station,
                 'attractions' => $this->nearby?->park,
                 'airport' => $this->nearby?->airport,
-            ]
+            ],
+            'is_favorite' => $this->is_favorite,
         ];
     }
 }

@@ -46,9 +46,7 @@ class SearchController extends Controller
             return $q->orderBy('min_price', 'asc')->simplePaginate(10);
         });
         $favoritesIds = [];
-        if ($user) {
-            $favoritesIds = $user->favorites()->pluck('hotel_id')->toArray();
-        }
+        $favoritesIds = $user->favorites()->pluck('hotel_id')->toArray();
         $hotels->getCollection()->transform(function (Hotel $hotel) use ($favoritesIds, $nights) {
             $hotel->is_favorite = in_array($hotel->id, $favoritesIds);
             $hotel->nights = $nights;

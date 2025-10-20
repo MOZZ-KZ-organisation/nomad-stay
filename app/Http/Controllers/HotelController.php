@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\Cache;
 
 class HotelController extends Controller
 {
-    public function show(Hotel $hotel)
+    public function show(Request $request, Hotel $hotel)
     {
+        $user = $request->user();
         $cacheKey = 'hotel_detail:' . $hotel->id;
         $hotel = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($hotel) {
             return $hotel->load([
@@ -21,9 +22,13 @@ class HotelController extends Controller
                 },
                 'reviews' => function ($q) {
                     $q->latest()->limit(10);
-                }
+                },
+                'nearby',
+                'city'
             ]);
         });
+        $isFavorite = $user->favorites()->where('hotel_id', $hotel->id)->exists();
+        $hotel->is_favorite = $isFavorite;
         return new HotelResource($hotel);
     }
 }
