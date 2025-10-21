@@ -28,6 +28,7 @@ class ReviewController extends Controller
                 $review->media()->create(['path' => $path]);
             }
         }
+        $review->refresh();
         return new ReviewResource($review->load('media'));
     }
 }
