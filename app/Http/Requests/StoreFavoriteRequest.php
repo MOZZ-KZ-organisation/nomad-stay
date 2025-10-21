@@ -15,7 +15,7 @@ class StoreFavoriteRequest extends FormRequest
     {
         return [
             'hotel_id' => 'required|exists:hotels,id',
-            'start_date' => 'nullable|date',
+            'start_date' => 'nullable|date|after_or_equal:today',
             'end_date' => 'nullable|date|after:start_date',
             'guests' => 'nullable|integer|min:1'
         ];

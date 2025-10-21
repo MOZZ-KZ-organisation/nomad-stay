@@ -14,7 +14,7 @@ class HotelShowRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'start_date' => ['required', 'date', 'before:end_date'],
+            'start_date' => ['required', 'date', 'after_or_equal:today'],
             'end_date'   => ['required', 'date', 'after:start_date'],
             'guests'     => ['nullable', 'integer', 'min:1'],
         ];

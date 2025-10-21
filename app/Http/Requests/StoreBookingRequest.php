@@ -15,7 +15,7 @@ class StoreBookingRequest extends FormRequest
     {
         return [
             'room_id' => 'required|exists:rooms,id',
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
             'guests' => 'required|integer|min:1'
         ];
