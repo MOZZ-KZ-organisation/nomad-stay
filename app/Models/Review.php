@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-    protected $fillable = ['user_id', 'hotel_id', 'rating', 'comment', 'media'];
+    protected $fillable = ['user_id', 'hotel_id', 'rating', 'comment'];
 
     protected $casts = [
         'media' => 'array'
@@ -20,5 +20,10 @@ class Review extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function media()
+    {
+        return $this->hasMany(ReviewMedia::class);
     }
 }

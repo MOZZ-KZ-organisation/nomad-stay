@@ -22,6 +22,12 @@ class ReviewController extends Controller
         }
         $data['user_id'] = $user->id;
         $review = Review::create($data);
-        return new ReviewResource($review);
+        if ($request->hasFile('media')) {
+            foreach ($request->file('media') as $file) {
+                $path = $file->store('reviews', 'public');
+                $review->media()->create(['path' => $path]);
+            }
+        }
+        return new ReviewResource($review->load('media'));
     }
 }
