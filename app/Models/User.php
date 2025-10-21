@@ -53,4 +53,9 @@ class User extends \TCG\Voyager\Models\User
             ->withPivot(['start_date', 'end_date', 'guests'])
             ->withTimestamps();
     }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
 }
