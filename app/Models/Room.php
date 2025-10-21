@@ -53,4 +53,16 @@ class Room extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+    public function getAvailableStockAttribute()
+    {
+        $start = request('start_date');
+        $end = request('end_date');
+        $bookedCount = Booking::where('room_id', $this->id)
+            ->where('status', 'confirmed')
+            ->where('end_date', '>', $start)
+            ->where('start_date', '<', $end)
+            ->count();
+        return max(0, $this->stock - $bookedCount);
+    }
 }

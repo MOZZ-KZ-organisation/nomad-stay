@@ -17,7 +17,7 @@ class RoomResource extends JsonResource
             'beds' => $this->beds,
             'capacity' => $this->capacity,
             'bathrooms' => $this->bathrooms,
-            'stock' => $this->stock,
+            'stock' => $this->available_stock,
             'images' => $this->images->map(fn($i) => Voyager::image($i->path))
         ];
     }
