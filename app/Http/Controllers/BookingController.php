@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBookingRequest;
+use App\Http\Resources\BookingMiniResource;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
 use App\Models\Room;
@@ -40,7 +41,14 @@ class BookingController extends Controller
 
     public function userBookings(Request $request)
     {
-        $bookings = $request->user()->bookings()->with(['hotel', 'room'])->latest()->paginate(10);
-        return BookingResource::collection($bookings);
+        $bookings = $request->user()->bookings()->with('hotel')->latest()->paginate(10);
+        return BookingMiniResource::collection($bookings);
+    }
+
+    public function show(Booking $booking)
+    {
+        $this->authorize('view', $booking);
+        $booking->load(['hotel', 'room']);
+        return new BookingResource($booking);
     }
 }

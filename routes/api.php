@@ -17,7 +17,6 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/cities', [CityController::class, 'index']);
 Route::get('rooms/{room}', [RoomController::class, 'show']);
-// Public reviews listing
 Route::get('hotels/{hotel}/reviews', function (Hotel $hotel) {
     return ReviewResource::collection($hotel->reviews()->latest()->paginate(10));
 });
@@ -29,5 +28,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/favorites', [FavoriteController::class, 'toggle']);
     Route::post('bookings', [BookingController::class, 'store']);
     Route::get('user/bookings', [BookingController::class, 'userBookings']);
+    Route::get('/bookings/{booking}', [BookingController::class, 'show']);
     Route::post('reviews', [ReviewController::class, 'store']);
 });
