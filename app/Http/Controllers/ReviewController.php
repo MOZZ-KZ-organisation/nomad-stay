@@ -6,6 +6,7 @@ use App\Http\Requests\StoreReviewRequest;
 use App\Http\Resources\ReviewResource;
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ReviewController extends Controller
 {
@@ -28,6 +29,16 @@ class ReviewController extends Controller
                 $review->media()->create(['path' => $path]);
             }
         }
-        return new ReviewResource($review);
+        $mediaUrls = $review->media()->get()->map(fn($m) => url(Storage::url($m->path)))->toArray();
+        return response()->json([
+			'data' => [
+				'id' => $review->id,
+				'user' => ['id' => $user->id, 'name' => $user->name],
+				'rating' => $review->rating,
+				'comment' => $review->comment,
+				'created_at' => $review->created_at->format('d.m.Y H:i'),
+				'media' => $mediaUrls,
+			]
+		], 201);
     }
 }

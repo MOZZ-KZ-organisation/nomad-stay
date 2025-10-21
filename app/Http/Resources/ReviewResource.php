@@ -15,8 +15,8 @@ class ReviewResource extends JsonResource
             'user' => ['id' => $this->user->id, 'name' => $this->user->name],
             'rating' => $this->rating,
             'comment' => $this->comment,
-            'created_at' => $this->created_at,
-            'media' => $this->media()?->map(fn($m) => url(Storage::url($m->path))) ?? [],
+            'created_at' => $this->created_at->format('d.m.Y H:i'),
+            'media' => $this->media?->map(fn($m) => url(Storage::url($m->path))) ?? [],
         ];
     }
 }
