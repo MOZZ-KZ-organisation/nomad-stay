@@ -40,7 +40,7 @@ class BookingController extends Controller
 
     public function userBookings(Request $request)
     {
-        $bookings = $request->user()->bookings()->with(['hotel', 'room'])->latest()->paginate(20);
+        $bookings = $request->user()->bookings()->with(['hotel', 'room'])->latest()->paginate(10);
         return BookingResource::collection($bookings);
     }
 }
