@@ -24,7 +24,7 @@ class BookingController extends Controller
         if ($bookedCount >= $room->stock) {
             return response()->json(['message' => 'No rooms left for selected dates'], 422);
         }
-        $nights = Carbon::parse($data['end_date'])->diffInDays(Carbon::parse($data['start_date']));
+        $nights = Carbon::parse($data['start_date'])->diffInDays(Carbon::parse($data['end_date']));
         $totalPrice = $room->price * max(1, $nights);
         $booking = Booking::create([
             'user_id' => $request->user()->id,
