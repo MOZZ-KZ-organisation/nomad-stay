@@ -58,6 +58,9 @@ class Room extends Model
     {
         $start = request('start_date');
         $end = request('end_date');
+        if (!$start || !$end) {
+            return $this->stock;
+        }
         $bookedCount = Booking::where('room_id', $this->id)
             ->where('status', 'confirmed')
             ->where('end_date', '>', $start)

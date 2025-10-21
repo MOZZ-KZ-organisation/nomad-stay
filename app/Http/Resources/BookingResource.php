@@ -12,7 +12,7 @@ class BookingResource extends JsonResource
         return [
             'id' => $this->id,
             'hotel' => new HotelMiniResource($this->whenLoaded('hotel')),
-            'room' => new RoomResource($this->whenLoaded('room')),
+            'room' => new RoomMiniResource($this->whenLoaded('room')),
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'guests' => $this->guests,
