@@ -26,10 +26,10 @@ class ReviewController extends Controller
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
                 $path = $file->store('reviews', 'public');
-                $review->media()->create(['path' => $path]);
+                $review->images()->create(['path' => $path]);
             }
         }
-        $mediaUrls = $review->media()->get()->map(fn($m) => url(Storage::url($m->path)))->toArray();
+        $mediaUrls = $review->images()->get()->map(fn($m) => url(Storage::url($m->path)))->toArray();
         return response()->json([
 			'data' => [
 				'id' => $review->id,
