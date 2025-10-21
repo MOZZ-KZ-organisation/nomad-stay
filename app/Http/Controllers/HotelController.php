@@ -12,15 +12,13 @@ class HotelController extends Controller
     public function show(HotelShowRequest $request, Hotel $hotel)
     {
         $user = $request->user();
-        ['start_date' => $start, 'end_date' => $end, 'guests' => $guests] = $request->validated();
+        ['guests' => $guests] = $request->validated();
         $cacheKey = 'hotel_detail:' . $hotel->id;
         $hotel = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($hotel) {
             return $hotel->load([
                 'images',
                 'amenities',
-                'rooms' => function ($q) {
-                    $q->select('id', 'hotel_id', 'title', 'price', 'beds', 'capacity', 'bathrooms');
-                },
+                'rooms.images',
                 'reviews' => function ($q) {
                     $q->latest()->limit(10);
                 },
