@@ -12,7 +12,7 @@ class HotelController extends Controller
     public function show(HotelShowRequest $request, Hotel $hotel)
     {
         $user = $request->user();
-        ['start' => $start, 'end' => $end, 'guests' => $guests] = $request->validatedFilters();
+        ['start' => $start, 'end' => $end, 'guests' => $guests] = $request->validated();
         $cacheKey = 'hotel_detail:' . $hotel->id;
         $hotel = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($hotel) {
             return $hotel->load([
