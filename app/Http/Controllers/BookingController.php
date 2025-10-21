@@ -50,4 +50,19 @@ class BookingController extends Controller
         $booking->load(['hotel', 'room']);
         return new BookingResource($booking);
     }
+
+    public function cancel(Request $request, Booking $booking)
+    {
+        if ($booking->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Вы не можете отменить эту бронь'], 403);
+        }
+        if (now()->greaterThanOrEqualTo($booking->start_date)) {
+            return response()->json(['message' => 'Нельзя отменить начавшееся бронирование'], 422);
+        }
+        $booking->update(['status' => 'cancelled']);
+        return response()->json([
+            'message' => 'Бронирование успешно отменено',
+            'booking' => new BookingMiniResource($booking->load('hotel'))
+        ]);
+    }
 }
