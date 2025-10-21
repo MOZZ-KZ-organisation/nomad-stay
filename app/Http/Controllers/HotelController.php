@@ -30,9 +30,6 @@ class HotelController extends Controller
         });
         $isFavorite = $user->favorites()->where('hotel_id', $hotel->id)->exists();
         $hotel->is_favorite = $isFavorite;
-        $hotel->rooms->each(function ($room) use ($start, $end) {
-            $room->available_stock = $room->calculateAvailableStock($start, $end);
-        });
         $hotel->rooms = $hotel->rooms
             ->filter(fn($room) => $room->available_stock > 0 && $room->capacity >= $guests)
             ->values();
