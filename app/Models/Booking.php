@@ -8,7 +8,20 @@ class Booking extends Model
 {
     protected $fillable = [
         'user_id', 'hotel_id', 'room_id',
-        'start_date', 'end_date', 'guests', 'price', 'status'
+        'start_date', 'end_date', 'guests', 'price_for_period', 'tax', 'total_price', 'status', 'first_name','last_name',
+        'email',
+        'country',
+        'phone',
+        'is_business_trip',
+        'special_requests',
+        'arrival_time',
+    ];
+
+    protected $casts = [
+        'is_business_trip' => 'boolean',
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'arrival_time' => 'datetime:H:i',
     ];
 
     public function user()

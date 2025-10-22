@@ -9,6 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
+            $table->decimal('tax', 10, 2)->default(0)->after('price_for_period');
+            $table->decimal('total_price', 10, 2)->default(0)->after('tax');
             $table->string('first_name')->after('user_id');
             $table->string('last_name')->after('first_name');
             $table->string('email')->after('last_name');

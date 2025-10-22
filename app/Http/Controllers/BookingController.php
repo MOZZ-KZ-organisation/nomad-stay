@@ -26,13 +26,15 @@ class BookingController extends Controller
         }
         $nights = Carbon::parse($data['start_date'])->diffInDays(Carbon::parse($data['end_date']));
         $basePrice = $room->price * $nights;
-        $tax = $basePrice * 0.1;
+        $tax = $basePrice * env('BOOKING_TAX_RATE', 0.0);
         $totalPrice = $basePrice + $tax;
         $data += [
             'user_id' => $request->user()->id,
             'hotel_id' => $room->hotel_id,
-            'price' => $totalPrice,
-            'status' => 'pending',
+            'price_for_period' => $basePrice,
+            'tax' => $tax,
+            'total_price' => $totalPrice,
+            'status' => 'сonfirmed',
         ];
         $booking = Booking::create($data);
         return new BookingResource($booking->load(['hotel', 'room']));
