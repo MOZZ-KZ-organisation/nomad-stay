@@ -18,6 +18,16 @@ class BookingResource extends JsonResource
             'guests' => $this->guests,
             'price' => $this->price,
             'status' => $this->status,
+            'guest' => [
+                'first_name' => $this->first_name,
+                'last_name' => $this->last_name,
+                'email' => $this->email,
+                'country' => $this->country,
+                'phone' => $this->phone,
+                'is_business_trip' => (bool)$this->is_business_trip,
+                'special_requests' => $this->special_requests,
+                'arrival_time' => $this->arrival_time,
+            ],
         ];
     }
 }

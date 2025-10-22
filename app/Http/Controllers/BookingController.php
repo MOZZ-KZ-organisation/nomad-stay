@@ -25,17 +25,16 @@ class BookingController extends Controller
             return response()->json(['message' => 'No rooms left for selected dates'], 422);
         }
         $nights = Carbon::parse($data['start_date'])->diffInDays(Carbon::parse($data['end_date']));
-        $totalPrice = $room->price * max(1, $nights);
-        $booking = Booking::create([
+        $basePrice = $room->price * $nights;
+        $tax = $basePrice * 0.1;
+        $totalPrice = $basePrice + $tax;
+        $data += [
             'user_id' => $request->user()->id,
             'hotel_id' => $room->hotel_id,
-            'room_id' => $data['room_id'],
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'guests' => $data['guests'],
             'price' => $totalPrice,
-            'status' => 'confirmed'
-        ]);
+            'status' => 'pending',
+        ];
+        $booking = Booking::create($data);
         return new BookingResource($booking->load(['hotel', 'room']));
     }
 
