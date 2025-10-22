@@ -11,7 +11,7 @@ class Hotel extends Model
     use HandlesImages;
     protected $fillable = [
         'title','slug','description','address','city_id',
-        'latitude','longitude','stars','is_active','min_price','type'
+        'latitude','longitude','stars','is_active','min_price', 'cancellation_fee','type'
     ];
     protected $appends = ['location'];
     protected $casts = ['is_active' => 'boolean'];

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\BookingPriceController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\HotelController;
@@ -26,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('hotels/{hotel}', [HotelController::class, 'show']);
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'toggle']);
+    Route::get('/bookings/price-details', [BookingPriceController::class, 'show']);
     Route::post('bookings', [BookingController::class, 'store']);
     Route::get('user/bookings', [BookingController::class, 'userBookings']);
     Route::get('/bookings/{booking}', [BookingController::class, 'show']);

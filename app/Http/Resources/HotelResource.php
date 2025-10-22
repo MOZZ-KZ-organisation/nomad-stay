@@ -19,6 +19,7 @@ class HotelResource extends JsonResource
             'city' => $this->city->location,
             'stars' => $this->stars,
             'rating' => round($this->reviews()->avg('rating') ?? 0, 2),
+            'cancellation_fee' => $this->cancellation_fee,
             'reviews_count' => $this->reviews()->count(),
             'images' => $this->images->map(fn($i) => Voyager::image($i->path)),
             'amenities' => $this->amenities->pluck('name'),
