@@ -15,7 +15,7 @@ class BookingPriceController extends Controller
         $start = Carbon::parse($request->start_date);
         $end = Carbon::parse($request->end_date);
         $nights = $start->diffInDays($end);
-        $basePrice = $room->price_per_night;
+        $basePrice = $room->price;
         $priceForPeriod = $basePrice * $nights;
         $taxRate = env('BOOKING_TAX_RATE', 0.1);
         $tax = round($priceForPeriod * $taxRate);
