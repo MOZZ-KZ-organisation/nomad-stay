@@ -34,7 +34,7 @@ class BookingController extends Controller
             'price_for_period' => $basePrice,
             'tax' => $tax,
             'total_price' => $totalPrice,
-            'status' => 'сonfirmed',
+            'status' => 'confirmed',
         ];
         $booking = Booking::create($data);
         return new BookingResource($booking->load(['hotel', 'room']));
