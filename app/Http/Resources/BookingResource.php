@@ -14,8 +14,8 @@ class BookingResource extends JsonResource
             'id' => $this->id,
             'hotel' => new HotelMiniResource($this->whenLoaded('hotel')),
             'room' => new RoomMiniResource($this->whenLoaded('room')),
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
+            'start_date' => Carbon::parse($this->start_date)->format('d.m.Y'),
+            'end_date' => Carbon::parse($this->end_date)->format('d.m.Y'),
             'guests' => $this->guests,
             'price_for_period' => $this->price_for_period,
             'tax' => $this->tax,
@@ -29,7 +29,7 @@ class BookingResource extends JsonResource
                 'phone' => $this->phone,
                 'is_business_trip' => (bool)$this->is_business_trip,
                 'special_requests' => $this->special_requests,
-                'arrival_time' => Carbon::parse($this->arrival_time)->format('H:i') ,
+                'arrival_time' => Carbon::parse($this->arrival_time)->format('H:i'),
             ],
         ];
     }
