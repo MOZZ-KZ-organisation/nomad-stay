@@ -29,6 +29,6 @@ class Booking extends Model
     public function review()
     {
         return $this->hasOne(Review::class, 'hotel_id', 'hotel_id')
-            ->whereColumn('reviews.user_id', 'bookings.user_id');
+            ->where('user_id', $this->user_id);
     }
 }
