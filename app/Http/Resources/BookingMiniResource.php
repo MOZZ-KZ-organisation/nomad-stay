@@ -14,7 +14,7 @@ class BookingMiniResource extends JsonResource
             'hotel' => new HotelMiniResource($this->whenLoaded('hotel')),
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
-            'price' => $this->price,
+            'total_price' => $this->total_price,
             'status' => $this->status,
         ];
     }
