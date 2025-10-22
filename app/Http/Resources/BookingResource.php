@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,7 +29,7 @@ class BookingResource extends JsonResource
                 'phone' => $this->phone,
                 'is_business_trip' => (bool)$this->is_business_trip,
                 'special_requests' => $this->special_requests,
-                'arrival_time' => $this->arrival_time,
+                'arrival_time' => Carbon::parse($this->arrival_time)->format('H:i') ,
             ],
         ];
     }
