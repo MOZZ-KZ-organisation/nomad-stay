@@ -7,8 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class Booking extends Model
 {
     protected $fillable = [
-        'user_id', 'hotel_id', 'room_id',
-        'start_date', 'end_date', 'guests', 'price_for_period', 'tax', 'total_price', 'status', 'first_name','last_name',
+        'user_id',
+        'hotel_id',
+        'room_id',
+        'start_date',
+        'end_date',
+        'guests',
+        'price_for_period',
+        'tax',
+        'total_price',
+        'status',         
+        'type',             
+        'source',           
+        'first_name',
+        'last_name',
         'email',
         'country',
         'phone',
@@ -48,5 +60,33 @@ class Booking extends Model
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->last_name}");
+    }
+
+    public function getColorAttribute()
+    {
+        return match ($this->status) {
+            'confirmed' => '#2D9CDB',  // синий (бронь)
+            'pending'   => '#F2994A',  // оранжевый (заявка)
+            'cancelled' => '#EB5757',  // красный
+            'archived'  => '#BDBDBD',  // серый
+            default     => '#9B51E0',  // фиолетовый
+        };
+    }
+    
+    public function scopeOverlapping($query, $start, $end)
+    {
+        return $query
+            ->where('end_date', '>', $start)
+            ->where('start_date', '<', $end);
+    }
+
+    public function scopeForCalendar($query, $start, $end)
+    {
+        return $query->whereBetween('start_date', [$start, $end])
+            ->orWhereBetween('end_date', [$start, $end])
+            ->orWhere(function ($q) use ($start, $end) {
+                $q->where('start_date', '<', $start)
+                  ->where('end_date', '>', $end);
+            });
     }
 }

@@ -34,6 +34,12 @@
     border-radius: 5px;
     padding: 5px;
 }
+
+.price-cell {
+    font-size:13px;
+    color:#555;
+    background:#F7F8FA;
+}
 </style>
 
 <h1>Брони и заявки</h1>
@@ -65,9 +71,13 @@
                 @endphp
                 <td>
                     @if($booking)
-                        <div class="booking {{ $booking->status }}">
+                        <div class="booking" style="background: {{ $booking->color }}">
                             {{ $booking->full_name }} <br>
                             {{ number_format($booking->total_price) }} ₸
+                        </div>
+                    @else
+                        <div class="price-cell">
+                            {{ number_format($room->price) }}
                         </div>
                     @endif
                 </td>

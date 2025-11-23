@@ -10,6 +10,6 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
-    Route::get('/bookings/calendar', [BookingCalendarController::class, 'index'])
+    Route::get('/calendar', [BookingCalendarController::class, 'index'])
         ->name('admin.bookings.calendar');
 });

@@ -17,7 +17,7 @@ class BookingController extends Controller
         $data = $request->validated();
         $room = Room::findOrFail($data['room_id']);
         $bookedCount = Booking::where('room_id', $room->id)
-            ->where('status', 'confirmed')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->where('end_date', '>', $data['start_date'])
             ->where('start_date', '<', $data['end_date'])
             ->count();
@@ -35,6 +35,8 @@ class BookingController extends Controller
             'tax' => $tax,
             'total_price' => $totalPrice,
             'status' => 'confirmed',
+            'type' => 'booking',
+            'source' => 'site'
         ];
         $booking = Booking::create($data);
         return new BookingResource($booking->load(['hotel', 'room']));
