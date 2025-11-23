@@ -14,31 +14,35 @@
     text-align: center;
 }
 
-.booking.confirmed {
-    background: #2b9fff;
-    color: white;
-    border-radius: 5px;
-    padding: 5px;
+.calendar-table td {
+    padding: 3px;   /* меньше, чтобы плитки были компактнее */
+    background: #fff;
 }
 
-.booking.pending {
-    background: orange;
-    color: white;
-    border-radius: 5px;
-    padding: 5px;
-}
+.booking {
+    display: block;
+    height: 100%;
+    min-height: 55px;
+    padding: 6px 6px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.3;
+    text-align: left;
 
-.booking.cancelled {
-    background: pink;
-    color: #222;
-    border-radius: 5px;
-    padding: 5px;
+    /* ВАЖНО: оставляем лёгкую прозрачность как в дизайне */
+    background: var(--booking-color);
 }
 
 .price-cell {
-    font-size:13px;
-    color:#555;
-    background:#F7F8FA;
+    height: 100%;
+    min-height: 55px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 13px;
+    color: #444;
+    background: #F7F8FA;
+    border-radius:8px;
 }
 </style>
 
@@ -48,7 +52,7 @@
     <tr>
         <th>Номер</th>
         @foreach($dates as $date)
-            <th>{{ $date->format('d M') }}</th>
+            <th>{{ $date->translatedFormat('d M') }}</th>
         @endforeach
     </tr>
     </thead>
@@ -71,13 +75,13 @@
                 @endphp
                 <td>
                     @if($booking)
-                        <div class="booking" style="background: {{ $booking->color }}">
-                            {{ $booking->full_name }} <br>
-                            {{ number_format($booking->total_price) }} ₸
+                        <div class="booking" style="--booking-color: {{ $booking->color }}aa;">
+                            <strong>{{ $booking->full_name }}</strong><br>
+                            {{ $booking->total_price }} ₸
                         </div>
                     @else
                         <div class="price-cell">
-                            {{ number_format($room->price) }}
+                            {{ $room->price }} ₸
                         </div>
                     @endif
                 </td>
