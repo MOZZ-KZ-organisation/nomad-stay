@@ -15,24 +15,34 @@
 }
 
 .calendar-table td {
-    padding: 3px;   /* меньше, чтобы плитки были компактнее */
+    padding: 3px;
     background: #fff;
+    vertical-align: middle;
 }
+.booking-bg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-.booking {
-    display: block;
     height: 100%;
     min-height: 55px;
-    padding: 6px 6px;
+
+    padding: 6px;
     border-radius: 8px;
+}
+.booking-content {
+    background: #fff;
+    color: #333;
+
+    padding: 6px 10px;
+    border-radius: 6px;
+
     font-size: 13px;
     line-height: 1.3;
     text-align: left;
 
-    /* ВАЖНО: оставляем лёгкую прозрачность как в дизайне */
-    background: var(--booking-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
 }
-
 .price-cell {
     height: 100%;
     min-height: 55px;
@@ -75,13 +85,15 @@
                 @endphp
                 <td>
                     @if($booking)
-                        <div class="booking" style="--booking-color: {{ $booking->color }}aa;">
-                            <strong>{{ $booking->full_name }}</strong><br>
-                            {{ $booking->total_price }} ₸
+                        <div class="booking-bg" style="background: {{ $booking->color }}">
+                            <div class="booking-content">
+                                {{ $booking->full_name }} <br>
+                                {{ number_format($booking->total_price, 0, '.', ' ') }} ₸
+                            </div>
                         </div>
                     @else
                         <div class="price-cell">
-                            {{ $room->price }} ₸
+                            {{ number_format($room->price, 0, '.', ' ') }} ₸
                         </div>
                     @endif
                 </td>
