@@ -89,7 +89,15 @@ h1{
         padding:10px;
         z-index:9999;
     ">
-        <h5 style="margin-bottom:10px;">Уведомления</h5>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h5>Уведомления</h5>
+            <button id="closeNotifications" style="
+                background: transparent;
+                border: none;
+                font-size:16px;
+                cursor:pointer;
+            ">✖</button>
+        </div>
         <div id="notificationsList"></div>
     </div>
 </div>
@@ -187,6 +195,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             count.innerText = current + 1;
             count.style.display = 'inline-block';
         });
+    
+    const closeBtn = document.getElementById('closeNotifications');
+    closeBtn.addEventListener('click', () => {
+        panel.style.display = 'none';
+    });
 });
 </script>
 @endsection
