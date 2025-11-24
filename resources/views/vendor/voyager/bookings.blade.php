@@ -133,7 +133,7 @@ h1{
                         <div class="booking-bg" style="background: {{ $booking->color }}">
                             <div class="booking-content">
                                 {{ $booking->full_name }} <br>
-                                {{ number_format($booking->total_price, 0, '.', ' ') }} ₸
+                                {{ number_format($booking->price_per_night, 0, '.', ' ') }} ₸
                             </div>
                         </div>
                     @else

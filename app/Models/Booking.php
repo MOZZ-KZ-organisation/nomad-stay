@@ -72,7 +72,7 @@ class Booking extends Model
             default     => '#9B51E0',  // фиолетовый
         };
     }
-    
+
     public function scopeOverlapping($query, $start, $end)
     {
         return $query
@@ -88,5 +88,13 @@ class Booking extends Model
                 $q->where('start_date', '<', $start)
                   ->where('end_date', '>', $end);
             });
+    }
+
+    public function getPricePerNightAttribute()
+    {
+        $nights = $this->start_date->diffInDays($this->end_date);
+        return $nights > 0
+            ? $this->total_price / $nights
+            : $this->total_price;
     }
 }
