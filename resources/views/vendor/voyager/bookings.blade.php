@@ -156,6 +156,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     const closeBtn = document.getElementById('closeNotifications');
     bell.addEventListener('click', () => {
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        if (panel.style.display === 'block') {
+            await fetch('/admin/notifications/mark-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+            });
+            count.style.display = 'none';
+        }
     });
     closeBtn.addEventListener('click', () => {
         panel.style.display = 'none';

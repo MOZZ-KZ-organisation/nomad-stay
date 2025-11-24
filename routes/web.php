@@ -17,8 +17,10 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/notifications', function() {
         return Notification::latest()->take(15)->get();
     });
-    Route::post('/notifications/read/{id}', function($id) {
-        Notification::where('id', $id)->update(['is_read' => true]);
+    Route::post('/notifications/mark-read', function() {
+        Notification::where('is_read', false)->update([
+            'is_read' => true
+        ]);
         return response()->json(['success'=>true]);
     });
 });
