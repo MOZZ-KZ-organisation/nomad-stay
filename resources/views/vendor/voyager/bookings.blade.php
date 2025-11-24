@@ -159,18 +159,26 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
     closeBtn.addEventListener('click', () => {
         panel.style.display = 'none';
-        alert('Закрытие сработало!');
     });
     function notificationTemplate(data) {
+        const date = new Date(data.created_at).toLocaleDateString('ru-RU', { day:'numeric', month:'long' });
         return `
             <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
                 padding:10px;
                 border-bottom:1px solid #eee;
                 cursor:pointer;
+                font-size:14px;
+                color:#333;
             ">
-                <strong>${data.title}</strong><br>
-                ${data.booking_id ? '№ ' + data.booking_id + '<br>' : ''}
-                <small>${new Date(data.created_at).toLocaleDateString('ru-RU', { day:'numeric', month:'long' }) }</small>
+                <div>
+                    ${data.title} ${data.booking_id ? '№ ' + data.booking_id : ''}
+                </div>
+                <div style="font-size:12px; color:#888;">
+                    ${date}
+                </div>
             </div>
         `;
     }
