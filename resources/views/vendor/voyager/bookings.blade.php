@@ -199,6 +199,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
     await loadNotifications();
+    console.log('Echo is:', window.Echo);
     window.Echo.channel('admin.notifications')
         .listen('.new.notification', (e) => {
             console.log('NEW NOTIFICATION', e);
