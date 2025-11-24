@@ -4,8 +4,12 @@
 .calendar-table {
     border-collapse: collapse;
     width: 100%;
+    margin: 1rem;
 }
-
+h1{
+    font-size: 26px;
+    margin: 1.2rem;
+}
 .calendar-table th,
 .calendar-table td {
     border: 1px solid #eee;
@@ -23,24 +27,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
     height: 100%;
     min-height: 55px;
-
-    padding: 6px;
+    padding: 10px;
     border-radius: 8px;
 }
 .booking-content {
     background: #fff;
     color: #333;
-
     padding: 6px 10px;
     border-radius: 6px;
-
     font-size: 13px;
     line-height: 1.3;
     text-align: left;
-
     box-shadow: 0 1px 3px rgba(0,0,0,.08);
 }
 .price-cell {
