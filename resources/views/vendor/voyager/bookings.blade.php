@@ -153,8 +153,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     const panel = document.getElementById('notificationPanel');
     const list = document.getElementById('notificationsList');
     const count = document.getElementById('notificationCount');
+    const closeBtn = document.getElementById('closeNotifications');
     bell.addEventListener('click', () => {
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    });
+    closeBtn.addEventListener('click', () => {
+        panel.style.display = 'none';
+        alert('Закрытие сработало!');
     });
     function notificationTemplate(data) {
         return `
@@ -196,10 +201,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             count.innerText = current + 1;
             count.style.display = 'inline-block';
         });
-    document.getElementById('closeNotifications').onclick = function() {
-        panel.style.display = 'none';
-        alert('Закрытие сработало!');
-    };
 });
 </script>
 @endsection
