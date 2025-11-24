@@ -102,6 +102,67 @@ h1{
     </div>
 </div>
 <h1>Брони и заявки</h1>
+<div class="filters-wrapper" style="position:relative; display:inline-block; margin:1rem;">
+    <button id="filterBtn" style="
+        background:#fff;
+        border-radius:12px;
+        padding:8px 14px;
+        border:1px solid #ddd;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        gap:6px;
+    ">
+        <span>⚙️</span> Фильтр
+    </button>
+    <div id="filterPanel" style="
+        position:absolute;
+        top:45px;
+        right:0;
+        width:280px;
+        background:#fff;
+        border-radius:12px;
+        box-shadow:0 8px 25px rgba(0,0,0,0.08);
+        padding:15px;
+        display:none;
+        z-index:999;
+    ">
+        <form id="filtersForm">
+            <h5 style="margin-bottom:10px;">Фильтры</h5>
+            <label style="display:flex; align-items:center; gap:6px; margin-bottom:10px;">
+                <input type="checkbox" name="only_booked" value="1">
+                Только занятые
+            </label>
+            <div style="margin-bottom:10px;">
+                <label>Тип номера</label>
+                <select name="room_type" style="width:100%;" class="form-control">
+                    <option value="">Все</option>
+                    @foreach($roomTypes as $type)
+                        <option value="{{ $type }}">{{ $type }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div style="margin-bottom:10px;">
+                <label>Источник</label>
+                <select name="source" class="form-control">
+                    <option value="">Все</option>
+                    <option value="site">Сайт</option>
+                    <option value="booking">Booking.com</option>
+                    <option value="kaspi">Kaspi</option>
+                </select>
+            </div>
+            <div style="margin-bottom:15px;">
+                <label>Статус</label>
+                <select name="payment_status" class="form-control">
+                    <option value="">Все</option>
+                    <option value="paid">Оплачено</option>
+                    <option value="unpaid">Не оплачено</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Применить</button>
+        </form>
+    </div>
+</div>
 <table class="calendar-table">
     <thead>
     <tr>
@@ -219,6 +280,22 @@ document.addEventListener('DOMContentLoaded', async function() {
             let current = parseInt(count.innerText || 0);
             count.innerText = current + 1;
             count.style.display = 'inline-block';
+        });
+        const filterBtn   = document.getElementById('filterBtn');
+        const filterPanel = document.getElementById('filterPanel');
+        const filtersForm = document.getElementById('filtersForm');
+        filterBtn.addEventListener('click', () => {
+            filterPanel.style.display = filterPanel.style.display === 'none' ? 'block' : 'none';
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.filters-wrapper')) {
+                filterPanel.style.display = 'none';
+            }
+        });
+        filtersForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            const params = new URLSearchParams(new FormData(this)).toString();
+            window.location.href = window.location.pathname + '?' + params;
         });
 });
 </script>
