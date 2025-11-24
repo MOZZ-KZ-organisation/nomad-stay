@@ -54,7 +54,45 @@ h1{
     border-radius:8px;
 }
 </style>
-
+<div class="notifications-wrapper" style="position:relative; margin:1rem;">
+    <button id="notificationBell" style="
+        background:#fff;
+        border-radius:50%;
+        width:40px;
+        height:40px;
+        border:1px solid #ddd;
+        cursor:pointer;
+        position:relative;
+    ">
+        🔔
+        <span id="notificationCount" style="
+            position:absolute;
+            top:-6px;
+            right:-6px;
+            background:red;
+            color:#fff;
+            border-radius:50%;
+            font-size:11px;
+            padding:2px 6px;
+            display:none;
+        ">0</span>
+    </button>
+    <div id="notificationPanel" style="
+        display:none;
+        position:absolute;
+        right:0;
+        top:50px;
+        width:320px;
+        background:#fff;
+        border-radius:10px;
+        box-shadow:0 5px 20px rgba(0,0,0,0.08);
+        padding:10px;
+        z-index:9999;
+    ">
+        <h5 style="margin-bottom:10px;">Уведомления</h5>
+        <div id="notificationsList"></div>
+    </div>
+</div>
 <h1>Брони и заявки</h1>
 <table class="calendar-table">
     <thead>
@@ -101,4 +139,54 @@ h1{
     @endforeach
     </tbody>
 </table>
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const bell = document.getElementById('notificationBell');
+    const panel = document.getElementById('notificationPanel');
+    const list = document.getElementById('notificationsList');
+    const count = document.getElementById('notificationCount');
+    bell.addEventListener('click', () => {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    });
+    function notificationTemplate(data) {
+        return `
+            <div style="
+                padding:10px;
+                border-bottom:1px solid #eee;
+                cursor:pointer;
+            ">
+                <strong>${data.title}</strong><br>
+                <small>Тип: ${data.type}</small>
+            </div>
+        `;
+    }
+    async function loadNotifications(){
+        const res = await fetch('/admin/notifications');
+        const data = await res.json();
+        list.innerHTML = '';
+        let unread = 0;
+        data.forEach(n => {
+            if(!n.is_read) unread++;
+            list.innerHTML += notificationTemplate(n);
+        });
+        if (unread > 0) {
+            count.innerText = unread;
+            count.style.display = 'inline-block';
+        } else {
+            count.style.display = 'none';
+        }
+    }
+    await loadNotifications();
+    window.Echo.channel('admin.notifications')
+        .listen('.new.notification', (e) => {
+            console.log('NEW NOTIFICATION', e);
+            list.innerHTML =
+                notificationTemplate(e.notification) + list.innerHTML;
+
+            let current = parseInt(count.innerText || 0);
+            count.innerText = current + 1;
+            count.style.display = 'inline-block';
+        });
+});
+</script>
 @endsection

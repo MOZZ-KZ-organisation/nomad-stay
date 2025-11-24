@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewNotification;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingMiniResource;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
+use App\Models\Notification;
 use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -39,6 +41,13 @@ class BookingController extends Controller
             'source' => 'site'
         ];
         $booking = Booking::create($data);
+        $notification = Notification::create([
+            'type' => 'booking_created',
+            'title' => 'Новая бронь',
+            'booking_id' => $booking->id,
+            'source' => $booking->source
+        ]);
+        broadcast(new NewNotification($notification))->toOthers();
         return new BookingResource($booking->load(['hotel', 'room']));
     }
 
@@ -63,6 +72,13 @@ class BookingController extends Controller
             return response()->json(['message' => 'Нельзя отменить начавшееся бронирование'], 422);
         }
         $booking->update(['status' => 'cancelled']);
+        $notification = Notification::create([
+            'type' => 'booking_cancelled',
+            'title' => 'Отменена бронь',
+            'booking_id' => $booking->id,
+            'source' => $booking->source
+        ]);
+        broadcast(new NewNotification($notification))->toOthers();
         return response()->json([
             'message' => 'Бронирование успешно отменено',
             'booking' => new BookingMiniResource($booking->load('hotel'))
