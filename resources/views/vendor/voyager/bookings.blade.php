@@ -163,12 +163,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                 border-bottom:1px solid #eee;
                 cursor:pointer;
             ">
-                // <div style="font-size:12px; color:#888;">
-                //     ${data.source ? data.source + ' (' + data.source + ')' : ''}
-                // </div>
+                /*
+                <div style="font-size:12px; color:#888;">
+                    ${data.source ? data.source + ' (' + data.source + ')' : ''}
+                </div>
+                */
                 <strong>${data.title}</strong><br>
                 ${data.booking_id ? '№ ' + data.booking_id + '<br>' : ''}
-                <small>${new Date(data.сreated_at).toLocaleDateString('ru-RU', { day:'numeric', month:'long' }) : ''}</small>
+                <small>${new Date(data.created_at).toLocaleDateString('ru-RU', { day:'numeric', month:'long' }) }</small>
             </div>
         `;
     }
