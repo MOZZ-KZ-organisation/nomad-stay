@@ -163,8 +163,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                 border-bottom:1px solid #eee;
                 cursor:pointer;
             ">
+                <div style="font-size:12px; color:#888;">
+                    ${data.source ? data.source + ' (' + data.source + ')' : ''}
+                </div>
                 <strong>${data.title}</strong><br>
-                <small>Тип: ${data.type}</small>
+                ${data.booking_number ? '№ ' + data.booking_number + '<br>' : ''}
+                <small>${data.date ? new Date(data.date).toLocaleDateString('ru-RU', { day:'numeric', month:'long' }) : ''}</small>
             </div>
         `;
     }
@@ -195,11 +199,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             count.innerText = current + 1;
             count.style.display = 'inline-block';
         });
-    
-    const closeBtn = document.getElementById('closeNotifications');
-    closeBtn.addEventListener('click', () => {
-        panel.style.display = 'none';
-    });
 });
+document.getElementById('closeNotifications').onclick = function() {
+    alert('Закрытие сработало!');
+};
 </script>
 @endsection
