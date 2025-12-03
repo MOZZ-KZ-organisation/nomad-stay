@@ -82,7 +82,6 @@ h1{
     <div id="notificationPanel" style="
         display:none;
         position:absolute;
-        right:0;
         top:50px;
         width:320px;
         background:#fff;
