@@ -118,7 +118,6 @@ h1{
     <div id="filterPanel" style="
         position:absolute;
         top:45px;
-        right:0;
         width:280px;
         background:#fff;
         border-radius:12px;
