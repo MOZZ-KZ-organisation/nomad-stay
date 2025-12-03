@@ -176,14 +176,12 @@ h1{
         display:flex;
         align-items:center;
         gap:6px;
-        margin-left:10px;
     ">
         🛈 Легенда
     </button>
     <div id="legendPanel" style="
         position:absolute;
         top:45px;
-        left:150px;
         width:220px;
         background:#fff;
         border-radius:12px;
