@@ -243,11 +243,10 @@ h1{
                         <div 
                             class="booking-bg booking-cell"
                             style="background: {{ $booking->color }}"
-
                             data-id="{{ $booking->id }}"
                             data-name="{{ $booking->full_name }}"
-                            data-start="{{ $booking->start_date->format('d F Y') }}"
-                            data-end="{{ $booking->end_date->format('d F Y') }}"
+                            data-start="{{ $booking->start_date->translatedFormat('d F Y') }}"
+                            data-end="{{ $booking->end_date->translatedFormat('d F Y') }}"
                             data-total="{{ number_format($booking->total_price, 0, '.', ' ') }}"
                             data-paid="{{ $booking->is_paid ? number_format($booking->total_price, 0, '.', ' ') : number_format(0, 0, '.', ' ') }}"
                             data-nights="{{ $booking->start_date->diffInDays($booking->end_date) }}"
@@ -277,14 +276,22 @@ h1{
             width:260px;
             z-index:99999;
         ">
+        <button id="closePopover" 
+            style="
+                position:absolute;
+                top:8px;
+                right:8px;
+                background:transparent;
+                border:none;
+                font-size:18px;
+                cursor:pointer;
+            "
+        >✖</button>
         <div id="popoverContent"></div>
-
         <div style="display:flex; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
             <a id="editBookingBtn" class="btn btn-sm btn-primary" style="flex:1; margin-right:6px;">Редактировать</a>
             <a id="deleteBookingBtn" class="btn btn-sm btn-danger" style="flex:1;">Удалить</a>
         </div>
-
-        <!-- стрелочка -->
         <div id="popoverArrow" 
             style="
                 width:16px; 
@@ -409,6 +416,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         const editBtn = document.getElementById('editBookingBtn');
         const deleteBtn = document.getElementById('deleteBookingBtn');
         let currentBookingId = null;
+        document.getElementById('closePopover').addEventListener('click', () => {
+            popover.style.display = 'none';
+        });
         document.querySelectorAll('.booking-cell').forEach(cell => {
             cell.addEventListener('click', e => {
                 e.stopPropagation();
