@@ -273,7 +273,7 @@ h1{
             padding:15px;
             border-radius:12px;
             box-shadow:0 8px 30px rgba(0,0,0,0.15);
-            width:260px;
+            width:265px;
             z-index:99999;
         ">
         <button id="closePopover" 
