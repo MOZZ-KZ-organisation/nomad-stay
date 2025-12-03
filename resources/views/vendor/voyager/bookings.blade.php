@@ -169,15 +169,18 @@ h1{
 <div class="legend-wrapper" style="position:relative; display:inline-block; margin:1rem;">
     <button id="legendBtn" style="
         background:#fff;
-        border-radius:12px;
-        padding:8px 14px;
+        border-radius:50%;
+        width:40px;
+        height:40px;
         border:1px solid #ddd;
         cursor:pointer;
+        position:relative;
         display:flex;
         align-items:center;
-        gap:6px;
+        justify-content:center;
+        font-size:18px;
     ">
-        🛈 Легенда
+        🛈
     </button>
     <div id="legendPanel" style="
         position:absolute;
