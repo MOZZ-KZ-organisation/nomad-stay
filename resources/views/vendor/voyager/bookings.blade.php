@@ -240,7 +240,18 @@ h1{
                 @endphp
                 <td>
                     @if($booking)
-                        <div class="booking-bg" style="background: {{ $booking->color }}">
+                        <div 
+                            class="booking-bg booking-cell"
+                            style="background: {{ $booking->color }}"
+
+                            data-id="{{ $booking->id }}"
+                            data-name="{{ $booking->full_name }}"
+                            data-start="{{ $booking->start_date->format('d F Y') }}"
+                            data-end="{{ $booking->end_date->format('d F Y') }}"
+                            data-total="{{ number_format($booking->total_price, 0, '.', ' ') }}"
+                            data-paid="{{ $booking->is_paid ? number_format($booking->total_price, 0, '.', ' ') : number_format(0, '.', ' ') }}"
+                            data-nights="{{ $booking->start_date->diffInDays($booking->end_date) }}"
+                        >
                             <div class="booking-content">
                                 {{ $booking->full_name }} <br>
                                 {{ number_format($booking->price_per_night, 0, '.', ' ') }} ₸
@@ -255,6 +266,38 @@ h1{
             @endforeach
         </tr>
     @endforeach
+    <div id="bookingPopover" 
+        style="
+            position:absolute;
+            display:none;
+            background:#fff;
+            padding:15px;
+            border-radius:12px;
+            box-shadow:0 8px 30px rgba(0,0,0,0.15);
+            width:260px;
+            z-index:99999;
+        ">
+        <div id="popoverContent"></div>
+
+        <div style="display:flex; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
+            <a id="editBookingBtn" class="btn btn-sm btn-primary" style="flex:1; margin-right:6px;">Редактировать</a>
+            <a id="deleteBookingBtn" class="btn btn-sm btn-danger" style="flex:1;">Удалить</a>
+        </div>
+
+        <!-- стрелочка -->
+        <div id="popoverArrow" 
+            style="
+                width:16px; 
+                height:16px; 
+                background:#fff; 
+                position:absolute; 
+                bottom:-8px; 
+                left:40px;
+                transform:rotate(45deg);
+                box-shadow:0 5px 15px rgba(0,0,0,0.15);
+            ">
+        </div>
+    </div>
     </tbody>
 </table>
 @vite(['resources/js/app.js'])
@@ -361,6 +404,40 @@ document.addEventListener('DOMContentLoaded', async function() {
             const params = new URLSearchParams(new FormData(this)).toString();
             window.location.href = window.location.pathname + '?' + params;
         });
+        const popover = document.getElementById('bookingPopover');
+        const popoverContent = document.getElementById('popoverContent');
+        const editBtn = document.getElementById('editBookingBtn');
+        const deleteBtn = document.getElementById('deleteBookingBtn');
+        let currentBookingId = null;
+        document.querySelectorAll('.booking-cell').forEach(cell => {
+            cell.addEventListener('click', e => {
+                e.stopPropagation();
+                const rect = cell.getBoundingClientRect();
+                const id = cell.dataset.id;
+                currentBookingId = id;
+                popoverContent.innerHTML = `
+                    <div style="font-size:14px; margin-bottom:8px;">
+                        <b>Бронь</b><br>
+                        ${cell.dataset.start} – ${cell.dataset.end}
+                    </div>
+
+                    <div style="font-size:14px;">
+                        Суток: <b>${cell.dataset.nights}</b><br>
+                        ${cell.dataset.total} ₸ 
+                        (оплачено ${cell.dataset.paid} ₸)
+                    </div>
+                `;
+                editBtn.href = `/admin/bookings/${id}/edit`;
+                deleteBtn.href = `/admin/bookings/${id}`;
+                popover.style.top = (window.scrollY + rect.top - popover.offsetHeight - 15) + 'px';
+                popover.style.left = (rect.left + rect.width / 2 - 130) + 'px';
+                popover.style.display = 'block';
+            });
+        });
+        document.addEventListener('click', function() {
+            popover.style.display = 'none';
+        });
+        popover.addEventListener('click', e => e.stopPropagation());
 });
 </script>
 @endsection
