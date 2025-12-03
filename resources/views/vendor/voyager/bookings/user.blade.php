@@ -11,16 +11,4 @@
         ?? ($item->user_id ?? null);
     $currentUser = $currentUserId ? User::find($currentUserId) : null;
 @endphp
-@if($isBrowse || $isRead)
-    <span>{{ $currentUser?->name ?? '—' }}</span>
-@elseif($isEditOrAdd)
-    @php($users = User::all(['id', 'name']))
-    <select class="form-control select2" name="user_id" id="user_id">
-        <option value="">Выберите пользователя</option>
-        @foreach($users as $user)
-            <option value="{{ $user->id }}" {{ $user->id == $currentUserId ? 'selected' : '' }}>
-                {{ $user->name }}
-            </option>
-        @endforeach
-    </select>
-@endif
+<span>{{ $currentUser?->name ?? '—' }}</span>
