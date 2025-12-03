@@ -54,8 +54,8 @@ h1{
     border-radius:8px;
 }
 </style>
-<h1>Брони и заявки</h1>
 <div class="top-controls" style="display:flex; align-items:center; gap:12px; margin:1rem;">
+<h1>Брони и заявки</h1>
 <div class="notifications-wrapper" style="position:relative; margin:1rem;">
     <button id="notificationBell" style="
         background:#fff;
@@ -115,6 +115,19 @@ h1{
     ">
         <span>⚙️</span> Фильтр
     </button>
+    <button id="legendBtn" style="
+        background:#fff;
+        border-radius:12px;
+        padding:8px 14px;
+        border:1px solid #ddd;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        gap:6px;
+        margin-left:10px;
+    ">
+        🛈 Легенда
+    </button>
     <div id="filterPanel" style="
         position:absolute;
         top:45px;
@@ -164,6 +177,35 @@ h1{
             </div>
             <button type="submit" class="btn btn-primary btn-block">Применить</button>
         </form>
+    </div>
+</div>
+<div id="legendPanel" style="
+    position:absolute;
+    top:45px;
+    left:150px;
+    width:220px;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    padding:15px;
+    display:none;
+    z-index:999;
+">
+    <h5 style="margin-bottom:10px;">Легенда цветов</h5>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+        <div style="width:20px; height:20px; background:#2D9CDB; border-radius:4px;"></div> Бронь (confirmed)
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+        <div style="width:20px; height:20px; background:#F2994A; border-radius:4px;"></div> Заявка (pending)
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+        <div style="width:20px; height:20px; background:#EB5757; border-radius:4px;"></div> Отменено (cancelled)
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+        <div style="width:20px; height:20px; background:#BDBDBD; border-radius:4px;"></div> Архив (archived)
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <div style="width:20px; height:20px; background:#9B51E0; border-radius:4px;"></div> Другое (default)
     </div>
 </div>
 </div>
@@ -220,6 +262,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     const list = document.getElementById('notificationsList');
     const count = document.getElementById('notificationCount');
     const closeBtn = document.getElementById('closeNotifications');
+    const legendBtn   = document.getElementById('legendBtn');
+    const legendPanel = document.getElementById('legendPanel');
+    legendBtn.addEventListener('click', () => {
+        legendPanel.style.display = legendPanel.style.display === 'none' ? 'block' : 'none';
+    });
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#legendBtn') && !e.target.closest('#legendPanel')) {
+            legendPanel.style.display = 'none';
+        }
+    });
     bell.addEventListener('click', async () => {
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         if (panel.style.display === 'block') {
