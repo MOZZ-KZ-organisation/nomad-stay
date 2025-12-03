@@ -208,6 +208,7 @@ h1{
     @endforeach
     </tbody>
 </table>
+<script src="{{ mix('js/app.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
     const bell = document.getElementById('notificationBell');
