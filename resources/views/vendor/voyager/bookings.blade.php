@@ -249,7 +249,7 @@ h1{
                             data-start="{{ $booking->start_date->format('d F Y') }}"
                             data-end="{{ $booking->end_date->format('d F Y') }}"
                             data-total="{{ number_format($booking->total_price, 0, '.', ' ') }}"
-                            data-paid="{{ $booking->is_paid ? number_format($booking->total_price, 0, '.', ' ') : number_format(0, '.', ' ') }}"
+                            data-paid="{{ $booking->is_paid ? number_format($booking->total_price, 0, '.', ' ') : number_format(0, 0, '.', ' ') }}"
                             data-nights="{{ $booking->start_date->diffInDays($booking->end_date) }}"
                         >
                             <div class="booking-content">
