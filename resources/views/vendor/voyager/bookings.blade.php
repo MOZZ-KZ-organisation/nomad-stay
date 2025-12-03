@@ -54,6 +54,8 @@ h1{
     border-radius:8px;
 }
 </style>
+<h1>Брони и заявки</h1>
+<div class="top-controls" style="display:flex; align-items:center; gap:12px; margin:1rem;">
 <div class="notifications-wrapper" style="position:relative; margin:1rem;">
     <button id="notificationBell" style="
         background:#fff;
@@ -101,7 +103,6 @@ h1{
         <div id="notificationsList"></div>
     </div>
 </div>
-<h1>Брони и заявки</h1>
 <div class="filters-wrapper" style="position:relative; display:inline-block; margin:1rem;">
     <button id="filterBtn" style="
         background:#fff;
@@ -165,6 +166,7 @@ h1{
             <button type="submit" class="btn btn-primary btn-block">Применить</button>
         </form>
     </div>
+</div>
 </div>
 <table class="calendar-table">
     <thead>
