@@ -36,7 +36,7 @@ class BookingController extends Controller
             'price_for_period' => $basePrice,
             'tax' => $tax,
             'total_price' => $totalPrice,
-            'status' => 'confirmed',
+            'status' => 'pending',
             'type' => 'booking',
             'source' => 'site'
         ];
