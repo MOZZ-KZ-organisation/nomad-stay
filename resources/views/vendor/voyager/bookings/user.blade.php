@@ -1,14 +1,26 @@
 @php
-    $isBrowse = isset($view) && $view === 'browse';
-    $isRead   = isset($view) && $view === 'read';
-    $isEdit   = isset($dataTypeContent->id);
-    $relationshipValue = $dataTypeContent->{$row->field} ?? null;
+    use App\Models\User;
+    use Illuminate\Support\Facades\Route;
+    use Illuminate\Support\Str;
+    $currentRoute = Route::currentRouteName();
+    $isBrowse = Str::contains($currentRoute, ['index', 'browse']);
+    $isRead = Str::contains($currentRoute, ['show', 'read']);
+    $isEditOrAdd = Str::contains($currentRoute, ['edit', 'create']);
+    $item = $data ?? $dataTypeContent ?? null;
+    $currentUserId = old('user_id') 
+        ?? ($item->user_id ?? null);
+    $currentUser = $currentUserId ? User::withTrashed()->find($currentUserId) : null;
 @endphp
 @if($isBrowse || $isRead)
-    <span>{{ $relationshipValue ? $relationshipValue->name : '' }}</span>
-@elseif($isEdit)
-    <input type="text" class="form-control" value="{{ $relationshipValue ? $relationshipValue->name : '' }}" readonly>
-    <input type="hidden" name="{{ $row->field }}" value="{{ $relationshipValue ? $relationshipValue->id : '' }}">
-@else
-    @include('voyager::formfields.relationship')
+    <span>{{ $currentUser?->name ?? '—' }}</span>
+@elseif($isEditOrAdd)
+    @php($users = User::all(['id', 'name']))
+    <select class="form-control select2" name="user_id" id="user_id">
+        <option value="">Выберите пользователя</option>
+        @foreach($users as $user)
+            <option value="{{ $user->id }}" {{ $user->id == $currentUserId ? 'selected' : '' }}>
+                {{ $user->name }}
+            </option>
+        @endforeach
+    </select>
 @endif
