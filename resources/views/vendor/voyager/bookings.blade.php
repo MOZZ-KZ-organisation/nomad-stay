@@ -54,7 +54,7 @@ h1{
     border-radius:8px;
 }
 </style>
-<div class="top-controls" style="display:flex; align-items:center; gap:12px; margin:1rem;">
+<div class="top-controls" style="display:flex; align-items:center; margin:1rem;">
 <h1>Брони и заявки</h1>
 <div class="notifications-wrapper" style="position:relative; margin:1rem;">
     <button id="notificationBell" style="
@@ -100,6 +100,51 @@ h1{
             ">✖</button>
         </div>
         <div id="notificationsList"></div>
+    </div>
+</div>
+<div class="legend-wrapper" style="position:relative; display:inline-block; margin:1rem;">
+    <button id="legendBtn" style="
+        background:#fff;
+        border-radius:50%;
+        width:40px;
+        height:40px;
+        border:1px solid #ddd;
+        cursor:pointer;
+        position:relative;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:18px;
+    ">
+        🛈
+    </button>
+    <div id="legendPanel" style="
+        position:absolute;
+        top:45px;
+        width:220px;
+        background:#fff;
+        border-radius:12px;
+        box-shadow:0 8px 25px rgba(0,0,0,0.08);
+        padding:15px;
+        display:none;
+        z-index:999;
+    ">
+        <h5 style="margin-bottom:10px;">Легенда цветов</h5>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <div style="width:20px; height:20px; background:#2D9CDB; border-radius:4px;"></div> Бронь
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <div style="width:20px; height:20px; background:#F2994A; border-radius:4px;"></div> Заявка
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <div style="width:20px; height:20px; background:#EB5757; border-radius:4px;"></div> Отменено
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <div style="width:20px; height:20px; background:#BDBDBD; border-radius:4px;"></div> Архив
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:20px; height:20px; background:#9B51E0; border-radius:4px;"></div> Другое
+        </div>
     </div>
 </div>
 <div class="filters-wrapper" style="position:relative; display:inline-block; margin:1rem;">
@@ -164,51 +209,6 @@ h1{
             </div>
             <button type="submit" class="btn btn-primary btn-block">Применить</button>
         </form>
-    </div>
-</div>
-<div class="legend-wrapper" style="position:relative; display:inline-block; margin:1rem;">
-    <button id="legendBtn" style="
-        background:#fff;
-        border-radius:50%;
-        width:40px;
-        height:40px;
-        border:1px solid #ddd;
-        cursor:pointer;
-        position:relative;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:18px;
-    ">
-        🛈
-    </button>
-    <div id="legendPanel" style="
-        position:absolute;
-        top:45px;
-        width:220px;
-        background:#fff;
-        border-radius:12px;
-        box-shadow:0 8px 25px rgba(0,0,0,0.08);
-        padding:15px;
-        display:none;
-        z-index:999;
-    ">
-        <h5 style="margin-bottom:10px;">Легенда цветов</h5>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <div style="width:20px; height:20px; background:#2D9CDB; border-radius:4px;"></div> Бронь
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <div style="width:20px; height:20px; background:#F2994A; border-radius:4px;"></div> Заявка
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <div style="width:20px; height:20px; background:#EB5757; border-radius:4px;"></div> Отменено
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <div style="width:20px; height:20px; background:#BDBDBD; border-radius:4px;"></div> Архив
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-            <div style="width:20px; height:20px; background:#9B51E0; border-radius:4px;"></div> Другое
-        </div>
     </div>
 </div>
 </div>
