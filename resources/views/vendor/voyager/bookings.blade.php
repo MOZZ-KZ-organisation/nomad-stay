@@ -208,7 +208,7 @@ h1{
     @endforeach
     </tbody>
 </table>
-<script src="{{ mix('js/app.js') }}"></script>
+@vite(['resources/js/app.js'])
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
     const bell = document.getElementById('notificationBell');
