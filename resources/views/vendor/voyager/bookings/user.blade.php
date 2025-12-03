@@ -11,4 +11,9 @@
         ?? ($item->user_id ?? null);
     $currentUser = $currentUserId ? User::find($currentUserId) : null;
 @endphp
-<span>{{ $currentUser?->name ?? '—' }}</span>
+@if($isBrowse || $isRead)
+    <span>{{ $currentUser?->name ?? '—' }}</span>
+@elseif($isEditOrAdd)
+    <input type="text" class="form-control" value="{{ $currentUser?->name ?? '—' }}" readonly>
+    <input type="hidden" name="user_id" value="{{ $currentUser?->id ?? '' }}">
+@endif
