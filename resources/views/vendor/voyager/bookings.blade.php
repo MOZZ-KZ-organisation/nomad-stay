@@ -215,17 +215,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     const list = document.getElementById('notificationsList');
     const count = document.getElementById('notificationCount');
     const closeBtn = document.getElementById('closeNotifications');
-    bell.addEventListener('click', () => {
+    bell.addEventListener('click', async () => {
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         if (panel.style.display === 'block') {
-            await fetch('/admin/notifications/mark-read', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-            });
-            count.style.display = 'none';
+            try {
+                await fetch('/admin/notifications/mark-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                });
+                count.style.display = 'none';
+            } catch (err) {
+                console.error('Failed to mark notifications read:', err);
+            }
         }
     });
     closeBtn.addEventListener('click', () => {
