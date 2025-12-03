@@ -115,19 +115,6 @@ h1{
     ">
         <span>⚙️</span> Фильтр
     </button>
-    <button id="legendBtn" style="
-        background:#fff;
-        border-radius:12px;
-        padding:8px 14px;
-        border:1px solid #ddd;
-        cursor:pointer;
-        display:flex;
-        align-items:center;
-        gap:6px;
-        margin-left:10px;
-    ">
-        🛈 Легенда
-    </button>
     <div id="filterPanel" style="
         position:absolute;
         top:45px;
@@ -179,33 +166,48 @@ h1{
         </form>
     </div>
 </div>
-<div id="legendPanel" style="
-    position:absolute;
-    top:45px;
-    left:150px;
-    width:220px;
-    background:#fff;
-    border-radius:12px;
-    box-shadow:0 8px 25px rgba(0,0,0,0.08);
-    padding:15px;
-    display:none;
-    z-index:999;
-">
-    <h5 style="margin-bottom:10px;">Легенда цветов</h5>
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-        <div style="width:20px; height:20px; background:#2D9CDB; border-radius:4px;"></div> Бронь (confirmed)
-    </div>
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-        <div style="width:20px; height:20px; background:#F2994A; border-radius:4px;"></div> Заявка (pending)
-    </div>
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-        <div style="width:20px; height:20px; background:#EB5757; border-radius:4px;"></div> Отменено (cancelled)
-    </div>
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-        <div style="width:20px; height:20px; background:#BDBDBD; border-radius:4px;"></div> Архив (archived)
-    </div>
-    <div style="display:flex; align-items:center; gap:8px;">
-        <div style="width:20px; height:20px; background:#9B51E0; border-radius:4px;"></div> Другое (default)
+<div class="legend-wrapper" style="position:relative; display:inline-block; margin:1rem;">
+    <button id="legendBtn" style="
+        background:#fff;
+        border-radius:12px;
+        padding:8px 14px;
+        border:1px solid #ddd;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        gap:6px;
+        margin-left:10px;
+    ">
+        🛈 Легенда
+    </button>
+    <div id="legendPanel" style="
+        position:absolute;
+        top:45px;
+        left:150px;
+        width:220px;
+        background:#fff;
+        border-radius:12px;
+        box-shadow:0 8px 25px rgba(0,0,0,0.08);
+        padding:15px;
+        display:none;
+        z-index:999;
+    ">
+        <h5 style="margin-bottom:10px;">Легенда цветов</h5>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <div style="width:20px; height:20px; background:#2D9CDB; border-radius:4px;"></div> Бронь
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <div style="width:20px; height:20px; background:#F2994A; border-radius:4px;"></div> Заявка
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <div style="width:20px; height:20px; background:#EB5757; border-radius:4px;"></div> Отменено
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <div style="width:20px; height:20px; background:#BDBDBD; border-radius:4px;"></div> Архив
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:20px; height:20px; background:#9B51E0; border-radius:4px;"></div> Другое
+        </div>
     </div>
 </div>
 </div>
