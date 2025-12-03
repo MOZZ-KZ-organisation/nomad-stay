@@ -56,7 +56,7 @@ h1{
 </style>
 <div class="top-controls" style="display:flex; align-items:center; margin:1rem;">
 <h1>Брони и заявки</h1>
-<div class="notifications-wrapper" style="position:relative; margin:1rem;">
+<div class="notifications-wrapper" style="position:relative;">
     <button id="notificationBell" style="
         background:#fff;
         border-radius:50%;
@@ -147,7 +147,7 @@ h1{
         </div>
     </div>
 </div>
-<div class="filters-wrapper" style="position:relative; display:inline-block; margin:1rem;">
+<div class="filters-wrapper" style="position:relative; display:inline-block;">
     <button id="filterBtn" style="
         background:#fff;
         border-radius:12px;
