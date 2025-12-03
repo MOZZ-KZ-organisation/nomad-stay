@@ -129,7 +129,8 @@ h1{
         <form id="filtersForm">
             <h5 style="margin-bottom:10px;">Фильтры</h5>
             <label style="display:flex; align-items:center; gap:6px; margin-bottom:10px;">
-                <input type="checkbox" name="only_booked" value="1">
+                <input type="checkbox" name="only_booked" value="1"
+                    {{ request('only_booked') ? 'checked' : '' }}>
                 Только занятые
             </label>
             <div style="margin-bottom:10px;">
@@ -137,7 +138,10 @@ h1{
                 <select name="room_type" style="width:100%;" class="form-control">
                     <option value="">Все</option>
                     @foreach($roomTypes as $type)
-                        <option value="{{ $type }}">{{ $type }}</option>
+                        <option value="{{ $type }}" 
+                            {{ request('room_type') == $type ? 'selected' : '' }}>
+                            {{ $type }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -145,17 +149,17 @@ h1{
                 <label>Источник</label>
                 <select name="source" class="form-control">
                     <option value="">Все</option>
-                    <option value="site">Сайт</option>
-                    <option value="booking">Booking.com</option>
-                    <option value="kaspi">Kaspi</option>
+                    <option value="site"    {{ request('source')=='site' ? 'selected' : '' }}>Сайт</option>
+                    <option value="booking" {{ request('source')=='booking' ? 'selected' : '' }}>Booking.com</option>
+                    <option value="kaspi"   {{ request('source')=='kaspi' ? 'selected' : '' }}>Kaspi</option>
                 </select>
             </div>
             <div style="margin-bottom:15px;">
                 <label>Статус</label>
                 <select name="payment_status" class="form-control">
                     <option value="">Все</option>
-                    <option value="paid">Оплачено</option>
-                    <option value="unpaid">Не оплачено</option>
+                    <option value="paid"   {{ request('payment_status')=='paid' ? 'selected' : '' }}>Оплачено</option>
+                    <option value="unpaid" {{ request('payment_status')=='unpaid' ? 'selected' : '' }}>Не оплачено</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Применить</button>
