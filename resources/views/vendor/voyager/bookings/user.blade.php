@@ -9,7 +9,7 @@
     $item = $data ?? $dataTypeContent ?? null;
     $currentUserId = old('user_id') 
         ?? ($item->user_id ?? null);
-    $currentUser = $currentUserId ? User::withTrashed()->find($currentUserId) : null;
+    $currentUser = $currentUserId ? User::find($currentUserId) : null;
 @endphp
 @if($isBrowse || $isRead)
     <span>{{ $currentUser?->name ?? '—' }}</span>
