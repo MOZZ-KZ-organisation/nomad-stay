@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'sendCode']);
+Route::post('/verify-otp', [AuthController::class, 'verifyCode']);
+
 
 Route::get('/cities', [CityController::class, 'index']);
 Route::get('rooms/{room}', [RoomController::class, 'show']);
@@ -23,6 +26,7 @@ Route::get('hotels/{hotel}/reviews', function (Hotel $hotel) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('search', [SearchController::class, 'index']);
     Route::get('hotels/{hotel}', [HotelController::class, 'show']);
     Route::get('/favorites', [FavoriteController::class, 'index']);
