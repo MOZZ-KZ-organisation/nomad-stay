@@ -15,7 +15,7 @@ class VerifyLoginRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            'code' => 'required|digits:4',
+            'code' => 'required|digits:5',
         ];
     }
 }
