@@ -31,6 +31,7 @@ class User extends \TCG\Voyager\Models\User
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'birth_date' => 'date',
         ];
     }
 
