@@ -6,7 +6,9 @@ use App\Http\Requests\AuthorizedResetPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\SendOtpRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\VerifyLoginRequest;
+use App\Http\Resources\UserResource;
 use App\Mail\OtpMail;
 use App\Models\EmailVerificationCode;
 use App\Models\User;
@@ -15,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -82,5 +85,27 @@ class AuthController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
         return response()->json(['message' => 'CHANGED'], 200);
+    }
+
+    public function profile()
+    {
+        return new UserResource(Auth::user());
+    }
+
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        $user = Auth::user();
+        if (!($user instanceof User)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $data = $request->validated();
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+        $user->update($data);
+        return new UserResource($user);
     }
 }
