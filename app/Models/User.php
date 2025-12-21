@@ -20,6 +20,7 @@ class User extends \TCG\Voyager\Models\User
         'citizenship',
         'address',
         'email',
+        'avatar'
     ];
 
     protected $hidden = [
