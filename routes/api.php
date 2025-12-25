@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AmenityController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BookingPriceController;
@@ -18,7 +19,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'sendCode']);
 Route::post('/verify-otp', [AuthController::class, 'verifyCode']);
 
-
+Route::get('/amenities', [AmenityController::class, 'index']);
 Route::get('/cities', [CityController::class, 'index']);
 Route::get('rooms/{room}', [RoomController::class, 'show']);
 Route::get('hotels/{hotel}/reviews', function (Hotel $hotel) {

@@ -16,11 +16,9 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->unsignedTinyInteger('guests')->default(1);
-            $table->unsignedInteger('price');
+            $table->unsignedInteger('price_for_period');
             $table->string('status')->default('pending')->index();
             $table->timestamps();
-
-            $table->index(['hotel_id', 'start_date', 'end_date']);
         });
     }
 

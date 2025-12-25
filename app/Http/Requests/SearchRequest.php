@@ -22,6 +22,8 @@ class SearchRequest extends FormRequest
             'price_max' => 'nullable|integer|min:0',
             'stars' => 'nullable|array',
             'stars.*' => 'integer|min:0|max:5',
+            'amenities'      => 'nullable|array',
+            'amenities.*'    => 'integer|exists:amenities,id',
             'page' => 'nullable|integer|min:1'
         ];
     }

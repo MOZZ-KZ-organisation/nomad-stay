@@ -20,8 +20,6 @@ return new class extends Migration
             $table->unsignedInteger('price'); // per night in smallest unit
             $table->unsignedInteger('stock')->default(1);
             $table->timestamps();
-
-            $table->index(['hotel_id','price']);
         });
     }
 
