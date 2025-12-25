@@ -48,13 +48,16 @@ class SearchController extends Controller
         }
         if (!empty($data['amenities'])) {
             $amenityIds = $data['amenities'];
-            $q->join('amenity_hotel as ah', 'ah.hotel_id', '=', 'hotels.id')
-            ->whereIn('ah.amenity_id', $amenityIds)
-            ->groupBy('hotels.id')
-            ->havingRaw(
-                'COUNT(DISTINCT ah.amenity_id) = ?',
-                [count($amenityIds)]
-            );
+            $q->whereIn('hotels.id', function ($sub) use ($amenityIds) {
+                $sub->select('ah.hotel_id')
+                    ->from('amenity_hotel as ah')
+                    ->whereIn('ah.amenity_id', $amenityIds)
+                    ->groupBy('ah.hotel_id')
+                    ->havingRaw(
+                        'COUNT(DISTINCT ah.amenity_id) = ?',
+                        [count($amenityIds)]
+                    );
+            });
         }
         $q->whereExists(function ($sub) use ($start, $end, $data) {
             $sub->select(DB::raw(1))
