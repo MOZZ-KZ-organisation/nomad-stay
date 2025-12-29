@@ -35,7 +35,7 @@ class HotelController extends Controller
         return new HotelResource($hotel);
     }
 
-    public function index()
+    public function recent()
     {
         $hotels = Hotel::query()
             ->where('is_active', true)

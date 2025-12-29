@@ -27,13 +27,13 @@ Route::get('rooms/{room}', [RoomController::class, 'show']);
 Route::get('hotels/{hotel}/reviews', function (Hotel $hotel) {
     return ReviewResource::collection($hotel->reviews()->latest()->paginate(10));
 });
+Route::get('search', [SearchController::class, 'index']);
+Route::get('hotels/{hotel}', [HotelController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/profile', [AuthController::class, 'updateProfile']);
-    Route::get('search', [SearchController::class, 'index']);
-    Route::get('hotels/{hotel}', [HotelController::class, 'show']);
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'toggle']);
     Route::get('/bookings/price-details', [BookingPriceController::class, 'show']);
