@@ -13,7 +13,9 @@ class CityResource extends JsonResource
         return [
             'id' => $this->id,
             'city' => "{$this->name}, {$this->country->name}",
-            'image' => url(Storage::url($this->image)),
+            'image' => $this->image
+                        ? url(Storage::url($this->image))
+                        : null,
         ];
     }
 }
