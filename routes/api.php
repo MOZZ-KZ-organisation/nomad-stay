@@ -19,6 +19,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'sendCode']);
 Route::post('/verify-otp', [AuthController::class, 'verifyCode']);
 
+Route::get('/hotels/recent', [HotelController::class, 'recent']);
+
 Route::get('/amenities', [AmenityController::class, 'index']);
 Route::get('/cities', [CityController::class, 'index']);
 Route::get('rooms/{room}', [RoomController::class, 'show']);

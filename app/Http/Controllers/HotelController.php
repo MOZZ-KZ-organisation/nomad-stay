@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\HotelShowRequest;
+use App\Http\Resources\HotelRecentResource;
 use App\Http\Resources\HotelResource;
 use App\Models\Hotel;
 use Illuminate\Support\Facades\Cache;
@@ -32,5 +33,17 @@ class HotelController extends Controller
             ->filter(fn($room) => $room->available_stock > 0 && $room->capacity >= $guests)
             ->values();
         return new HotelResource($hotel);
+    }
+
+    public function index()
+    {
+        $hotels = Hotel::query()
+            ->where('is_active', true)
+            ->with(['images' => function ($q) {
+                $q->orderByDesc('is_main');
+            }])
+            ->inRandomOrder()
+            ->limit(6)->get();
+        return HotelRecentResource::collection($hotels);
     }
 }
