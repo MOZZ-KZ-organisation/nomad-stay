@@ -27,7 +27,10 @@ class HotelController extends Controller
                 'city'
             ]);
         });
-        $isFavorite = $user->favorites()->where('hotel_id', $hotel->id)->exists();
+        $isFavorite = $user
+            ? $user->favorites()->where('hotel_id', $hotel->id)->exists()
+            : false;
+        $hotel->is_favorite = $isFavorite;
         $hotel->is_favorite = $isFavorite;
         $hotel->rooms = $hotel->rooms
             ->filter(fn($room) => $room->available_stock > 0 && $room->capacity >= $guests)
