@@ -26,6 +26,8 @@ class SearchController extends Controller
                 'hotels.city_id',
                 'hotels.stars',
                 'hotels.min_price',
+                'hotels.latitude',
+                'hotels.longitude',
             ])
             ->with([
                 'images' => fn ($q) => $q->where('is_main', true),
