@@ -17,6 +17,8 @@ class HotelResource extends JsonResource
             'description' => $this->description,
             'address' => $this->address,
             'city' => $this->city->location,
+            'lat' => (float) $this->latitude,
+            'lng' => (float) $this->longitude,
             'stars' => $this->stars,
             'rating' => round($this->reviews()->avg('rating') ?? 0, 2),
             'reviews_count' => $this->reviews()->count(),
