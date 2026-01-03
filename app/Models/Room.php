@@ -62,7 +62,7 @@ class Room extends Model
             return $this->stock;
         }
         $bookedCount = Booking::where('room_id', $this->id)
-            ->where('status', 'confirmed')
+            // ->where('status', 'confirmed')
             ->where('end_date', '>', $start)
             ->where('start_date', '<', $end)
             ->count();
