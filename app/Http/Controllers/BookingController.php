@@ -99,8 +99,7 @@ class BookingController extends Controller
         $startDate = $request->start_date;
         $endDate   = $request->end_date;
         $room = $booking->room;
-        $availableStock = $room->availableStock($booking->id);
-        if ($availableStock <= 0) {
+        if ($room->availableStock <= 0) {
             return response()->json([
                 'message' => 'Номер недоступен на выбранные даты'
             ], 422);
