@@ -100,11 +100,11 @@ class BookingController extends Controller
         $endDate   = $request->end_date;
         $room = $booking->room;
         $availableStock = $room->availableStock($booking->id);
-    if ($availableStock <= 0) {
-        return response()->json([
-            'message' => 'Номер недоступен на выбранные даты'
-        ], 422);
-    }
+        if ($availableStock <= 0) {
+            return response()->json([
+                'message' => 'Номер недоступен на выбранные даты'
+            ], 422);
+        }
         $nights = Carbon::parse($startDate)->diffInDays(Carbon::parse($endDate));
         $basePrice = $room->price * $nights;
         $tax = $basePrice * env('BOOKING_TAX_RATE', 0.0);
