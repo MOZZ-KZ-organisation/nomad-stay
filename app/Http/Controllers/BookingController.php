@@ -99,7 +99,13 @@ class BookingController extends Controller
         $startDate = $request->start_date;
         $endDate   = $request->end_date;
         $room = $booking->room;
-        if ($room->availableStock <= 0) {
+        $bookedCount = Booking::where('room_id', $room->id)
+            ->whereIn('status', ['confirmed', 'pending'])
+            ->where('id', '!=', $booking->id)
+            ->where('end_date', '>', $startDate)
+            ->where('start_date', '<', $endDate)
+            ->count();
+        if ($bookedCount >= $room->stock) {
             return response()->json([
                 'message' => 'Номер недоступен на выбранные даты'
             ], 422);
