@@ -16,6 +16,6 @@ class VoyagerSupportChatsController extends VoyagerBaseController
             ->where('sender_id', '!=', auth()->id())
             ->where('read', false)
             ->update(['read' => true]);
-        return view('vendor.voyager.support-chats.show', compact('chat'));
+        return view('vendor.voyager.support-chats.read', compact('chat'));
     }
 }
