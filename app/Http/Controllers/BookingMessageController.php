@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBookingMessageRequest;
 use App\Http\Resources\BookingMessageResource;
 use App\Models\Booking;
 use App\Models\BookingChat;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -50,12 +51,24 @@ class BookingMessageController extends Controller
         return $paginator->getCollection()
             ->groupBy(fn ($message) => $message->created_at->toDateString())
             ->map(function ($messages, $date) {
+                $carbonDate = Carbon::parse($date);
                 return [
-                    'date' => $date,
+                    'date' => $this->humanDate($carbonDate),
                     'messages' => BookingMessageResource::collection($messages),
                 ];
             })
             ->values();
+    }
+
+    protected function humanDate(Carbon $date): string
+    {
+        if ($date->isToday()) {
+            return 'Сегодня';
+        }
+        if ($date->isYesterday()) {
+            return 'Вчера';
+        }
+        return $date->format('d.m.Y');
     }
 
     public function store(StoreBookingMessageRequest $request, Booking $booking)
