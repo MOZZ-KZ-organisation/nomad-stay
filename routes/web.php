@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingCalendarController;
+use App\Http\Controllers\VoyagerSupportMessageController;
 use App\Models\Notification;
 
 Route::get('/', function () {
@@ -11,6 +12,8 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
+    Route::post('/support-messages/{chat}', [VoyagerSupportMessageController::class, 'store'])
+        ->name('voyager.support-messages.store');
     Route::get('/calendar', [BookingCalendarController::class, 'index'])
         ->name('admin.bookings.calendar');
 
