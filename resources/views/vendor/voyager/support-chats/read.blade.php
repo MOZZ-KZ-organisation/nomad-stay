@@ -2,7 +2,6 @@
 
 @section('css')
 <style>
-/* Контейнер чата */
 .chat-container {
     max-width: 900px;
     margin: 0 auto;
@@ -15,7 +14,13 @@
     background-color: #f5f5f5;
 }
 
-/* Чат-бокс с сообщениями */
+.chat-header {
+    padding: 12px;
+    background: #f0f0f0;
+    text-align: center;
+    font-weight: bold;
+}
+
 .chat-box {
     flex-grow: 1;
     padding: 20px;
@@ -24,45 +29,36 @@
     flex-direction: column;
     gap: 10px;
     background-color: #b2d8e9;
-    scroll-behavior: smooth;
 }
 
-/* Стили для сообщений */
 .message {
     max-width: 70%;
     padding: 10px 15px;
     border-radius: 20px;
-    position: relative;
-    display: inline-block;
     word-wrap: break-word;
-    line-height: 1.4;
     font-size: 0.95rem;
 }
 
-/* Сообщения пользователя (слева) */
 .from-user {
     align-self: flex-start;
     background-color: #ffffff;
     border-top-left-radius: 0;
 }
 
-/* Сообщения поддержки (справа) */
 .from-support {
     align-self: flex-end;
     background-color: #dcf8c6;
     border-top-right-radius: 0;
 }
 
-/* Время в правом нижнем углу */
 .message small {
     font-size: 0.7rem;
-    color: #999;
+    color: #666;
     display: block;
     text-align: right;
-    margin-top: 5px;
+    margin-top: 4px;
 }
 
-/* Форма ввода */
 .chat-form {
     display: flex;
     padding: 10px;
@@ -84,22 +80,14 @@
     border-radius: 20px;
     padding: 0 20px;
 }
-
-/* Скролл бар для чата */
-.chat-box::-webkit-scrollbar {
-    width: 6px;
-}
-
-.chat-box::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 3px;
-}
 </style>
 @stop
 
 @section('content')
 <div class="page-content container-fluid chat-container">
-    <h3 class="text-center" style="padding: 10px; background: #f0f0f0; margin:0;">Чат с пользователем: {{ $chat->user->name }}</h3>
+    <div class="chat-header">
+        Чат с пользователем: {{ $chat->user->name }}
+    </div>
 
     <div class="chat-box" id="chatBox">
         @foreach($chat->messages as $message)
@@ -119,8 +107,67 @@
 @stop
 
 @section('javascript')
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+
 <script>
+    // scroll вниз при загрузке
     const chatBox = document.getElementById('chatBox');
     chatBox.scrollTop = chatBox.scrollHeight;
+
+    // ============================
+    // Pusher init
+    // ============================
+    Pusher.logToConsole = false;
+
+    const pusher = new Pusher("{{ config('broadcasting.connections.pusher.key') }}", {
+        cluster: "{{ config('broadcasting.connections.pusher.options.cluster') }}",
+        authEndpoint: '/broadcasting/auth',
+        auth: {
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        }
+    });
+
+    const chatId = {{ $chat->id }};
+    const authUserId = {{ auth()->id() }};
+
+    // ============================
+    // Subscribe to support chat
+    // ============================
+    const channel = pusher.subscribe('private-support-chat.' + chatId);
+
+    channel.bind('support.message.sent', function (data) {
+        appendMessage(data);
+    });
+
+    // ============================
+    // Append message to DOM
+    // ============================
+    function appendMessage(message) {
+        const div = document.createElement('div');
+        div.classList.add('message');
+
+        if (message.sender_id === authUserId) {
+            div.classList.add('from-support');
+        } else {
+            div.classList.add('from-user');
+        }
+
+        div.innerHTML = `
+            ${escapeHtml(message.body)}
+            <small>${message.created_at}</small>
+        `;
+
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // защита от XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.innerText = text;
+        return div.innerHTML;
+    }
 </script>
 @stop
