@@ -49,9 +49,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('reviews', [ReviewController::class, 'store']);
 
     Route::get('/booking-chats', [BookingChatController::class, 'index']);
-    Route::post('/booking-chats/{booking}', [BookingChatController::class, 'create']);
-    Route::get('/booking-chats/{chat}/messages', [BookingMessageController::class, 'index']);
-    Route::post('/booking-chats/{chat}/messages', [BookingMessageController::class, 'store']);
+    Route::get('/booking-chats/{booking}/messages', [BookingMessageController::class, 'index']);
+    Route::post('/booking-chats/{booking}/messages', [BookingMessageController::class, 'store']);
     Route::get('/support-chats', [SupportChatController::class, 'index']);
     Route::get('/support-chat', [SupportChatController::class, 'show']);
     Route::post('/support-chat/messages', [SupportMessageController::class, 'store']);
