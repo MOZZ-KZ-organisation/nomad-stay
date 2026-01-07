@@ -23,7 +23,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background-color: #e5ddd5;
+    background-color: #b2d8e9;
     scroll-behavior: smooth;
 }
 
