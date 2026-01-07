@@ -110,13 +110,9 @@
 <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
 <script>
-    // scroll вниз при загрузке
     const chatBox = document.getElementById('chatBox');
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // ============================
-    // Pusher init
-    // ============================
     Pusher.logToConsole = false;
 
     const pusher = new Pusher("{{ config('broadcasting.connections.pusher.key') }}", {
@@ -131,24 +127,17 @@
 
     const chatId = {{ $chat->id }};
     const authUserId = {{ auth()->id() }};
-
-    // ============================
-    // Subscribe to support chat
-    // ============================
     const channel = pusher.subscribe('private-support-chat.' + chatId);
 
     channel.bind('support.message.sent', function (data) {
         appendMessage(data);
     });
 
-    // ============================
-    // Append message to DOM
-    // ============================
     function appendMessage(message) {
         const div = document.createElement('div');
         div.classList.add('message');
 
-        if (message.sender_id === authUserId) {
+        if (message.is_mine) {
             div.classList.add('from-support');
         } else {
             div.classList.add('from-user');
@@ -156,14 +145,13 @@
 
         div.innerHTML = `
             ${escapeHtml(message.body)}
-            <small>${message.created_at}</small>
+            <small>${message.time} ${message.date}</small>
         `;
 
         chatBox.appendChild(div);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // защита от XSS
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.innerText = text;
