@@ -30,7 +30,6 @@ class BookingMessageController extends Controller
             ->where('sender_id', '!=', auth()->id())
             ->update(['read' => true]);
         $messages = $chat->messages()
-            ->with('sender')
             ->latest()
             ->paginate(20);
         return response()->json([

@@ -11,7 +11,7 @@ class BookingChatController extends Controller
 {
     public function index()
     {
-        $chats = BookingChat::with(['hotel.images', 'lastMessage.sender'])
+        $chats = BookingChat::with(['hotel.images', 'lastMessage'])
             ->where('user_id', auth()->id())
             ->orderByDesc('last_message_at')
             ->get();

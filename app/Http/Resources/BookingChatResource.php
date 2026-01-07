@@ -21,9 +21,7 @@ class BookingChatResource extends JsonResource
             ],
             'last_message' => $lastMessage ? [
                 'text' => Str::limit($lastMessage->body, 100),
-                'sender' => $lastMessage->sender_id === auth()->id()
-                    ? 'me'
-                    : 'hotel',
+                'sender' => $lastMessage->sender_type,
                 'last_message_at' => $lastMessage->created_at->diffForHumans(),
             ] : null,
         ];
