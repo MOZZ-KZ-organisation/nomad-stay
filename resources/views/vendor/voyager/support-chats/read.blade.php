@@ -130,6 +130,9 @@
     const channel = pusher.subscribe('private-support-chat.' + chatId);
 
     channel.bind('support.message.sent', function (data) {
+        if (data.is_mine) {
+            return;
+        }
         appendMessage(data);
     });
 
