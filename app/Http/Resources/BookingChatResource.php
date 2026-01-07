@@ -13,6 +13,7 @@ class BookingChatResource extends JsonResource
         $lastMessage = $this->whenLoaded('lastMessage');
         return [
             'id' => $this->id,
+            'booking_id' => $this->booking_id,
             'hotel' => [
                 'title' => $this->hotel->title,
                 'icon' => $this->hotel->images->first()?->url,

@@ -37,9 +37,7 @@ class BookingMessageController extends Controller
                 'name' => $chat->hotel->title,
                 'avatar' => url(Storage::url($chat->hotel->images->first()?->path)),
             ],
-            'messages' => $this->groupMessagesByDate(
-                BookingMessageResource::collection($messages)
-            ),
+            'messages' => $this->groupMessagesByDate($messages),
             'meta' => [
                 'current_page' => $messages->currentPage(),
                 'has_more' => $messages->hasMorePages(),
@@ -47,19 +45,18 @@ class BookingMessageController extends Controller
         ]);
     }
 
-    protected function groupMessagesByDate($messages)
+    protected function groupMessagesByDate($paginator)
     {
-        return $messages->collection
-            ->groupBy('date')
-            ->map(function ($items, $date) {
+        return $paginator->getCollection()
+            ->groupBy(fn ($message) => $message->created_at->toDateString())
+            ->map(function ($messages, $date) {
                 return [
                     'date' => $date,
-                    'messages' => $items->values(),
+                    'messages' => BookingMessageResource::collection($messages),
                 ];
             })
             ->values();
     }
-
 
     public function store(StoreBookingMessageRequest $request, Booking $booking)
     {
