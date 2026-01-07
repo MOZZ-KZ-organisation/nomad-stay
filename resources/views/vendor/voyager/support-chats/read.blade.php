@@ -130,7 +130,7 @@
     const channel = pusher.subscribe('private-support-chat.' + chatId);
 
     channel.bind('support.message.sent', function (data) {
-        if (data.is_mine) {
+        if (data.sender_id === authUserId) {
             return;
         }
         appendMessage(data);
@@ -140,7 +140,7 @@
         const div = document.createElement('div');
         div.classList.add('message');
 
-        if (message.is_mine) {
+        if (message.sender_id === authUserId) {
             div.classList.add('from-support');
         } else {
             div.classList.add('from-user');

@@ -12,7 +12,7 @@ class SupportMessageResource extends JsonResource
         return [
             'id' => $this->id,
             'body' => $this->body,
-            'is_mine' => $this->sender_id === auth()->id(),
+            'sender_id' => $this->sender_id,
             'read' => $this->read,
             'time' => $this->created_at->format('H:i'),
             'date' => $this->created_at->toDateString(),
