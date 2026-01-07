@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SupportMessageSent;
+use App\Models\SupportChat;
 use Illuminate\Http\Request;
 
 class VoyagerSupportMessageController extends Controller
@@ -13,10 +15,10 @@ class VoyagerSupportMessageController extends Controller
         ]);
         $message = $chat->messages()->create([
             'sender_id' => auth()->id(),
-            'sender_type' => 'support',
             'body' => $request->body,
             'read' => false,
         ]);
+        broadcast(new SupportMessageSent($message))->toOthers();
         return redirect()
             ->back()
             ->with('success', 'Сообщение успешно отправлено.');
