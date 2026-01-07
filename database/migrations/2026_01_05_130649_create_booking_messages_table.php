@@ -13,9 +13,7 @@ return new class extends Migration
             $table->foreignId('booking_chat_id')
                 ->constrained('booking_chats')
                 ->cascadeOnDelete();
-            $table->foreignId('sender_id')
-                ->constrained('users')
-                ->cascadeOnDelete();
+            $table->unsignedBigInteger('sender_id');
             $table->string('sender_type')
                 ->default('user');
             $table->text('body');
