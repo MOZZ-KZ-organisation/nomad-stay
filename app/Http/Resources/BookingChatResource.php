@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BookingChatResource extends JsonResource
@@ -16,7 +17,7 @@ class BookingChatResource extends JsonResource
             'booking_id' => $this->booking_id,
             'hotel' => [
                 'title' => $this->hotel->title,
-                'icon' => $this->hotel->images->first()?->url,
+                'icon' => url(Storage::url($this->hotel->images->first()?->path)),
             ],
             'last_message' => $lastMessage ? [
                 'text' => Str::limit($lastMessage->body, 100),
