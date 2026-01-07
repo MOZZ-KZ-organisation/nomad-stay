@@ -6,7 +6,6 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Пользователь</th>
                 <th>Последнее сообщение</th>
                 <th>Время последнего сообщения</th>
@@ -16,7 +15,6 @@
         <tbody>
             @foreach($dataTypeContent as $chat)
                 <tr>
-                    <td>{{ $chat->id }}</td>
                     <td>{{ $chat->user->name }}</td>
                     <td>{{ Str::limit($chat->lastMessage->body ?? '', 50) }}</td>
                     <td>{{ $chat->last_message_at ? $chat->last_message_at->diffForHumans() : '' }}</td>
