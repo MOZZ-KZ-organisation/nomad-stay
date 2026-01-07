@@ -19,7 +19,7 @@ class VoyagerSupportMessageController extends Controller
             'read' => false,
         ]);
         $chat->update(['last_message_at' => now()]);
-        broadcast(new SupportMessageSent($message))->toOthers();
+        broadcast(new SupportMessageSent($message));
         return redirect()
             ->back()
             ->with('success', 'Сообщение успешно отправлено.');
