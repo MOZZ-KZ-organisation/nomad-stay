@@ -120,7 +120,6 @@
 
 @section('javascript')
 <script>
-    // Автопрокрутка чата вниз
     const chatBox = document.getElementById('chatBox');
     chatBox.scrollTop = chatBox.scrollHeight;
 </script>
