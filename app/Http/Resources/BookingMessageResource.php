@@ -9,10 +9,12 @@ class BookingMessageResource extends JsonResource
 {
     public function toArray($request)
     {
+        $isMine = $this->sender_type === 'user'
+            && $this->sender_id === auth()->id();
         return [
             'id' => $this->id,
             'body' => $this->body,
-            'is_mine' => $this->sender_id === auth()->id(),
+            'is_mine' => $isMine,
             'read' => $this->read,
             'time' => $this->created_at->format('H:i'),
             'date' => $this->created_at->toDateString(),

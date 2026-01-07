@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('sender_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
+            $table->string('sender_type')
+                ->default('user');
             $table->text('body');
             $table->boolean('read')
                 ->default(false)->index();

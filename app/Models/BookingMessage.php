@@ -9,6 +9,7 @@ class BookingMessage extends Model
     protected $fillable = [
         'booking_chat_id',
         'sender_id',
+        'sender_type',
         'body',
         'read'
     ];
@@ -22,8 +23,13 @@ class BookingMessage extends Model
         return $this->belongsTo(BookingChat::class, 'booking_chat_id');
     }
 
-    public function sender()
+    public function userSender()
     {
         return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function hotelSender()
+    {
+        return $this->belongsTo(Hotel::class, 'sender_id');
     }
 }
