@@ -35,7 +35,7 @@ class BookingMessageController extends Controller
         return response()->json([
             'hotel' => [
                 'name' => $chat->hotel->title,
-                'avatar' => url(Storage::url($chat->hotel->images->first()?->url)),
+                'avatar' => url(Storage::url($chat->hotel->images->first()?->path)),
             ],
             'messages' => $this->groupMessagesByDate(
                 BookingMessageResource::collection($messages)
