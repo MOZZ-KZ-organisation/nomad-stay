@@ -36,7 +36,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
-        if (!Auth::attempt($credentials)) {
+        if (!Auth::attempt(array_merge($credentials, ['deleted_at' => null]))) {
             return response()->json([
                 'message' => 'Неверный email или пароль'
             ], 401);
@@ -107,5 +107,13 @@ class AuthController extends Controller
         }
         $user->update($data);
         return new UserResource($user);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = $request->user();
+        $user->tokens()->delete();
+        $user->delete();
+        return response()->json(['message' => 'ACCOUNT_DELETED'], 200);
     }
 }

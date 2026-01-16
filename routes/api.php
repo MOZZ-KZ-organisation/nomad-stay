@@ -35,6 +35,7 @@ Route::get('search', [SearchController::class, 'index']);
 Route::get('hotels/{hotel}', [HotelController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::delete('/delete-account',[AuthController::class, 'deleteAccount']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/profile', [AuthController::class, 'updateProfile']);
