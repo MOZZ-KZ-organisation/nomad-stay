@@ -10,7 +10,7 @@ class RoomController extends Controller
 {
     public function show(HotelShowRequest $request, Room $room)
     {
-        $room->load('images', 'hotel');
+        $room->load('images', 'hotel.amenities');
         return new RoomResource($room);
     }
 }
