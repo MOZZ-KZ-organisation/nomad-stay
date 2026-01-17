@@ -17,8 +17,8 @@ class StoreReviewRequest extends FormRequest
             'hotel_id' => 'required|exists:hotels,id',
             'rating' => 'required|integer|min:1|max:10',
             'comment' => 'nullable|string',
-            'media' => 'nullable|array|max:5',
-            'media.*' => 'file|mimes:jpg,jpeg,png,webp|max:5120',
+            'media' => 'nullable|array',
+            'media.*' => 'file|mimes:jpg,jpeg,png,mp4,mov,avi,webm|max:51200',
         ];
     }
 }
