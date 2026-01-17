@@ -20,7 +20,7 @@ class BookingController extends Controller
         $data = $request->validated();
         $room = Room::findOrFail($data['room_id']);
         $bookedCount = Booking::where('room_id', $room->id)
-            ->whereIn('status', ['confirmed', 'pending'])
+            ->whereIn('status', ['booked', 'checked_in'])
             ->where('end_date', '>', $data['start_date'])
             ->where('start_date', '<', $data['end_date'])
             ->count();
@@ -37,7 +37,7 @@ class BookingController extends Controller
             'price_for_period' => $basePrice,
             'tax' => $tax,
             'total_price' => $totalPrice,
-            'status' => 'pending',
+            'status' => 'booked',
             'type' => 'booking',
             'source' => 'site'
         ];
@@ -91,7 +91,7 @@ class BookingController extends Controller
         if ($booking->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
-        if (!in_array($booking->status, ['confirmed', 'pending'])) {
+        if (!in_array($booking->status, ['booked'])) {
             return response()->json([
                 'message' => 'Эту бронь нельзя изменить в текущем статусе'
             ], 422);
@@ -100,7 +100,7 @@ class BookingController extends Controller
         $endDate   = $request->end_date;
         $room = $booking->room;
         $bookedCount = Booking::where('room_id', $room->id)
-            ->whereIn('status', ['confirmed', 'pending'])
+            ->whereIn('status', ['booked', 'checked_in'])
             ->where('id', '!=', $booking->id)
             ->where('end_date', '>', $startDate)
             ->where('start_date', '<', $endDate)

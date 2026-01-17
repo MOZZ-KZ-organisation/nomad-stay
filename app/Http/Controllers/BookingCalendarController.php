@@ -27,9 +27,9 @@ class BookingCalendarController extends Controller
         }
         $rooms = $roomsQuery->get();
         $bookingsQuery = Booking::where('end_date', '>=', $dates->first())
-            ->where('start_date', '<=', $dates->last());
+            ->where('start_date', '<=', $dates->last())->whereNotIn('status', ['cancelled']);
         if ($request->boolean('only_booked')) {
-            $bookingsQuery->whereIn('status', ['confirmed', 'pending']);
+            $bookingsQuery->whereIn('status', ['booked', 'checked_in']);
         }
         if ($request->filled('source')) {
             $bookingsQuery->where('source', $request->source);
