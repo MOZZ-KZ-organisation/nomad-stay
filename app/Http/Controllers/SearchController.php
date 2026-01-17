@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SearchRequest;
+use App\Http\Resources\CityAttractionResource;
 use App\Http\Resources\HotelListResource;
 use App\Http\Resources\HotelWithDiscountResource;
+use App\Models\CityAttraction;
 use App\Models\Hotel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -115,9 +117,16 @@ class SearchController extends Controller
             $hotel->is_favorite = in_array($hotel->id, $favoritesIds);
             return $hotel;
         });
+        $attractions = [];
+        if (!empty($data['city_id'])) {
+            $attractions = CityAttraction::query()
+                ->where('city_id', $data['city_id'])
+                ->limit(6)->get();
+        }
         return response()->json([
             'data' => HotelListResource::collection($hotels),
             'special_offers' => HotelWithDiscountResource::collection($specialOffers),
+            'city_attractions' => CityAttractionResource::collection($attractions),
             'meta' => [
                 'current_page' => $hotels->currentPage(),
                 'per_page' => $hotels->perPage(),
