@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SearchRequest;
 use App\Http\Resources\HotelListResource;
+use App\Http\Resources\HotelWithDiscountResource;
 use App\Models\Hotel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,7 @@ class SearchController extends Controller
             ->with([
                 'images' => fn ($q) => $q->where('is_main', true),
                 'city.country',
+                'discount:id,hotel_id,discount_percent,price_override',
             ]);
         if (!empty($data['city_id'])) {
             $q->where('hotels.city_id', $data['city_id']);
@@ -91,6 +93,28 @@ class SearchController extends Controller
             $hotel->nights = $nights;
             return $hotel;
         });
-        return HotelListResource::collection($hotels);
+        $specialOffers = Hotel::query()
+            ->where('hotels.is_active', true)->whereHas('discount')
+            ->select([
+                'hotels.id',
+                'hotels.title',
+                'hotels.slug',
+                'hotels.city_id',
+                'hotels.stars',
+            ])
+            ->with([
+                'images' => fn ($q) => $q->where('is_main', true),
+                'city',
+                'discount:id,hotel_id,discount_percent,price_override',
+            ])->limit(6)->get();
+        return response()->json([
+            'data' => HotelListResource::collection($hotels),
+            'special_offers' => HotelWithDiscountResource::collection($specialOffers),
+            'meta' => [
+                'current_page' => $hotels->currentPage(),
+                'per_page' => $hotels->perPage(),
+                'has_more' => $hotels->hasMorePages(),
+            ],
+        ]);
     }
 }

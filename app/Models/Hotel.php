@@ -68,4 +68,9 @@ class Hotel extends Model
     {
         return $this->belongsTo(City::class);
     }
+
+    public function discount()
+    {
+        return $this->hasOne(HotelDiscount::class);
+    }
 }
