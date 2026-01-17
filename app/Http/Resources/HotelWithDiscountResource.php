@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class HotelWithDiscountResource extends JsonResource
 {
@@ -13,12 +14,12 @@ class HotelWithDiscountResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'slug' => $this->slug,
+            'location' => "{$this->city->name}, {$this->city->country->name}",
             'stars' => $this->stars,
-            'city' => $this->city->name ?? null,
             'discount_percent' => $discount->discount_percent,
             'price_override' => $discount->price_override,
-            'image' => $this->images->first()?->path,
+            'is_favorite' => $this->is_favorite,
+            'image' => url(Storage::url($this->images->first()?->path)),
         ];
     }
 }

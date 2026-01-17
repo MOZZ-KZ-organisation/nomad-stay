@@ -7,12 +7,16 @@ use App\Http\Resources\HotelListResource;
 use App\Http\Resources\HotelWithDiscountResource;
 use App\Models\Hotel;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class SearchController extends Controller
 {
     public function index(SearchRequest $request)
     {
+        if ($request->bearerToken()) {
+            Auth::shouldUse('sanctum');
+        }
         $user = $request->user();
         $data = $request->validated();
         $start  = Carbon::parse($data['start_date']);
@@ -107,6 +111,10 @@ class SearchController extends Controller
                 'city',
                 'discount:id,hotel_id,discount_percent,price_override',
             ])->limit(6)->get();
+        $specialOffers->transform(function (Hotel $hotel) use ($favoritesIds) {
+            $hotel->is_favorite = in_array($hotel->id, $favoritesIds);
+            return $hotel;
+        });
         return response()->json([
             'data' => HotelListResource::collection($hotels),
             'special_offers' => HotelWithDiscountResource::collection($specialOffers),
