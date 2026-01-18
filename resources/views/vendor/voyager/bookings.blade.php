@@ -1,453 +1,204 @@
 @extends('voyager::master')
 @section('content')
 <style>
-.calendar-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1rem;
-}
-h1{
-    font-size: 26px;
-    margin: 1.2rem;
-}
-.calendar-table th,
-.calendar-table td {
-    border: 1px solid #eee;
-    padding: 6px;
-    min-width: 80px;
-    text-align: center;
-}
-
-.calendar-table td {
-    padding: 3px;
+/* ====== КАЛЕНДАРЬ ====== */
+.calendar-wrapper {
     background: #fff;
-    vertical-align: middle;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 16px;
 }
-.booking-bg {
+.calendar-header,
+.calendar-row {
+    display: flex;
+}
+.room-col {
+    width: 160px;
+    padding: 10px;
+    border-right: 2px solid #e5e7eb;
+    background: #fafafa;
+    flex-shrink: 0;
+}
+.day-col {
+    width: 60px;
+    border-right: 1px solid #e5e7eb;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+}
+.calendar-row {
+    height: 64px;
+    border-bottom: 1px solid #eee;
+}
+.row-body {
+    position: relative;
+    flex: 1;
+    min-height: 64px;
+}
+.day-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: #f8fafc;
+    border-right: 1px solid #e5e7eb;
+}
+.booking-bar {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #111;
     display: flex;
     align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 55px;
-    padding: 10px;
-    border-radius: 8px;
+    cursor: pointer;
+    z-index: 10;
+    white-space: nowrap;
+    overflow: hidden;
 }
-.booking-content {
-    background: #fff;
-    color: #333;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 13px;
-    line-height: 1.3;
-    text-align: left;
-    box-shadow: 0 1px 3px rgba(0,0,0,.08);
-}
-.price-cell {
-    height: 100%;
-    min-height: 55px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size: 13px;
-    color: #444;
-    background: #F7F8FA;
-    border-radius:8px;
+.booking-bar:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,.15);
 }
 </style>
-<div class="top-controls" style="display:flex; align-items:center; margin:1rem;">
-<h1>Брони и заявки</h1>
-<div class="notifications-wrapper" style="position:relative;">
-    <button id="notificationBell" style="
-        background:#fff;
-        border-radius:50%;
-        width:40px;
-        height:40px;
-        border:1px solid #ddd;
-        cursor:pointer;
-        position:relative;
-    ">
-        🔔
-        <span id="notificationCount" style="
-            position:absolute;
-            top:-6px;
-            right:-6px;
-            background:red;
-            color:#fff;
-            border-radius:50%;
-            font-size:11px;
-            padding:2px 6px;
-            display:none;
-        ">0</span>
-    </button>
-    <div id="notificationPanel" style="
-        display:none;
-        position:absolute;
-        top:50px;
-        width:320px;
-        background:#fff;
-        border-radius:10px;
-        box-shadow:0 5px 20px rgba(0,0,0,0.08);
-        padding:10px;
-        z-index:9999;
-    ">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h5>Уведомления</h5>
-            <button id="closeNotifications" style="
-                background: transparent;
-                border: none;
-                font-size:16px;
-                cursor:pointer;
-            ">✖</button>
-        </div>
-        <div id="notificationsList"></div>
-    </div>
-</div>
-<div class="legend-wrapper" style="position:relative; display:inline-block; margin:1rem;">
-    <button id="legendBtn" style="
-        background:#fff;
-        border-radius:50%;
-        width:40px;
-        height:40px;
-        border:1px solid #ddd;
-        cursor:pointer;
-        position:relative;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:18px;
-    ">
-        🛈
-    </button>
-    <div id="legendPanel" style="
-        position:absolute;
-        top:45px;
-        width:220px;
-        background:#fff;
-        border-radius:12px;
-        box-shadow:0 8px 25px rgba(0,0,0,0.08);
-        padding:15px;
-        display:none;
-        z-index:999;
-    ">
-        <h5 style="margin-bottom:10px;">Легенда цветов</h5>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <div style="width:20px; height:20px; background:#2D9CDB; border-radius:4px;"></div> Бронь
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <div style="width:20px; height:20px; background:#F2994A; border-radius:4px;"></div> Заявка
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <div style="width:20px; height:20px; background:#EB5757; border-radius:4px;"></div> Отменено
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <div style="width:20px; height:20px; background:#BDBDBD; border-radius:4px;"></div> Архив
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-            <div style="width:20px; height:20px; background:#9B51E0; border-radius:4px;"></div> Другое
+
+{{-- ===== TOP BAR ===== --}}
+<div style="display:flex;align-items:center;gap:12px;margin:16px;">
+    <h1 style="font-size:26px;">Календарь бронирований</h1>
+
+    {{-- 🔔 Notifications --}}
+    <div style="position:relative;">
+        <button id="notificationBell" class="btn btn-light">🔔
+            <span id="notificationCount"
+                style="display:none;position:absolute;top:-6px;right:-6px;
+                background:red;color:#fff;border-radius:50%;font-size:11px;padding:2px 6px;">0</span>
+        </button>
+        <div id="notificationPanel"
+             style="display:none;position:absolute;top:45px;width:320px;
+             background:#fff;border-radius:12px;
+             box-shadow:0 10px 30px rgba(0,0,0,.15);padding:10px;z-index:9999;">
+            <b>Уведомления</b>
+            <div id="notificationsList"></div>
         </div>
     </div>
-</div>
-<div class="filters-wrapper" style="position:relative; display:inline-block;">
-    <button id="filterBtn" style="
-        background:#fff;
-        border-radius:12px;
-        padding:8px 14px;
-        border:1px solid #ddd;
-        cursor:pointer;
-        display:flex;
-        align-items:center;
-        gap:6px;
-    ">
-        <span>⚙️</span> Фильтр
-    </button>
-    <div id="filterPanel" style="
-        position:absolute;
-        top:45px;
-        width:280px;
-        background:#fff;
-        border-radius:12px;
-        box-shadow:0 8px 25px rgba(0,0,0,0.08);
-        padding:15px;
-        display:none;
-        z-index:999;
-    ">
-        <form id="filtersForm">
-            <h5 style="margin-bottom:10px;">Фильтры</h5>
-            <label style="display:flex; align-items:center; gap:6px; margin-bottom:10px;">
-                <input type="checkbox" name="only_booked" value="1"
-                    {{ request('only_booked') ? 'checked' : '' }}>
-                Только занятые
-            </label>
-            <div style="margin-bottom:10px;">
-                <label>Тип номера</label>
-                <select name="room_type" style="width:100%;" class="form-control">
-                    <option value="">Все</option>
+
+    {{-- 🛈 Legend --}}
+    <div style="position:relative;">
+        <button id="legendBtn" class="btn btn-light">🛈</button>
+        <div id="legendPanel"
+             style="display:none;position:absolute;top:45px;width:220px;
+             background:#fff;border-radius:12px;padding:12px;
+             box-shadow:0 10px 30px rgba(0,0,0,.12);z-index:999;">
+            <div><span style="background:#FACC15;width:14px;height:14px;display:inline-block"></span> booked</div>
+            <div><span style="background:#22C55E;width:14px;height:14px;display:inline-block"></span> checked in</div>
+            <div><span style="background:#9CA3AF;width:14px;height:14px;display:inline-block"></span> checked out</div>
+        </div>
+    </div>
+
+    {{-- ⚙️ Filters --}}
+    <div style="position:relative;">
+        <button id="filterBtn" class="btn btn-light">⚙️ Фильтр</button>
+        <div id="filterPanel"
+             style="display:none;position:absolute;top:45px;width:280px;
+             background:#fff;border-radius:12px;padding:12px;
+             box-shadow:0 10px 30px rgba(0,0,0,.15);z-index:999;">
+            <form id="filtersForm">
+                <label>
+                    <input type="checkbox" name="only_booked" value="1"
+                        {{ request('only_booked') ? 'checked' : '' }}>
+                    Только занятые
+                </label>
+
+                <select name="room_type" class="form-control">
+                    <option value="">Все типы</option>
                     @foreach($roomTypes as $type)
-                        <option value="{{ $type }}" 
-                            {{ request('room_type') == $type ? 'selected' : '' }}>
+                        <option value="{{ $type }}" {{ request('room_type')==$type?'selected':'' }}>
                             {{ $type }}
                         </option>
                     @endforeach
                 </select>
-            </div>
-            <div style="margin-bottom:10px;">
-                <label>Источник</label>
+
                 <select name="source" class="form-control">
-                    <option value="">Все</option>
-                    <option value="site"    {{ request('source')=='site' ? 'selected' : '' }}>Сайт</option>
-                    <option value="booking" {{ request('source')=='booking' ? 'selected' : '' }}>Booking.com</option>
-                    <option value="kaspi"   {{ request('source')=='kaspi' ? 'selected' : '' }}>Kaspi</option>
+                    <option value="">Все источники</option>
+                    <option value="site">Сайт</option>
+                    <option value="booking">Booking</option>
+                    <option value="kaspi">Kaspi</option>
                 </select>
-            </div>
-            <div style="margin-bottom:15px;">
-                <label>Статус</label>
+
                 <select name="payment_status" class="form-control">
-                    <option value="">Все</option>
-                    <option value="paid"   {{ request('payment_status')=='paid' ? 'selected' : '' }}>Оплачено</option>
-                    <option value="unpaid" {{ request('payment_status')=='unpaid' ? 'selected' : '' }}>Не оплачено</option>
+                    <option value="">Оплата</option>
+                    <option value="paid">Оплачено</option>
+                    <option value="unpaid">Не оплачено</option>
                 </select>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Применить</button>
-        </form>
+
+                <button class="btn btn-primary btn-block">Применить</button>
+            </form>
+        </div>
     </div>
 </div>
-</div>
-<table class="calendar-table">
-    <thead>
-    <tr>
-        <th>Номер</th>
+
+{{-- ===== КАЛЕНДАРЬ ===== --}}
+<div class="calendar-wrapper">
+    <div class="calendar-header">
+        <div class="room-col"><b>Номер</b></div>
         @foreach($dates as $date)
-            <th>{{ $date->translatedFormat('d M') }}</th>
+            <div class="day-col">
+                <b>{{ $date->format('d') }}</b><br>
+                <small>{{ $date->translatedFormat('dd') }}</small>
+            </div>
         @endforeach
-    </tr>
-    </thead>
-    <tbody>
-    @foreach($rooms as $room)
-        <tr>
-            <td>
-                {{ $room->number ?? $room->title }} <br>
-                <small>{{ $room->hotel->title }}</small>
-            </td>
-            @foreach($dates as $date)
-                @php
-                    $booking = $bookings->first(function($b) use ($room, $date) {
-                        return $b->room_id == $room->id &&
-                               $date->between(
-                                    \Carbon\Carbon::parse($b->start_date),
-                                    \Carbon\Carbon::parse($b->end_date)->subDay()
-                               );
-                    });
-                @endphp
-                <td>
-                    @if($booking)
-                        <div 
-                            class="booking-bg booking-cell"
-                            style="background: {{ $booking->color }}"
-                            data-id="{{ $booking->id }}"
-                            data-name="{{ $booking->full_name }}"
-                            data-start="{{ $booking->start_date->translatedFormat('d F Y') }}"
-                            data-end="{{ $booking->end_date->translatedFormat('d F Y') }}"
-                            data-total="{{ number_format($booking->total_price, 0, '.', ' ') }}"
-                            data-paid="{{ $booking->is_paid ? number_format($booking->total_price, 0, '.', ' ') : number_format(0, 0, '.', ' ') }}"
-                            data-nights="{{ $booking->start_date->diffInDays($booking->end_date) }}"
-                        >
-                            <div class="booking-content">
-                                {{ $booking->full_name }} <br>
-                                {{ number_format($booking->price_per_night, 0, '.', ' ') }} ₸
-                            </div>
-                        </div>
-                    @else
-                        <div class="price-cell">
-                            {{ number_format($room->price, 0, '.', ' ') }} ₸
-                        </div>
-                    @endif
-                </td>
-            @endforeach
-        </tr>
-    @endforeach
-    <div id="bookingPopover" 
-        style="
-            position:absolute;
-            display:none;
-            background:#fff;
-            padding:15px;
-            border-radius:12px;
-            box-shadow:0 8px 30px rgba(0,0,0,0.15);
-            width:265px;
-            z-index:99999;
-        ">
-        <button id="closePopover" 
-            style="
-                position:absolute;
-                top:8px;
-                right:8px;
-                background:transparent;
-                border:none;
-                font-size:18px;
-                cursor:pointer;
-            "
-        >✖</button>
-        <div id="popoverContent"></div>
-        <div style="display:flex; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
-            <a id="editBookingBtn" class="btn btn-sm btn-primary" style="flex:1; margin-right:6px;">Редактировать</a>
-            <a id="deleteBookingBtn" class="btn btn-sm btn-danger" style="flex:1;">Удалить</a>
-        </div>
-        <div id="popoverArrow" 
-            style="
-                width:16px; 
-                height:16px; 
-                background:#fff; 
-                position:absolute; 
-                bottom:-8px; 
-                left:40px;
-                transform:rotate(45deg);
-                box-shadow:0 5px 15px rgba(0,0,0,0.15);
-            ">
-        </div>
     </div>
-    </tbody>
-</table>
+
+    @foreach($rooms as $room)
+        @php $roomBookings = $bookings->where('room_id', $room->id); @endphp
+        <div class="calendar-row">
+            <div class="room-col">
+                <b>{{ $room->number ?? $room->title }}</b><br>
+                <small>{{ $room->hotel->title }}</small>
+            </div>
+
+            <div class="row-body" style="min-width:{{ $dates->count()*60 }}px">
+                @foreach($dates as $i => $date)
+                    <div class="day-bg" style="left:{{ $i*60 }}px;width:60px"></div>
+                @endforeach
+
+                @foreach($roomBookings as $booking)
+                    @php
+                        $start = $dates->search(fn($d)=>$d->gte($booking->start_date));
+                        $end   = $dates->search(fn($d)=>$d->gte($booking->end_date));
+                        $left  = max(0,$start)*60;
+                        $width = max(60,($end-$start)*60);
+                    @endphp
+
+                    <div class="booking-bar"
+                         style="left:{{ $left }}px;width:{{ $width }}px;background:{{ $booking->color }}">
+                        {{ $booking->full_name }}
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endforeach
+</div>
+
 @vite(['resources/js/app.js'])
 <script>
-document.addEventListener('DOMContentLoaded', async function() {
-    const bell = document.getElementById('notificationBell');
-    const panel = document.getElementById('notificationPanel');
-    const list = document.getElementById('notificationsList');
-    const count = document.getElementById('notificationCount');
-    const closeBtn = document.getElementById('closeNotifications');
-    const legendBtn   = document.getElementById('legendBtn');
-    const legendPanel = document.getElementById('legendPanel');
-    legendBtn.addEventListener('click', () => {
-        legendPanel.style.display = legendPanel.style.display === 'none' ? 'block' : 'none';
-    });
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('#legendBtn') && !e.target.closest('#legendPanel')) {
-            legendPanel.style.display = 'none';
-        }
-    });
-    bell.addEventListener('click', async () => {
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        if (panel.style.display === 'block') {
-            try {
-                await fetch('/admin/notifications/mark-read', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                });
-                count.style.display = 'none';
-            } catch (err) {
-                console.error('Failed to mark notifications read:', err);
-            }
-        }
-    });
-    closeBtn.addEventListener('click', () => {
-        panel.style.display = 'none';
-    });
-    function notificationTemplate(data) {
-        const date = new Date(data.created_at).toLocaleDateString('ru-RU', { day:'numeric', month:'long' });
-        return `
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                padding:10px;
-                border-bottom:1px solid #eee;
-                cursor:pointer;
-                font-size:14px;
-                color:#333;
-            ">
-                <div>
-                    ${data.title} ${data.booking_id ? '№ ' + data.booking_id : ''}
-                </div>
-                <div style="font-size:12px; color:#888;">
-                    ${date}
-                </div>
-            </div>
-        `;
-    }
-    async function loadNotifications(){
-        const res = await fetch('/admin/notifications');
-        const data = await res.json();
-        list.innerHTML = '';
-        let unread = 0;
-        data.forEach(n => {
-            if(!n.is_read) unread++;
-            list.innerHTML += notificationTemplate(n);
-        });
-        if (unread > 0) {
-            count.innerText = unread;
-            count.style.display = 'inline-block';
-        } else {
-            count.style.display = 'none';
-        }
-    }
-    await loadNotifications();
-    console.log('Echo is:', window.Echo);
-    window.Echo.channel('admin.notifications')
-        .listen('.new.notification', (e) => {
-            console.log('NEW NOTIFICATION', e);
-            list.innerHTML =
-                notificationTemplate(e.notification) + list.innerHTML;
+/* ===== UI LOGIC ===== */
+const toggle = (btn,panel)=>{
+    btn.onclick=e=>{
+        e.stopPropagation();
+        panel.style.display=panel.style.display==='block'?'none':'block';
+    };
+    document.addEventListener('click',()=>panel.style.display='none');
+};
 
-            let current = parseInt(count.innerText || 0);
-            count.innerText = current + 1;
-            count.style.display = 'inline-block';
-        });
-        const filterBtn   = document.getElementById('filterBtn');
-        const filterPanel = document.getElementById('filterPanel');
-        const filtersForm = document.getElementById('filtersForm');
-        filterBtn.addEventListener('click', () => {
-            filterPanel.style.display = filterPanel.style.display === 'none' ? 'block' : 'none';
-        });
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.filters-wrapper')) {
-                filterPanel.style.display = 'none';
-            }
-        });
-        filtersForm.addEventListener('submit', function(e){
-            e.preventDefault();
-            const params = new URLSearchParams(new FormData(this)).toString();
-            window.location.href = window.location.pathname + '?' + params;
-        });
-        const popover = document.getElementById('bookingPopover');
-        const popoverContent = document.getElementById('popoverContent');
-        const editBtn = document.getElementById('editBookingBtn');
-        const deleteBtn = document.getElementById('deleteBookingBtn');
-        let currentBookingId = null;
-        document.getElementById('closePopover').addEventListener('click', () => {
-            popover.style.display = 'none';
-        });
-        document.querySelectorAll('.booking-cell').forEach(cell => {
-            cell.addEventListener('click', e => {
-                e.stopPropagation();
-                const rect = cell.getBoundingClientRect();
-                const id = cell.dataset.id;
-                currentBookingId = id;
-                popoverContent.innerHTML = `
-                    <div style="font-size:14px; margin-bottom:8px;">
-                        <b>Бронь</b><br>
-                        ${cell.dataset.start} – ${cell.dataset.end}
-                    </div>
+toggle(filterBtn,filterPanel);
+toggle(legendBtn,legendPanel);
+toggle(notificationBell,notificationPanel);
 
-                    <div style="font-size:14px;">
-                        Суток: <b>${cell.dataset.nights}</b><br>
-                        ${cell.dataset.total} ₸ 
-                        (оплачено ${cell.dataset.paid} ₸)
-                    </div>
-                `;
-                editBtn.href = `/admin/bookings/${id}/edit`;
-                deleteBtn.href = `/admin/bookings/${id}`;
-                popover.style.top = (window.scrollY + rect.top - popover.offsetHeight - 15) + 'px';
-                popover.style.left = (rect.left + rect.width / 2 - 130) + 'px';
-                popover.style.display = 'block';
-            });
-        });
-        document.addEventListener('click', function() {
-            popover.style.display = 'none';
-        });
-        popover.addEventListener('click', e => e.stopPropagation());
-});
+filtersForm.onsubmit=e=>{
+    e.preventDefault();
+    location.search=new URLSearchParams(new FormData(filtersForm)).toString();
+};
 </script>
 @endsection
