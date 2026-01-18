@@ -1,265 +1,251 @@
 @extends('voyager::master')
-@section('page_title', 'Календарь бронирований')
-@section('page_header')
-    <h1 class="page-title">
-        <i class="voyager-calendar"></i> Календарь бронирований
-    </h1>
-@stop
+
 @section('content')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+
 <style>
-.header-actions {
+/* ===== TOP CONTROLS ===== */
+.top-controls {
     display:flex;
-    gap:16px;
     align-items:center;
+    gap:12px;
+    margin:1rem;
 }
-.icon-btn {
+
+/* ===== CALENDAR (ТВОЙ) ===== */
+.calendar-wrapper {
+    background:#fff;
+    border-radius:12px;
+    overflow-x:auto;
+    margin:16px;
+}
+.calendar-header, .calendar-row {
+    display:flex;
     position:relative;
-    cursor:pointer;
 }
-.badge {
-    position:absolute;
-    top:-6px;
-    right:-6px;
-    background:red;
-    color:white;
-    font-size:11px;
-    padding:2px 6px;
-    border-radius:50%;
-    display:none;
-}
-.panel {
-    position:absolute;
-    right:0;
-    top:40px;
-    background:white;
-    border:1px solid #ddd;
-    width:320px;
-    display:none;
-    z-index:999;
-    box-shadow:0 4px 10px rgba(0,0,0,.1);
-}
-.panel h5 {
+.room-col {
+    width:150px;
     padding:10px;
-    margin:0;
+    border-right:2px solid #e5e7eb;
+    background:#fafafa;
+    flex-shrink:0;
+}
+.day-col {
+    width:60px;
+    border-right:1px solid #e5e7eb;
+    text-align:center;
+    padding:6px 0;
+    font-size:12px;
+}
+.calendar-row {
+    height:64px;
     border-bottom:1px solid #eee;
 }
-.panel-body {
-    max-height:300px;
-    overflow:auto;
+.row-body {
+    position:relative;
+    flex:1;
+    min-height:64px;
 }
-.filter-panel {
-    width:360px;
-    padding:12px;
+.day-bg {
+    position:absolute;
+    top:0;
+    bottom:0;
+    background:#eff6ff;
+    border-right:1px solid #e5e7eb;
 }
-.legend-item {
+.booking-bar {
+    position:absolute;
+    top:6px;
+    bottom:6px;
+    border-radius:8px;
+    padding:4px 8px;
+    font-size:12px;
+    font-weight:500;
+    color:#111;
     display:flex;
     align-items:center;
-    gap:8px;
-    margin-bottom:6px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    cursor:pointer;
+    z-index:10;
 }
-.legend-color {
-    width:14px;
-    height:14px;
-    border-radius:3px;
+.booking-bar:hover {
+    box-shadow:0 6px 18px rgba(0,0,0,.15);
 }
 </style>
 
-<div class="container-fluid">
+{{-- ================= TOP BAR ================= --}}
+<div class="top-controls">
+    <h1 style="font-size:26px;">Календарь бронирований</h1>
 
-    {{-- ===== HEADER ACTIONS ===== --}}
-    <div class="header-actions">
+    {{-- 🔔 Уведомления --}}
+    <div class="notifications-wrapper" style="position:relative;">
+        <button id="notificationBell" style="width:40px;height:40px;border-radius:50%;border:1px solid #ddd;background:#fff;">
+            🔔
+            <span id="notificationCount"
+                  style="position:absolute;top:-6px;right:-6px;background:red;color:#fff;border-radius:50%;font-size:11px;padding:2px 6px;display:none;">
+            </span>
+        </button>
 
-        {{-- 🔔 Уведомления --}}
-        <div class="icon-btn" id="notificationBell">
-            <i class="voyager-bell"></i>
-            <span class="badge" id="notificationCount"></span>
-
-            <div class="panel" id="notificationPanel">
+        <div id="notificationPanel"
+             style="display:none;position:absolute;top:50px;width:320px;background:#fff;border-radius:10px;
+             box-shadow:0 5px 20px rgba(0,0,0,.08);padding:10px;z-index:9999;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                 <h5>Уведомления</h5>
-                <div class="panel-body" id="notificationsList"></div>
+                <button id="closeNotifications" style="border:none;background:transparent;">✖</button>
             </div>
+            <div id="notificationsList"></div>
         </div>
+    </div>
 
-        {{-- 🛈 Легенда --}}
-        <div class="icon-btn" id="legendBtn">
-            <i class="voyager-info-circled"></i>
+    {{-- 🛈 Легенда --}}
+    <div style="position:relative;">
+        <button id="legendBtn" style="width:40px;height:40px;border-radius:50%;border:1px solid #ddd;background:#fff;">🛈</button>
+        <div id="legendPanel"
+             style="display:none;position:absolute;top:45px;width:220px;background:#fff;border-radius:12px;
+             box-shadow:0 8px 25px rgba(0,0,0,.08);padding:15px;z-index:999;">
+            <h5>Легенда</h5>
+            <div><span style="background:#2D9CDB;width:14px;height:14px;display:inline-block"></span> Забронировано</div>
+            <div><span style="background:#BDBDBD;width:14px;height:14px;display:inline-block"></span> Выселено</div>
+            <div><span style="background:#EB5757;width:14px;height:14px;display:inline-block"></span> Отменено</div>
+        </div>
+    </div>
 
-            <div class="panel" id="legendPanel">
-                <h5>Легенда</h5>
-                <div class="panel-body">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background:#FACC15"></div>
-                        Забронировано
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background:#22C55E"></div>
-                        Заселён
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background:#9CA3AF"></div>
-                        Выселено
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background:#EF4444"></div>
-                        Отменено
-                    </div>
+    {{-- ⚙️ Фильтр --}}
+    <div class="filters-wrapper" style="position:relative;">
+        <button id="filterBtn" style="border:1px solid #ddd;border-radius:12px;padding:8px 14px;background:#fff;">
+            ⚙️ Фильтр
+        </button>
+        <div id="filterPanel"
+             style="display:none;position:absolute;top:45px;width:280px;background:#fff;border-radius:12px;
+             box-shadow:0 8px 25px rgba(0,0,0,.08);padding:15px;z-index:999;">
+            <form id="filtersForm">
+                <label>
+                    <input type="checkbox" name="only_booked" value="1" {{ request('only_booked') ? 'checked' : '' }}>
+                    Только занятые
+                </label>
+
+                <div style="margin-top:10px">
+                    <label>Тип номера</label>
+                    <select name="room_type" class="form-control">
+                        <option value="">Все</option>
+                        @foreach($roomTypes as $type)
+                            <option value="{{ $type }}" {{ request('room_type')==$type?'selected':'' }}>
+                                {{ $type }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-            </div>
+
+                <button class="btn btn-primary btn-block" style="margin-top:12px">Применить</button>
+            </form>
         </div>
-
-        {{-- ⚙️ Фильтр --}}
-        <div class="icon-btn" id="filterBtn">
-            <i class="voyager-filter"></i>
-
-            <div class="panel filter-panel" id="filterPanel">
-                <h5>Фильтр</h5>
-                <form id="filtersForm">
-                    <div class="form-group">
-                        <label>Отель</label>
-                        <select name="hotel_id" class="form-control">
-                            <option value="">Все</option>
-                            @foreach($hotels as $hotel)
-                                <option value="{{ $hotel->id }}">{{ $hotel->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Тип комнаты</label>
-                        <select name="room_type" class="form-control">
-                            <option value="">Все</option>
-                            @foreach($roomTypes as $type)
-                                <option value="{{ $type }}">{{ $type }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" name="only_booked" value="1">
-                            Только забронированные
-                        </label>
-                    </div>
-
-                    <button class="btn btn-primary btn-block">
-                        Применить
-                    </button>
-                </form>
-            </div>
-        </div>
-
     </div>
-
-    {{-- ===== КАЛЕНДАРЬ (заглушка под твой grid) ===== --}}
-    <div style="margin-top:20px">
-        <p><b>Комнат:</b> {{ count($rooms) }}</p>
-        <p><b>Дней:</b> {{ count($dates) }}</p>
-        {{-- тут твой grid --}}
-    </div>
-
 </div>
 
-{{-- ================= JS ================= --}}
+{{-- ================= CALENDAR ================= --}}
+<div class="calendar-wrapper">
+    {{-- HEADER --}}
+    <div class="calendar-header">
+        <div class="room-col"><b>Номер</b></div>
+        @foreach($dates as $date)
+            <div class="day-col">
+                <b>{{ $date->format('d') }}</b>
+                <div style="font-size:11px;color:#666">{{ $date->translatedFormat('dd') }}</div>
+            </div>
+        @endforeach
+    </div>
+
+    {{-- ROOMS --}}
+    @foreach($rooms as $room)
+        @php $roomBookings = $bookings->where('room_id', $room->id); @endphp
+        <div class="calendar-row">
+            <div class="room-col">
+                <b>{{ $room->number ?? $room->title }}</b>
+                <div style="font-size:11px;color:#666">{{ $room->hotel->title }}</div>
+            </div>
+
+            <div class="row-body" style="min-width:{{ $dates->count()*60 }}px">
+                @foreach($dates as $i=>$date)
+                    <div class="day-bg" style="left:{{ $i*60 }}px;width:60px"></div>
+                @endforeach
+
+                @foreach($roomBookings as $booking)
+                    @php
+                        $startIndex = $dates->search(fn($d)=>$d->gte($booking->start_date));
+                        $endIndex   = $dates->search(fn($d)=>$d->gte($booking->end_date));
+                        $left = max(0,$startIndex)*60+30;
+                        $width = max(60,($endIndex-$startIndex)*60);
+                    @endphp
+                    <div class="booking-bar"
+                         style="left:{{ $left }}px;width:{{ $width }}px;background:{{ $booking->color }}">
+                        {{ $booking->full_name }}
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endforeach
+</div>
+
+{{-- ================= JS (ИЗ ВТОРОГО КОДА) ================= --}}
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
 
-    const csrf = document.querySelector('meta[name="csrf-token"]').content;
-
-    /* 🔔 УВЕДОМЛЕНИЯ */
+    /* 🔔 notifications */
     const bell = document.getElementById('notificationBell');
     const panel = document.getElementById('notificationPanel');
-    const list = document.getElementById('notificationsList');
+    const list  = document.getElementById('notificationsList');
     const count = document.getElementById('notificationCount');
 
-    function render(n) {
-        return `
-            <div style="padding:8px;border-bottom:1px solid #eee">
-                <b>${n.title}</b>
-                ${n.booking_id ? '№ ' + n.booking_id : ''}
-                <div style="font-size:12px;color:#777">
-                    ${new Date(n.created_at).toLocaleString('ru-RU')}
-                </div>
-            </div>
-        `;
-    }
-
-    async function loadNotifications() {
+    async function loadNotifications(){
         const res = await fetch('/admin/notifications');
         const data = await res.json();
-
-        list.innerHTML = '';
         let unread = 0;
-
-        data.forEach(n => {
-            list.innerHTML += render(n);
-            if (!n.is_read) unread++;
+        list.innerHTML = '';
+        data.forEach(n=>{
+            if(!n.is_read) unread++;
+            list.innerHTML += `<div style="padding:8px;border-bottom:1px solid #eee">${n.title}</div>`;
         });
-
-        if (unread) {
-            count.innerText = unread;
-            count.style.display = 'inline-block';
-        }
+        if(unread){ count.innerText = unread; count.style.display='inline-block'; }
     }
-
     await loadNotifications();
 
-    bell.addEventListener('click', async e => {
+    bell.onclick = async (e)=>{
         e.stopPropagation();
-        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-
-        if (panel.style.display === 'block') {
-            await fetch('/admin/notifications/mark-read', {
+        panel.style.display = panel.style.display==='block'?'none':'block';
+        if(panel.style.display==='block'){
+            await fetch('/admin/notifications/mark-read',{
                 method:'POST',
-                headers:{'X-CSRF-TOKEN':csrf}
+                headers:{'X-CSRF-TOKEN':document.querySelector('meta[name=csrf-token]').content}
             });
-            count.style.display = 'none';
+            count.style.display='none';
         }
-    });
+    };
 
-    if (window.Echo) {
-        Echo.channel('admin.notifications')
-            .listen('.new.notification', e => {
-                list.innerHTML = render(e.notification) + list.innerHTML;
-                count.innerText = (parseInt(count.innerText || 0) + 1);
-                count.style.display = 'inline-block';
-            });
-    }
-
-    /* 🛈 ЛЕГЕНДА */
-    const legendBtn = document.getElementById('legendBtn');
-    const legendPanel = document.getElementById('legendPanel');
-    legendBtn.addEventListener('click', e => {
+    /* legend */
+    legendBtn.onclick = e=>{
         e.stopPropagation();
-        legendPanel.style.display =
-            legendPanel.style.display === 'block' ? 'none' : 'block';
-    });
+        legendPanel.style.display = legendPanel.style.display==='block'?'none':'block';
+    };
 
-    /* ⚙️ ФИЛЬТР */
-    const filterBtn = document.getElementById('filterBtn');
-    const filterPanel = document.getElementById('filterPanel');
-    const filtersForm = document.getElementById('filtersForm');
-
-    filterBtn.addEventListener('click', e => {
+    /* filter */
+    filterBtn.onclick = e=>{
         e.stopPropagation();
-        filterPanel.style.display =
-            filterPanel.style.display === 'block' ? 'none' : 'block';
-    });
-
-    filtersForm.addEventListener('click', e => e.stopPropagation());
-
-    filtersForm.addEventListener('submit', e => {
+        filterPanel.style.display = filterPanel.style.display==='block'?'none':'block';
+    };
+    filtersForm.onclick = e=>e.stopPropagation();
+    filtersForm.onsubmit = e=>{
         e.preventDefault();
-        const params = new URLSearchParams(new FormData(filtersForm)).toString();
-        window.location = '?' + params;
-    });
+        const p = new URLSearchParams(new FormData(filtersForm)).toString();
+        location.search = p;
+    };
 
-    /* ❌ Закрытие */
-    document.addEventListener('click', () => {
-        panel.style.display = 'none';
-        legendPanel.style.display = 'none';
-        filterPanel.style.display = 'none';
-    });
+    document.onclick = ()=>{
+        panel.style.display='none';
+        legendPanel.style.display='none';
+        filterPanel.style.display='none';
+    };
 });
 </script>
 @endsection
