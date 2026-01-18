@@ -1,7 +1,74 @@
 @extends('voyager::master')
 @section('content')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-@vite('resources/css/vendor/voyager/booking.css')
+<style>
+.top-controls {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:1rem;
+}
+.calendar-wrapper {
+    background:#fff;
+    border-radius:12px;
+    overflow-x:auto;
+    margin:16px;
+}
+.calendar-header, .calendar-row {
+    display:flex;
+    position:relative;
+}
+.room-col {
+    width:150px;
+    padding:10px;
+    border-right:2px solid #e5e7eb;
+    background:#fafafa;
+    flex-shrink:0;
+}
+.day-col {
+    width:60px;
+    border-right:1px solid #e5e7eb;
+    text-align:center;
+    padding:6px 0;
+    font-size:12px;
+}
+.calendar-row {
+    height:64px;
+    border-bottom:1px solid #eee;
+}
+.row-body {
+    position:relative;
+    flex:1;
+    min-height:64px;
+}
+.day-bg {
+    position:absolute;
+    top:0;
+    bottom:0;
+    background:#eff6ff;
+    border-right:1px solid #e5e7eb;
+}
+.booking-bar {
+    position:absolute;
+    top:6px;
+    bottom:6px;
+    border-radius:8px;
+    padding:4px 8px;
+    font-size:12px;
+    font-weight:500;
+    color:#111;
+    display:flex;
+    align-items:center;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    cursor:pointer;
+    z-index:10;
+}
+.booking-bar:hover {
+    box-shadow:0 6px 18px rgba(0,0,0,.15);
+}
+</style>
 <div class="top-controls">
     <h1 style="font-size:26px;">Календарь бронирований</h1>
     <div class="notifications-wrapper" style="position:relative;">
