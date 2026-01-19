@@ -172,26 +172,43 @@
     background: #9ca3af;
 }
 </style>
-<div class="top-controls">
-    <div class="calendar-nav">
-        <a class="btn btn-sm btn-default"
-           href="{{ route('admin.bookings.calendar', array_merge(request()->all(), [
-               'start' => $startDate->copy()->subDay()->toDateString()
-           ])) }}">←</a>
-        <a class="btn btn-sm btn-default"
-           href="{{ route('admin.bookings.calendar', array_merge(request()->all(), [
-               'start' => $startDate->copy()->addDay()->toDateString()
-           ])) }}">→</a>
+<div class="top-controls" style="display:flex;align-items:center;gap:12px;margin:16px;">
+    <h1 style="font-size:26px;margin-right:12px;">Календарь бронирований</h1>
+    <div class="filters-wrapper" style="position:relative;">
+        <button id="filterBtn" class="btn btn-default">⚙️ Фильтр</button>
+        <div id="filterPanel" class="filter-panel">
+            <form id="filtersForm">
+                <label>
+                    <input type="checkbox" name="only_booked" value="1" {{ request('only_booked') ? 'checked' : '' }}>
+                    Только занятые
+                </label>
+                <div style="margin-top:10px;">
+                    <label>Тип номера</label>
+                    <select name="room_type" class="form-control">
+                        <option value="">Все</option>
+                        @foreach($roomTypes as $type)
+                            <option value="{{ $type }}" {{ request('room_type') == $type ? 'selected' : '' }}>
+                                {{ $type }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <button class="btn btn-primary btn-block" style="margin-top:12px;">Применить</button>
+            </form>
+        </div>
     </div>
-    <h1 class="calendar-title">
-        Календарь бронирований
-        <span>
-            {{ $dates->first()->format('d.m') }} – {{ $dates->last()->format('d.m') }}
-        </span>
-    </h1>
-    <div class="notifications-wrapper">
-        <button id="notificationBell" class="icon-btn">
-            🔔
+    <div class="calendar-nav" style="margin-left:12px;">
+        <a class="btn btn-sm btn-default"
+           href="{{ route('admin.bookings.calendar', array_merge(request()->all(), ['start' => $startDate->copy()->subDay()->toDateString()])) }}">
+           ←
+        </a>
+        <a class="btn btn-sm btn-default"
+           href="{{ route('admin.bookings.calendar', array_merge(request()->all(), ['start' => $startDate->copy()->addDay()->toDateString()])) }}">
+           →
+        </a>
+    </div>
+    <div class="notifications-wrapper" style="margin-left:12px;">
+        <button id="notificationBell" class="icon-btn">🔔
             <span id="notificationCount"></span>
         </button>
         <div id="notificationPanel" class="dropdown-panel">
@@ -202,7 +219,7 @@
             <div id="notificationsList"></div>
         </div>
     </div>
-    <div class="legend-wrapper">
+    <div class="legend-wrapper" style="margin-left:12px;">
         <button id="legendBtn" class="icon-btn">🛈</button>
         <div id="legendPanel" class="dropdown-panel">
             <b>Легенда</b>
@@ -211,39 +228,14 @@
             <div><span class="legend checked-out"></span> Выселено</div>
         </div>
     </div>
-    <div class="filters-wrapper">
-        <button id="filterBtn" class="btn btn-default">⚙️ Фильтр</button>
-        <div id="filterPanel" class="dropdown-panel">
-            <form id="filtersForm">
-                <label>
-                    <input type="checkbox" name="only_booked" value="1"
-                        {{ request('only_booked') ? 'checked' : '' }}>
-                    Только занятые
-                </label>
-                <div>
-                    <label>Тип номера</label>
-                    <select name="room_type" class="form-control">
-                        <option value="">Все</option>
-                        @foreach($roomTypes as $type)
-                            <option value="{{ $type }}"
-                                {{ request('room_type') == $type ? 'selected' : '' }}>
-                                {{ $type }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <button class="btn btn-primary btn-block">Применить</button>
-            </form>
-        </div>
-    </div>
 </div>
 <div class="calendar-wrapper">
     <div class="calendar-header">
-        <div class="room-col">Номер</div>
+        <div class="room-col"><b>Номер</b></div>
         @foreach($dates as $date)
             <div class="day-col">
-                <b>{{ $date->format('d') }}</b>
-                <span>{{ $date->translatedFormat('dd') }}</span>
+                <b style="font-size:14px;">{{ $date->format('d') }}</b>
+                <div style="font-size:11px;color:#6b7280;">{{ $date->translatedFormat('dd') }}</div>
             </div>
         @endforeach
     </div>
@@ -256,8 +248,7 @@
             <div class="row-body">
                 @foreach($dates as $i => $date)
                     <div class="day-bg"
-                         style="left:{{ ($i / 18) * 100 }}%;
-                                width:{{ 100 / 18 }}%;">
+                         style="left:{{ ($i / 18) * 100 }}%; width:{{ 100 / 18 }}%; border-right:1px solid #e5e7eb;">
                     </div>
                 @endforeach
                 @foreach($bookings->where('room_id', $room->id) as $booking)
@@ -270,9 +261,7 @@
                         $width = (($end - $start) / 18) * 100;
                     @endphp
                     <div class="booking-bar"
-                         style="left:{{ $left }}%;
-                                width:{{ $width }}%;
-                                background:{{ $booking->color }};">
+                         style="left:{{ $left }}%; width:{{ $width }}%; background:{{ $booking->color }};">
                         {{ $booking->full_name }}
                     </div>
                 @endforeach
@@ -281,7 +270,7 @@
     @endforeach
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     const bell   = notificationBell;
     const panel  = notificationPanel;
     const count  = notificationCount;
@@ -292,24 +281,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         let unread = 0;
         list.innerHTML = '';
         data.forEach(n => {
-            if (!n.is_read) unread++;
+            if(!n.is_read) unread++;
             list.innerHTML += `<div class="notify-item">${n.title}</div>`;
         });
         count.textContent = unread || '';
         count.style.display = unread ? 'block' : 'none';
     }
-    await loadNotifications();
+    loadNotifications();
     bell.onclick = async e => {
         e.stopPropagation();
         panel.classList.toggle('show');
-        await fetch('/admin/notifications/mark-read', {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content }
-        });
-        count.style.display = 'none';
+        if(panel.classList.contains('show')){
+            await fetch('/admin/notifications/mark-read', {
+                method:'POST',
+                headers:{'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content}
+            });
+            count.style.display='none';
+        }
     };
     legendBtn.onclick = e => { e.stopPropagation(); legendPanel.classList.toggle('show'); };
     filterBtn.onclick = e => { e.stopPropagation(); filterPanel.classList.toggle('show'); };
+    filtersForm.onclick = e => e.stopPropagation();
+    filtersForm.onsubmit = e => {
+        e.preventDefault();
+        const params = new URLSearchParams(new FormData(filtersForm)).toString();
+        location.search = params;
+    };
     document.onclick = () => {
         panel.classList.remove('show');
         legendPanel.classList.remove('show');
