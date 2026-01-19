@@ -39,6 +39,12 @@
     font-size: 11px;
     color: #6b7280;
 }
+.day-col:hover,
+.day-bg:hover {
+    background-color: #fefefe;
+    cursor: pointer; 
+    transition: background-color 0.2s ease;
+}
 .calendar-row {
     height: 38px;
     border-top: 1px solid #e5e7eb;
@@ -76,7 +82,7 @@
     transition: box-shadow 0.2s ease;
 }
 .booking-bar:hover {
-    filter: brightness(85%);
+    filter: brightness(95%);
 }
 .filters-wrapper {
     position: relative;
