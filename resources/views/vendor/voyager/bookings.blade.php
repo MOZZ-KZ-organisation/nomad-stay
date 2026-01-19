@@ -18,6 +18,8 @@
 .calendar-row {
     display: flex;
     position: relative;
+    border: 1px solid #e5e7eb;
+    border-bottom: none;
 }
 .room-col {
     width: 160px;
@@ -39,7 +41,9 @@
 }
 .calendar-row {
     height: 64px;
-    border-bottom: 1px solid #eee;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    border-left: 1px solid #e5e7eb; 
 }
 .row-body {
     position: relative;
@@ -188,7 +192,7 @@
     transition: all 0.2s ease;
 }
 .nav-arrow:hover {
-    background: #2563eb;
+    background: #3e72e2;
     color: #fff;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
