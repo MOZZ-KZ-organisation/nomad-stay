@@ -1,6 +1,5 @@
 @extends('voyager::master')
 @section('content')
-
 <style>
 .top-controls {
     display: flex;
@@ -23,7 +22,6 @@
 .room-col {
     width: 160px;
     padding: 10px;
-    border-right: 2px solid #e5e7eb;
     background: #ffffff;
     flex-shrink: 0;
 }
@@ -48,8 +46,6 @@
     flex: 1;
     height: 38px;
 }
-
-/* Фон каждой ячейки */
 .day-bg {
     position: absolute;
     top: 0;
@@ -57,8 +53,6 @@
     background: #ffffff;
     border-right: 1px solid #e5e7eb;
 }
-
-/* Бронирования */
 .booking-bar {
     position: absolute;
     top: 0;
@@ -82,7 +76,6 @@
 .booking-bar:hover {
     filter: brightness(95%);
 }
-
 .hover-slot {
     position: absolute;
     top: 0;
@@ -95,8 +88,6 @@
 .hover-slot:hover {
     background: #d8efff;
 }
-
-/* Остальные стили календаря, фильтров, уведомлений, легенды */
 .filters-wrapper { position: relative; }
 .filter-panel {
     display: none;
@@ -130,21 +121,19 @@
 .panel-header button { border: none; background: transparent; cursor: pointer; font-size: 14px; }
 .notify-item { padding: 8px 6px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
 .notify-item:last-child { border-bottom: none; }
-
 .legend-wrapper { position: relative; }
 .legend { width: 14px; height: 14px; border-radius: 4px; display: inline-block; margin-right: 6px; }
 .legend.booked { background: #facc15; }
 .legend.checked-in { background: #4ade80; }
 .legend.checked-out { background: #9ca3af; }
-
 .nav-arrow {
     display: flex; justify-content: center; align-items: center;
     width: 36px; height: 36px; border-radius: 8px;
-    background: #f3f4f6; border:1px solid #d1d5db;
+    background: #fff; border:1px solid #e6e6e6;
     text-decoration:none; font-weight:bold; font-size:18px; color:#111;
     cursor:pointer; transition: all 0.2s ease;
 }
-.nav-arrow:hover { background:#3e72e2; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+.nav-arrow:hover { background:#5283c4; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
 .day-col.weekend {
     background: #ffe7e7;
 }
@@ -158,7 +147,6 @@
     background: #fff3f3;
 }
 </style>
-
 <div class="top-controls">
     <h1 style="font-size:26px;">
         Календарь бронирований
@@ -213,7 +201,6 @@
         <a class="nav-arrow" href="{{ route('admin.bookings.calendar', array_merge(request()->all(), ['start' => $startDate->copy()->addDay()->toDateString()])) }}">→</a>
     </div>
 </div>
-
 <div class="calendar-wrapper">
     <div class="calendar-header">
         <div class="room-col"><b>Номер</b></div>
@@ -226,28 +213,21 @@
             </div>
         @endforeach
     </div>
-
     @foreach($rooms as $room)
         <div class="calendar-row">
             <div class="room-col">
                 <b>{{ $room->number ?? $room->title }}</b>
                 <div class="room-hotel">{{ $room->hotel->title }}</div>
             </div>
-
             <div class="row-body">
-                {{-- Пустые ячейки --}}
                 @foreach($dates as $i => $date)
                     <div class="day-bg {{ $date->isWeekend() ? 'weekend' : '' }}"
                         style="left:{{ ($i/18)*100 }}%; width:{{ 100/18 }}%;">
                     </div>
                 @endforeach
-
-                {{-- Hover-зоны между ячейками --}}
                 @for($i = 0; $i < 18-1; $i++)
                     <div class="hover-slot" style="left:{{ (($i+0.5)/18)*100 }}%; width:{{ (1/18)*100 }}%;"></div>
                 @endfor
-
-                {{-- Бронирования --}}
                 @foreach($bookings->where('room_id', $room->id) as $booking)
                     @php
                         $start = $dates->search(fn($d) => $d->gte($booking->start_date));
@@ -265,14 +245,12 @@
         </div>
     @endforeach
 </div>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const bell = document.getElementById('notificationBell');
     const panel = document.getElementById('notificationPanel');
     const count = document.getElementById('notificationCount');
     const list = document.getElementById('notificationsList');
-
     async function loadNotifications() {
         const res = await fetch('/admin/notifications');
         const data = await res.json();
@@ -286,7 +264,6 @@ document.addEventListener('DOMContentLoaded', () => {
         count.style.display = unread ? 'block' : 'none';
     }
     loadNotifications();
-
     bell.onclick = async e => {
         e.stopPropagation();
         panel.classList.toggle('show');
