@@ -47,15 +47,6 @@ class BookingCalendarController extends Controller
         }
         $hotels = Hotel::all();
         $roomTypes = Room::select('title')->distinct()->pluck('title');
-        foreach ($bookings as $booking) {
-        if (Carbon::parse($booking->end_date)->lt($today)) {
-                $booking->status = 'checked_out';
-            } elseif (Carbon::parse($booking->start_date)->lte($today) && Carbon::parse($booking->end_date)->gte($today)) {
-                $booking->status = 'checked_in';
-            } else {
-                $booking->status = 'booked';
-            }
-        }
         return view('vendor.voyager.bookings', compact(
             'rooms',
             'dates',
