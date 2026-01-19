@@ -83,21 +83,6 @@
     flex: 1;
     height: 38px;
 }
-.row-body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: transparent;
-    z-index: 1;
-    pointer-events: none;
-    transition: background-color 0.2s ease;
-}
-.row-body:hover::before {
-    background-color: #fefefe;
-}
 .filters-wrapper {
     position: relative;
 }
