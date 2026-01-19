@@ -48,7 +48,7 @@
 .row-body {
     position: relative;
     flex: 1;
-    height: 64px;
+    height: 38px;
 }
 .day-bg {
     position: absolute;
@@ -59,8 +59,8 @@
 }
 .booking-bar {
     position: absolute;
-    top: 6px;
-    bottom: 6px;
+    top: 4px;
+    bottom: 4px;
     border-radius: 8px;
     padding: 4px 8px;
     font-size: 12px;
