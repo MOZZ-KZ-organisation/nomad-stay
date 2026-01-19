@@ -59,9 +59,9 @@
 }
 .booking-bar {
     position: absolute;
-    top: 4px;
-    bottom: 4px;
-    border-radius: 8px;
+    top: 0;
+    bottom: 0;
+    border-radius: 0;
     padding: 4px 8px;
     font-size: 12px;
     font-weight: 500;
