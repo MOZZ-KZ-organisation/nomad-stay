@@ -33,11 +33,6 @@
     padding: 6px 0;
     font-size: 12px;
     border-right: 1px solid #ededed;
-    background: #fff; /* белый фон */
-}
-.day-col.weekend b,
-.day-col.weekend .day-week {
-    color: #ef4444; /* красный для выходных */
 }
 .day-week {
     font-size: 11px;
@@ -210,8 +205,7 @@
     <div class="calendar-header">
         <div class="room-col"><b>Номер</b></div>
         @foreach($dates as $date)
-            @php $isWeekend = in_array($date->dayOfWeek, [0,6]); @endphp
-            <div class="day-col {{ $isWeekend ? 'weekend' : '' }}">
+            <div class="day-col">
                 <b>{{ $date->format('d') }}</b>
                 <div class="day-week">{{ mb_substr($date->translatedFormat('D'), 0, 2) }}</div>
             </div>
@@ -228,8 +222,7 @@
             <div class="row-body">
                 {{-- Пустые ячейки --}}
                 @foreach($dates as $i => $date)
-                    @php $isWeekend = in_array($date->dayOfWeek, [0,6]); @endphp
-                    <div class="day-bg {{ $isWeekend ? 'weekend' : '' }}" style="left:{{ ($i/18)*100 }}%; width:{{ 100/18 }}%;"></div>
+                    <div class="day-bg" style="left:{{ ($i/18)*100 }}%; width:{{ 100/18 }}%;"></div>
                 @endforeach
 
                 {{-- Hover-зоны между ячейками --}}
