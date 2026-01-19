@@ -86,7 +86,7 @@
     top: 0;
     bottom: 0;
     background: transparent;
-    z-index: 9;
+    z-index: 10;
     cursor: pointer;
     transition: background 0.15s ease;
 }
