@@ -24,7 +24,7 @@
     width: 160px;
     padding: 10px;
     border-right: 2px solid #e5e7eb;
-    background: #fafafa;
+    background: #ffffff;
     flex-shrink: 0;
 }
 .day-col {
