@@ -144,7 +144,7 @@
 }
 .nav-arrow:hover { background:#3e72e2; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
 .day-col.weekend {
-    background: #fff5f5;
+    background: #ffd6d6;
 }
 .day-col.weekend b {
     color: #dc2626;
@@ -153,7 +153,7 @@
     color: #ef4444;
 }
 .day-bg.weekend {
-    background: #fffafa;
+    background: #ffe5e5;
 }
 </style>
 
