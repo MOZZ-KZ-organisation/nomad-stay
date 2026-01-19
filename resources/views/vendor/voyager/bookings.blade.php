@@ -81,18 +81,17 @@
     filter: brightness(95%);
 }
 
-/* Hover-зоны между ячейками */
 .hover-slot {
     position: absolute;
     top: 0;
     bottom: 0;
     background: transparent;
-    z-index: 5;
+    z-index: 9;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.15s ease;
 }
 .hover-slot:hover {
-    background: rgba(231, 231, 231, 0.05);
+    background: rgba(59, 130, 246, 0.08);
 }
 
 /* Остальные стили календаря, фильтров, уведомлений, легенды */
