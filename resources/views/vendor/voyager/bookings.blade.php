@@ -92,7 +92,7 @@
     transition: background 0.2s ease;
 }
 .hover-slot:hover {
-    background: rgba(0,0,0,0.05);
+    background: rgba(231, 231, 231, 0.05);
 }
 
 /* Остальные стили календаря, фильтров, уведомлений, легенды */
@@ -207,7 +207,7 @@
         @foreach($dates as $date)
             <div class="day-col">
                 <b>{{ $date->format('d') }}</b>
-                <div class="day-week">{{ $date->translatedFormat('D') }}</div>
+                <div class="day-week">{{ mb_substr($date->translatedFormat('D'), 0, 2) }}</div>
             </div>
         @endforeach
     </div>
