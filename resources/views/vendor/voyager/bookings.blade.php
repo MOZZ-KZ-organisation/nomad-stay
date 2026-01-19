@@ -61,8 +61,8 @@
 /* Бронирования */
 .booking-bar {
     position: absolute;
-    top: 1px;
-    bottom: 1px;
+    top: 0;
+    bottom: 0;
     border-radius: 1px;
     padding: 4px 8px;
     font-size: 12px;
@@ -76,6 +76,8 @@
     cursor: pointer;
     z-index: 10;
     transition: filter 0.2s ease;
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.15);
 }
 .booking-bar:hover {
     filter: brightness(95%);
