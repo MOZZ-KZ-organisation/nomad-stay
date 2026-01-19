@@ -10,7 +10,7 @@ Route::get('/', function () {
 });
 
 
-Route::group(['prefix' => 'admin'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['web', 'admin.user']], function () {
     Voyager::routes();
     Route::post('/support-messages/{chat}', [VoyagerSupportMessageController::class, 'store'])
         ->name('voyager.support-messages.store');
