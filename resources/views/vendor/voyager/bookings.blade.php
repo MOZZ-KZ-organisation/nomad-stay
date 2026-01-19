@@ -171,6 +171,27 @@
 .legend.checked-out {
     background: #9ca3af;
 }
+.nav-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    color: #111;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.nav-arrow:hover {
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
 </style>
 <div class="top-controls" style="display:flex;align-items:center;gap:12px;margin:16px; flex-wrap:wrap;">
     <h1 style="font-size:26px;margin-right:12px;">
@@ -223,14 +244,14 @@
             </form>
         </div>
     </div>
-    <div class="calendar-nav" style="margin-left:auto;">
-        <a class="btn btn-sm btn-default"
-           href="{{ route('admin.bookings.calendar', array_merge(request()->all(), ['start' => $startDate->copy()->subDay()->toDateString()])) }}">
-           ←
+    <div class="calendar-nav" style="margin-left:auto; display:flex; gap:6px;">
+        <a class="nav-arrow" 
+        href="{{ route('admin.bookings.calendar', array_merge(request()->all(), ['start' => $startDate->copy()->subDay()->toDateString()])) }}">
+        ←
         </a>
-        <a class="btn btn-sm btn-default"
-           href="{{ route('admin.bookings.calendar', array_merge(request()->all(), ['start' => $startDate->copy()->addDay()->toDateString()])) }}">
-           →
+        <a class="nav-arrow" 
+        href="{{ route('admin.bookings.calendar', array_merge(request()->all(), ['start' => $startDate->copy()->addDay()->toDateString()])) }}">
+        →
         </a>
     </div>
 </div>
