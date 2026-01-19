@@ -32,16 +32,16 @@
     text-align: center;
     padding: 6px 0;
     font-size: 12px;
-    border-right: 1px solid #e5e7eb;
-    background: #f3f4f6; /* фон заголовка */
-    color: #374151; /* серый текст */
+    border-right: 1px solid #ededed;
+    background: #fff; /* белый фон */
 }
-.day-col.weekend {
-    color: #dc2626; /* красный для сб/вс */
+.day-col.weekend b,
+.day-col.weekend .day-week {
+    color: #ef4444; /* красный для выходных */
 }
 .day-week {
     font-size: 11px;
-    color: inherit;
+    color: #6b7280;
 }
 .calendar-row {
     height: 38px;
@@ -59,7 +59,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    background: #eff6ff;
+    background: #ffffff;
     border-right: 1px solid #e5e7eb;
 }
 
@@ -97,7 +97,7 @@
     transition: background 0.2s ease;
 }
 .hover-slot:hover {
-    background: #d0ebff; /* голубой при наведении */
+    background: rgba(231, 231, 231, 0.05);
 }
 
 /* Остальные стили календаря, фильтров, уведомлений, легенды */
@@ -210,13 +210,10 @@
     <div class="calendar-header">
         <div class="room-col"><b>Номер</b></div>
         @foreach($dates as $date)
-            @php
-                $day = mb_substr($date->translatedFormat('D'),0,2);
-                $isWeekend = in_array($day,['Сб','Вс']);
-            @endphp
+            @php $isWeekend = in_array($date->dayOfWeek, [0,6]); @endphp
             <div class="day-col {{ $isWeekend ? 'weekend' : '' }}">
                 <b>{{ $date->format('d') }}</b>
-                <div class="day-week">{{ $day }}</div>
+                <div class="day-week">{{ mb_substr($date->translatedFormat('D'), 0, 2) }}</div>
             </div>
         @endforeach
     </div>
@@ -231,10 +228,11 @@
             <div class="row-body">
                 {{-- Пустые ячейки --}}
                 @foreach($dates as $i => $date)
-                    <div class="day-bg" style="left:{{ ($i/18)*100 }}%; width:{{ 100/18 }}%;"></div>
+                    @php $isWeekend = in_array($date->dayOfWeek, [0,6]); @endphp
+                    <div class="day-bg {{ $isWeekend ? 'weekend' : '' }}" style="left:{{ ($i/18)*100 }}%; width:{{ 100/18 }}%;"></div>
                 @endforeach
 
-                {{-- Hover-зоны --}}
+                {{-- Hover-зоны между ячейками --}}
                 @for($i = 0; $i < 18-1; $i++)
                     <div class="hover-slot" style="left:{{ (($i+0.5)/18)*100 }}%; width:{{ (1/18)*100 }}%;"></div>
                 @endfor
@@ -242,10 +240,10 @@
                 {{-- Бронирования --}}
                 @foreach($bookings->where('room_id', $room->id) as $booking)
                     @php
-                        $start = $dates->search(fn($d)=>$d->gte($booking->start_date));
-                        $end = $dates->search(fn($d)=>$d->gte($booking->end_date));
-                        $start = max(0,$start)+0.5;
-                        $end = ($end ?? 18)+0.5;
+                        $start = $dates->search(fn($d) => $d->gte($booking->start_date));
+                        $end = $dates->search(fn($d) => $d->gte($booking->end_date));
+                        $start = max(0,$start) + 0.5;
+                        $end = ($end ?? 18) + 0.5;
                         $left = ($start/18)*100;
                         $width = (($end-$start)/18)*100;
                     @endphp
