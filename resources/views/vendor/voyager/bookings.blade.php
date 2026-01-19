@@ -94,36 +94,55 @@
 }
 </style>
 <div class="top-controls">
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div class="calendar-nav">
         <a class="btn btn-sm btn-default"
            href="{{ route('admin.bookings.calendar', array_merge(request()->all(), [
-                'start' => $startDate->copy()->subDay()->toDateString()
-           ])) }}">
-            ←
-        </a>
+               'start' => $startDate->copy()->subDay()->toDateString()
+           ])) }}">←</a>
         <a class="btn btn-sm btn-default"
            href="{{ route('admin.bookings.calendar', array_merge(request()->all(), [
-                'start' => $startDate->copy()->addDay()->toDateString()
-           ])) }}">
-            →
-        </a>
+               'start' => $startDate->copy()->addDay()->toDateString()
+           ])) }}">→</a>
     </div>
-    <h1 style="font-size:26px;margin-left:12px;">
+    <h1 class="calendar-title">
         Календарь бронирований
-        <span style="font-size:14px;color:#6b7280;">
+        <span>
             {{ $dates->first()->format('d.m') }} – {{ $dates->last()->format('d.m') }}
         </span>
     </h1>
+    <div class="notifications-wrapper">
+        <button id="notificationBell" class="icon-btn">
+            🔔
+            <span id="notificationCount"></span>
+        </button>
+        <div id="notificationPanel" class="dropdown-panel">
+            <div class="panel-header">
+                <b>Уведомления</b>
+                <button id="closeNotifications">✖</button>
+            </div>
+            <div id="notificationsList"></div>
+        </div>
+    </div>
+    <div class="legend-wrapper">
+        <button id="legendBtn" class="icon-btn">🛈</button>
+        <div id="legendPanel" class="dropdown-panel">
+            <b>Легенда</b>
+            <div><span class="legend booked"></span> Забронировано</div>
+            <div><span class="legend checked-in"></span> Заселено</div>
+            <div><span class="legend checked-out"></span> Выселено</div>
+            <div><span class="legend cancelled"></span> Отменено</div>
+        </div>
+    </div>
     <div class="filters-wrapper">
         <button id="filterBtn" class="btn btn-default">⚙️ Фильтр</button>
-        <div id="filterPanel" class="filter-panel">
+        <div id="filterPanel" class="dropdown-panel">
             <form id="filtersForm">
                 <label>
                     <input type="checkbox" name="only_booked" value="1"
                         {{ request('only_booked') ? 'checked' : '' }}>
                     Только занятые
                 </label>
-                <div style="margin-top:10px;">
+                <div>
                     <label>Тип номера</label>
                     <select name="room_type" class="form-control">
                         <option value="">Все</option>
@@ -135,29 +154,22 @@
                         @endforeach
                     </select>
                 </div>
-                <button class="btn btn-primary btn-block" style="margin-top:12px;">
-                    Применить
-                </button>
+                <button class="btn btn-primary btn-block">Применить</button>
             </form>
         </div>
     </div>
 </div>
 <div class="calendar-wrapper">
     <div class="calendar-header">
-        <div class="room-col"><b>Номер</b></div>
+        <div class="room-col">Номер</div>
         @foreach($dates as $date)
             <div class="day-col">
                 <b>{{ $date->format('d') }}</b>
-                <div class="day-week">
-                    {{ $date->translatedFormat('dd') }}
-                </div>
+                <span>{{ $date->translatedFormat('dd') }}</span>
             </div>
         @endforeach
     </div>
     @foreach($rooms as $room)
-        @php
-            $roomBookings = $bookings->where('room_id', $room->id);
-        @endphp
         <div class="calendar-row">
             <div class="room-col">
                 <b>{{ $room->number ?? $room->title }}</b>
@@ -170,24 +182,19 @@
                                 width:{{ 100 / 18 }}%;">
                     </div>
                 @endforeach
-                @foreach($roomBookings as $booking)
+                @foreach($bookings->where('room_id', $room->id) as $booking)
                     @php
-                        $startIndex = max(
-                            0,
-                            $dates->search(fn($d) => $d->gte($booking->start_date))
-                        );
-                        $endIndex = $dates->search(
-                            fn($d) => $d->gt($booking->end_date)
-                        ) ?? $dates->count();
-                        $left  = ($startIndex / 18) * 100;
-                        $width = max(5, (($endIndex - $startIndex) / 18) * 100);
+                        $start = $dates->search(fn($d) => $d->gte($booking->start_date));
+                        $end   = $dates->search(fn($d) => $d->gte($booking->end_date));
+                        $start = max(0, $start) + 0.5;
+                        $end   = ($end ?? 18) + 0.5;
+                        $left  = ($start / 18) * 100;
+                        $width = (($end - $start) / 18) * 100;
                     @endphp
                     <div class="booking-bar"
-                         style="
-                            left: {{ $left }}%;
-                            width: {{ $width }}%;
-                            background: {{ $booking->color }};
-                         ">
+                         style="left:{{ $left }}%;
+                                width:{{ $width }}%;
+                                background:{{ $booking->color }};">
                         {{ $booking->full_name }}
                     </div>
                 @endforeach
@@ -196,23 +203,39 @@
     @endforeach
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const filterBtn   = document.getElementById('filterBtn');
-    const filterPanel = document.getElementById('filterPanel');
-    const filtersForm = document.getElementById('filtersForm');
-    filterBtn.onclick = e => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const bell   = notificationBell;
+    const panel  = notificationPanel;
+    const count  = notificationCount;
+    const list   = notificationsList;
+    async function loadNotifications() {
+        const res = await fetch('/admin/notifications');
+        const data = await res.json();
+        let unread = 0;
+        list.innerHTML = '';
+        data.forEach(n => {
+            if (!n.is_read) unread++;
+            list.innerHTML += `<div class="notify-item">${n.title}</div>`;
+        });
+        count.textContent = unread || '';
+        count.style.display = unread ? 'block' : 'none';
+    }
+    await loadNotifications();
+    bell.onclick = async e => {
         e.stopPropagation();
-        filterPanel.style.display =
-            filterPanel.style.display === 'block' ? 'none' : 'block';
+        panel.classList.toggle('show');
+        await fetch('/admin/notifications/mark-read', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content }
+        });
+        count.style.display = 'none';
     };
-    filtersForm.onclick = e => e.stopPropagation();
-    filtersForm.onsubmit = e => {
-        e.preventDefault();
-        const params = new URLSearchParams(new FormData(filtersForm)).toString();
-        location.search = params;
-    };
+    legendBtn.onclick = e => { e.stopPropagation(); legendPanel.classList.toggle('show'); };
+    filterBtn.onclick = e => { e.stopPropagation(); filterPanel.classList.toggle('show'); };
     document.onclick = () => {
-        filterPanel.style.display = 'none';
+        panel.classList.remove('show');
+        legendPanel.classList.remove('show');
+        filterPanel.classList.remove('show');
     };
 });
 </script>
