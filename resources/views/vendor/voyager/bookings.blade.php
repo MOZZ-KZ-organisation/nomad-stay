@@ -33,10 +33,15 @@
     padding: 6px 0;
     font-size: 12px;
     border-right: 1px solid #e5e7eb;
+    background: #f3f4f6; /* фон заголовка */
+    color: #374151; /* серый текст */
+}
+.day-col.weekend {
+    color: #dc2626; /* красный для сб/вс */
 }
 .day-week {
     font-size: 11px;
-    color: #6b7280;
+    color: inherit;
 }
 .calendar-row {
     height: 38px;
@@ -92,7 +97,7 @@
     transition: background 0.2s ease;
 }
 .hover-slot:hover {
-    background: rgba(231, 231, 231, 0.05);
+    background: #d0ebff; /* голубой при наведении */
 }
 
 /* Остальные стили календаря, фильтров, уведомлений, легенды */
@@ -205,9 +210,13 @@
     <div class="calendar-header">
         <div class="room-col"><b>Номер</b></div>
         @foreach($dates as $date)
-            <div class="day-col">
+            @php
+                $day = mb_substr($date->translatedFormat('D'),0,2);
+                $isWeekend = in_array($day,['Сб','Вс']);
+            @endphp
+            <div class="day-col {{ $isWeekend ? 'weekend' : '' }}">
                 <b>{{ $date->format('d') }}</b>
-                <div class="day-week">{{ mb_substr($date->translatedFormat('D'), 0, 2) }}</div>
+                <div class="day-week">{{ $day }}</div>
             </div>
         @endforeach
     </div>
@@ -225,7 +234,7 @@
                     <div class="day-bg" style="left:{{ ($i/18)*100 }}%; width:{{ 100/18 }}%;"></div>
                 @endforeach
 
-                {{-- Hover-зоны между ячейками --}}
+                {{-- Hover-зоны --}}
                 @for($i = 0; $i < 18-1; $i++)
                     <div class="hover-slot" style="left:{{ (($i+0.5)/18)*100 }}%; width:{{ (1/18)*100 }}%;"></div>
                 @endfor
@@ -233,10 +242,10 @@
                 {{-- Бронирования --}}
                 @foreach($bookings->where('room_id', $room->id) as $booking)
                     @php
-                        $start = $dates->search(fn($d) => $d->gte($booking->start_date));
-                        $end = $dates->search(fn($d) => $d->gte($booking->end_date));
-                        $start = max(0,$start) + 0.5;
-                        $end = ($end ?? 18) + 0.5;
+                        $start = $dates->search(fn($d)=>$d->gte($booking->start_date));
+                        $end = $dates->search(fn($d)=>$d->gte($booking->end_date));
+                        $start = max(0,$start)+0.5;
+                        $end = ($end ?? 18)+0.5;
                         $left = ($start/18)*100;
                         $width = (($end-$start)/18)*100;
                     @endphp
