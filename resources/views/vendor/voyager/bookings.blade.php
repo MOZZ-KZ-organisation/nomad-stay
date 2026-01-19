@@ -24,6 +24,7 @@
     padding: 10px;
     background: #ffffff;
     flex-shrink: 0;
+    border-right: 1px solid #ededed;
 }
 .day-col {
     flex: 1;
@@ -39,7 +40,6 @@
 .calendar-row {
     height: 38px;
     border-top: 1px solid #e5e7eb;
-    border-bottom: 1px solid #e5e7eb;
 }
 .row-body {
     position: relative;
@@ -130,10 +130,10 @@
     display: flex; justify-content: center; align-items: center;
     width: 36px; height: 36px; border-radius: 8px;
     background: #fff; border:1px solid #e6e6e6;
-    text-decoration:none; font-weight:bold; font-size:18px; color:#111;
+    text-decoration:none; font-weight:bold; font-size:18px; color:#000;
     cursor:pointer; transition: all 0.2s ease;
 }
-.nav-arrow:hover { background:#5283c4; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+.nav-arrow:hover { background:#c0c0c0; color:#000; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
 .day-col.weekend {
     background: #ffe7e7;
 }
