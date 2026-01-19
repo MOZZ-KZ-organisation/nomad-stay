@@ -12,11 +12,12 @@ class BookingCalendarController extends Controller
 {
     public function index(Request $request)
     {
-        $today = Carbon::today();
-        $days = 30;
+        $startDate = $request->filled('start')
+            ? Carbon::parse($request->start): Carbon::today();
+        $days = 18;
         $dates = collect();
         for ($i = 0; $i < $days; $i++) {
-            $dates->push($today->copy()->addDays($i));
+            $dates->push($startDate->copy()->addDays($i));
         }
         $roomsQuery = Room::with(['hotel']);
         if ($request->filled('hotel_id')) {
@@ -52,7 +53,8 @@ class BookingCalendarController extends Controller
             'dates',
             'bookings',
             'hotels',
-            'roomTypes'
+            'roomTypes',
+            'startDate'
         ));
     }
 }
