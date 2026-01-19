@@ -39,12 +39,6 @@
     font-size: 11px;
     color: #6b7280;
 }
-.day-col:hover,
-.day-bg:hover {
-    background-color: #fefefe;
-    cursor: pointer; 
-    transition: background-color 0.2s ease;
-}
 .calendar-row {
     height: 38px;
     border-top: 1px solid #e5e7eb;
@@ -55,6 +49,9 @@
     position: relative;
     flex: 1;
     height: 38px;
+}
+.row-body:hover {
+    background-color: #fefefe;
 }
 .day-bg {
     position: absolute;
