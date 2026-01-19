@@ -152,6 +152,9 @@
 .day-col.weekend .day-week {
     color: #ef4444;
 }
+.day-bg.weekend {
+    background: #fffafa;
+}
 </style>
 
 <div class="top-controls">
