@@ -91,7 +91,7 @@
     transition: background 0.15s ease;
 }
 .hover-slot:hover {
-    background: #82b0ff;
+    background: #afd6ff;
 }
 
 /* Остальные стили календаря, фильтров, уведомлений, легенды */
