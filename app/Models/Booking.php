@@ -67,7 +67,7 @@ class Booking extends Model
     {
         return match ($this->status) {
             'checked_in'  => '#4ADE80', 
-            'booked'      => '#ecbd4f', 
+            'booked'      => '#fbd06d', 
             'checked_out' => '#9CA3AF', 
             'cancelled'   => '#EB5757',
             default       => '#E5E7EB',
