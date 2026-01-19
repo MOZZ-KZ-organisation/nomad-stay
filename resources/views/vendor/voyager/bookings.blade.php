@@ -143,6 +143,15 @@
     cursor:pointer; transition: all 0.2s ease;
 }
 .nav-arrow:hover { background:#3e72e2; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+.day-col.weekend {
+    background: #fff5f5;
+}
+.day-col.weekend b {
+    color: #dc2626;
+}
+.day-col.weekend .day-week {
+    color: #ef4444;
+}
 </style>
 
 <div class="top-controls">
@@ -204,9 +213,11 @@
     <div class="calendar-header">
         <div class="room-col"><b>Номер</b></div>
         @foreach($dates as $date)
-            <div class="day-col">
+            <div class="day-col {{ $date->isWeekend() ? 'weekend' : '' }}">
                 <b>{{ $date->format('d') }}</b>
-                <div class="day-week">{{ mb_substr($date->translatedFormat('D'), 0, 2) }}</div>
+                <div class="day-week">
+                    {{ mb_substr($date->translatedFormat('D'), 0, 2) }}
+                </div>
             </div>
         @endforeach
     </div>
@@ -221,7 +232,9 @@
             <div class="row-body">
                 {{-- Пустые ячейки --}}
                 @foreach($dates as $i => $date)
-                    <div class="day-bg" style="left:{{ ($i/18)*100 }}%; width:{{ 100/18 }}%;"></div>
+                    <div class="day-bg {{ $date->isWeekend() ? 'weekend' : '' }}"
+                        style="left:{{ ($i/18)*100 }}%; width:{{ 100/18 }}%;">
+                    </div>
                 @endforeach
 
                 {{-- Hover-зоны между ячейками --}}
