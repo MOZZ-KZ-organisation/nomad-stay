@@ -61,8 +61,8 @@
 /* Бронирования */
 .booking-bar {
     position: absolute;
-    top: 0;
-    bottom: 0;
+    top: 1px;
+    bottom: 1px;
     border-radius: 1px;
     padding: 4px 8px;
     font-size: 12px;
@@ -144,7 +144,7 @@
 }
 .nav-arrow:hover { background:#3e72e2; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
 .day-col.weekend {
-    background: #ffe3e3;
+    background: #ffe7e7;
 }
 .day-col.weekend b {
     color: #dc2626;
@@ -153,7 +153,7 @@
     color: #ef4444;
 }
 .day-bg.weekend {
-    background: #ffefef;
+    background: #fff3f3;
 }
 </style>
 
