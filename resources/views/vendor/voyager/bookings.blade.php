@@ -50,15 +50,16 @@
     flex: 1;
     height: 38px;
 }
-.row-body:hover {
-    background-color: #fefefe;
-}
 .day-bg {
     position: absolute;
     top: 0;
     bottom: 0;
     background: #eff6ff;
     border-right: 1px solid #e5e7eb;
+}
+.day-bg:hover {
+    background-color: #fefefe;
+    cursor: pointer;
 }
 .booking-bar {
     position: absolute;
