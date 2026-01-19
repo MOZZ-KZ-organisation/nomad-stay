@@ -40,7 +40,7 @@
     color: #6b7280;
 }
 .calendar-row {
-    height: 60px;
+    height: 38px;
     border-top: 1px solid #e5e7eb;
     border-bottom: 1px solid #e5e7eb;
     border-left: 1px solid #e5e7eb; 
