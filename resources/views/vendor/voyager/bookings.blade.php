@@ -172,9 +172,35 @@
     background: #9ca3af;
 }
 </style>
-<div class="top-controls" style="display:flex;align-items:center;gap:12px;margin:16px;">
-    <h1 style="font-size:26px;margin-right:12px;">Календарь бронирований</h1>
-    <div class="filters-wrapper" style="position:relative;">
+<div class="top-controls" style="display:flex;align-items:center;gap:12px;margin:16px; flex-wrap:wrap;">
+    <h1 style="font-size:26px;margin-right:12px;">
+        Календарь бронирований
+        <span style="font-size:14px;color:#6b7280;">
+            {{ $dates->first()->format('d.m') }} – {{ $dates->last()->format('d.m') }}
+        </span>
+    </h1>
+    <div class="legend-wrapper" style="margin-left:12px;">
+        <button id="legendBtn" class="icon-btn">🛈</button>
+        <div id="legendPanel" class="dropdown-panel">
+            <b>Легенда</b>
+            <div><span class="legend booked"></span> Забронировано</div>
+            <div><span class="legend checked-in"></span> Заселено</div>
+            <div><span class="legend checked-out"></span> Выселено</div>
+        </div>
+    </div>
+    <div class="notifications-wrapper" style="margin-left:12px;">
+        <button id="notificationBell" class="icon-btn">🔔
+            <span id="notificationCount"></span>
+        </button>
+        <div id="notificationPanel" class="dropdown-panel">
+            <div class="panel-header">
+                <b>Уведомления</b>
+                <button id="closeNotifications">✖</button>
+            </div>
+            <div id="notificationsList"></div>
+        </div>
+    </div>
+    <div class="filters-wrapper" style="position:relative;margin-left:12px;">
         <button id="filterBtn" class="btn btn-default">⚙️ Фильтр</button>
         <div id="filterPanel" class="filter-panel">
             <form id="filtersForm">
@@ -197,7 +223,7 @@
             </form>
         </div>
     </div>
-    <div class="calendar-nav" style="margin-left:12px;">
+    <div class="calendar-nav" style="margin-left:auto;">
         <a class="btn btn-sm btn-default"
            href="{{ route('admin.bookings.calendar', array_merge(request()->all(), ['start' => $startDate->copy()->subDay()->toDateString()])) }}">
            ←
@@ -207,45 +233,24 @@
            →
         </a>
     </div>
-    <div class="notifications-wrapper" style="margin-left:12px;">
-        <button id="notificationBell" class="icon-btn">🔔
-            <span id="notificationCount"></span>
-        </button>
-        <div id="notificationPanel" class="dropdown-panel">
-            <div class="panel-header">
-                <b>Уведомления</b>
-                <button id="closeNotifications">✖</button>
-            </div>
-            <div id="notificationsList"></div>
-        </div>
-    </div>
-    <div class="legend-wrapper" style="margin-left:12px;">
-        <button id="legendBtn" class="icon-btn">🛈</button>
-        <div id="legendPanel" class="dropdown-panel">
-            <b>Легенда</b>
-            <div><span class="legend booked"></span> Забронировано</div>
-            <div><span class="legend checked-in"></span> Заселено</div>
-            <div><span class="legend checked-out"></span> Выселено</div>
-        </div>
-    </div>
 </div>
-<div class="calendar-wrapper">
+<div class="calendar-wrapper" style="overflow:hidden;">
     <div class="calendar-header">
         <div class="room-col"><b>Номер</b></div>
         @foreach($dates as $date)
-            <div class="day-col">
+            <div class="day-col" style="border-right:1px solid #e5e7eb;">
                 <b style="font-size:14px;">{{ $date->format('d') }}</b>
                 <div style="font-size:11px;color:#6b7280;">{{ $date->translatedFormat('dd') }}</div>
             </div>
         @endforeach
     </div>
     @foreach($rooms as $room)
-        <div class="calendar-row">
+        <div class="calendar-row" style="border-bottom:1px solid #eee;">
             <div class="room-col">
                 <b>{{ $room->number ?? $room->title }}</b>
-                <div class="room-hotel">{{ $room->hotel->title }}</div>
+                <div class="room-hotel" style="font-size:11px;color:#6b7280;">{{ $room->hotel->title }}</div>
             </div>
-            <div class="row-body">
+            <div class="row-body" style="position:relative; height:64px;">
                 @foreach($dates as $i => $date)
                     <div class="day-bg"
                          style="left:{{ ($i / 18) * 100 }}%; width:{{ 100 / 18 }}%; border-right:1px solid #e5e7eb;">
