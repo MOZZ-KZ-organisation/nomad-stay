@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('bookings:complete')->dailyAt('11:00');
+Schedule::command('bookings:auto-checkout')->dailyAt('00:00');

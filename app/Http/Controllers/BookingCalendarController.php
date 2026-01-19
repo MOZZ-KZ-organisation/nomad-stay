@@ -12,11 +12,11 @@ class BookingCalendarController extends Controller
 {
     public function index(Request $request)
     {
-        $start = $request->get('start_date', now()->startOfMonth()->toDateString());
+        $today = Carbon::today();
         $days = 30;
         $dates = collect();
         for ($i = 0; $i < $days; $i++) {
-            $dates->push(Carbon::parse($start)->addDays($i));
+            $dates->push($today->copy()->addDays($i));
         }
         $roomsQuery = Room::with(['hotel']);
         if ($request->filled('hotel_id')) {
@@ -47,6 +47,15 @@ class BookingCalendarController extends Controller
         }
         $hotels = Hotel::all();
         $roomTypes = Room::select('title')->distinct()->pluck('title');
+        foreach ($bookings as $booking) {
+        if (Carbon::parse($booking->end_date)->lt($today)) {
+                $booking->status = 'checked_out';
+            } elseif (Carbon::parse($booking->start_date)->lte($today) && Carbon::parse($booking->end_date)->gte($today)) {
+                $booking->status = 'checked_in';
+            } else {
+                $booking->status = 'booked';
+            }
+        }
         return view('vendor.voyager.bookings', compact(
             'rooms',
             'dates',
