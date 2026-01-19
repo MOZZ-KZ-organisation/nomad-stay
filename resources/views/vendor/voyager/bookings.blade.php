@@ -275,7 +275,7 @@
                 <b>{{ $room->number ?? $room->title }}</b>
                 <div class="room-hotel" style="font-size:11px;color:#6b7280;">{{ $room->hotel->title }}</div>
             </div>
-            <div class="row-body" style="position:relative; height:64px;">
+            <div class="row-body" style="position:relative;">
                 @foreach($dates as $i => $date)
                     <div class="day-bg"
                          style="left:{{ ($i / 18) * 100 }}%; width:{{ 100 / 18 }}%; border-right:1px solid #e5e7eb;">
