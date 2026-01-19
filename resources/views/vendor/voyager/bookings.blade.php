@@ -61,7 +61,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    border-radius: 0;
+    border-radius: 1px;
     padding: 4px 8px;
     font-size: 12px;
     font-weight: 500;
@@ -76,7 +76,7 @@
     transition: box-shadow 0.2s ease;
 }
 .booking-bar:hover {
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    filter: brightness(85%);
 }
 .filters-wrapper {
     position: relative;
