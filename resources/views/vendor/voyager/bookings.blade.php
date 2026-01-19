@@ -76,8 +76,8 @@
     cursor: pointer;
     z-index: 10;
     transition: filter 0.2s ease;
-    border-left: 1px solid #fff;
-    border-right: 1px solid #fff;
+    border-left: 2px solid #fff;
+    border-right: 2px solid #fff;
 }
 .booking-bar:hover {
     filter: brightness(95%);
