@@ -10,7 +10,7 @@
 }
 .calendar-wrapper {
     background: #fff;
-    border-radius: 12px;
+    border-radius: 2px;
     margin: 16px;
     overflow: hidden;
 }
@@ -133,7 +133,7 @@
     text-decoration:none; font-weight:bold; font-size:18px; color:#000;
     cursor:pointer; transition: all 0.2s ease;
 }
-.nav-arrow:hover { background:#c0c0c0; color:#000; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+.nav-arrow:hover { background:#f3f3f3; color:#000; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
 .day-col.weekend {
     background: #ffe7e7;
 }
