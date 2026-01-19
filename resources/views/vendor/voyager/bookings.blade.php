@@ -63,7 +63,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    border-radius: 1px;
+    border-radius: 2px;
     padding: 4px 8px;
     font-size: 12px;
     font-weight: 500;
@@ -76,8 +76,8 @@
     cursor: pointer;
     z-index: 10;
     transition: filter 0.2s ease;
-    box-sizing: border-box;
-    border: 1px solid #fff;
+    border-left: 1px solid #fff;
+    border-right: 1px solid #fff;
 }
 .booking-bar:hover {
     filter: brightness(95%);
