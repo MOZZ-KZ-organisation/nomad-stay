@@ -77,7 +77,7 @@
     z-index: 10;
     transition: filter 0.2s ease;
     box-sizing: border-box;
-    border: 1px solid rgba(0,0,0,0.15);
+    border: 1px solid #fff;
 }
 .booking-bar:hover {
     filter: brightness(95%);
