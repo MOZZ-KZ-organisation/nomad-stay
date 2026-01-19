@@ -92,6 +92,85 @@
     font-size: 11px;
     color: #6b7280;
 }
+.notifications-wrapper {
+    position: relative;
+}
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    font-size: 16px;
+}
+#notificationCount {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ef4444;
+    color: #fff;
+    border-radius: 999px;
+    font-size: 11px;
+    padding: 2px 6px;
+    display: none;
+    line-height: 1;
+}
+.dropdown-panel {
+    display: none;
+    position: absolute;
+    top: 48px;
+    right: 0;
+    width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    padding: 12px;
+    z-index: 9999;
+}
+.dropdown-panel.show {
+    display: block;
+}
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.panel-header button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+}
+.notify-item {
+    padding: 8px 6px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+}
+.notify-item:last-child {
+    border-bottom: none;
+}
+.legend-wrapper {
+    position: relative;
+}
+.legend {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-right: 6px;
+}
+.legend.booked {
+    background: #facc15;
+}
+.legend.checked-in {
+    background: #4ade80;
+}
+.legend.checked-out {
+    background: #9ca3af;
+}
 </style>
 <div class="top-controls">
     <div class="calendar-nav">
@@ -130,7 +209,6 @@
             <div><span class="legend booked"></span> Забронировано</div>
             <div><span class="legend checked-in"></span> Заселено</div>
             <div><span class="legend checked-out"></span> Выселено</div>
-            <div><span class="legend cancelled"></span> Отменено</div>
         </div>
     </div>
     <div class="filters-wrapper">
