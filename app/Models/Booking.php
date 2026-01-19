@@ -66,9 +66,9 @@ class Booking extends Model
     public function getColorAttribute()
     {
         return match ($this->status) {
-            'checked_in'  => '#4ADE80', 
-            'booked'      => '#fbd06d', 
-            'checked_out' => '#9CA3AF', 
+            'checked_in'  => '#a9d445', 
+            'booked'      => '#ffd97f', 
+            'checked_out' => '#b5b7b9', 
             'cancelled'   => '#EB5757',
             default       => '#E5E7EB',
         };
