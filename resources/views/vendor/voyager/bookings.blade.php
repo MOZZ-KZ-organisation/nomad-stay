@@ -45,11 +45,6 @@
     border-bottom: 1px solid #e5e7eb;
     border-left: 1px solid #e5e7eb; 
 }
-.row-body {
-    position: relative;
-    flex: 1;
-    height: 38px;
-}
 .day-bg {
     position: absolute;
     top: 0;
@@ -57,9 +52,25 @@
     background: #eff6ff;
     border-right: 1px solid #e5e7eb;
 }
-.day-bg:hover {
+.row-body {
+    position: relative;
+    flex: 1;
+    height: 38px;
+}
+.row-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: transparent;
+    z-index: 1;
+    pointer-events: none;
+    transition: background-color 0.2s ease;
+}
+.row-body:hover::before {
     background-color: #fefefe;
-    cursor: pointer;
 }
 .booking-bar {
     position: absolute;
@@ -77,7 +88,7 @@
     text-overflow: ellipsis;
     cursor: pointer;
     z-index: 10;
-    transition: box-shadow 0.2s ease;
+    transition: filter 0.2s ease;
 }
 .booking-bar:hover {
     filter: brightness(95%);
@@ -269,7 +280,7 @@
         @foreach($dates as $date)
             <div class="day-col" style="border-right:1px solid #e5e7eb;">
                 <b style="font-size:14px;">{{ $date->format('d') }}</b>
-                <div style="font-size:11px;color:#6b7280;">{{ $date->translatedFormat('dd') }}</div>
+                <div style="font-size:11px;color:#6b7280;">{{ $date->translatedFormat('D') }}</div>
             </div>
         @endforeach
     </div>
