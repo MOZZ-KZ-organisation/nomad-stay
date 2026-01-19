@@ -10,20 +10,19 @@ Route::get('/', function () {
 });
 
 
-Route::group(['prefix' => 'admin', 'middleware' => ['web', 'admin.user']], function () {
+Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
-    Route::post('/support-messages/{chat}', [VoyagerSupportMessageController::class, 'store'])
-        ->name('voyager.support-messages.store');
-    Route::get('/calendar', [BookingCalendarController::class, 'index'])
-        ->name('admin.bookings.calendar');
-
-    Route::get('/notifications', function() {
-        return Notification::latest()->take(15)->get();
-    });
-    Route::post('/notifications/mark-read', function() {
-        Notification::where('is_read', false)->update([
-            'is_read' => true
-        ]);
-        return response()->json(['success'=>true]);
+    Route::group(['middleware' => 'admin.user'], function () {
+        Route::get('/calendar', [BookingCalendarController::class, 'index'])
+            ->name('admin.bookings.calendar');
+        Route::get('/notifications', function () {
+            return Notification::latest()->take(15)->get();
+        });
+        Route::post('/notifications/mark-read', function () {
+            Notification::where('is_read', false)->update([
+                'is_read' => true
+            ]);
+            return response()->json(['success' => true]);
+        });
     });
 });
