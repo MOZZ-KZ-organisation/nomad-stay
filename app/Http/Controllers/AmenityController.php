@@ -9,6 +9,6 @@ class AmenityController extends Controller
 {
     public function index()
     {
-        return Amenity::select('id', 'name')->orderBy('name')->get();
+        return Amenity::select('id', 'code', 'name')->orderBy('code')->get();
     }
 }

@@ -24,7 +24,10 @@ class HotelResource extends JsonResource
             'reviews_count' => $this->reviews()->count(),
             'cancellation_fee' => $this->cancellation_fee,
             'images' => $this->images->map(fn($i) => Voyager::image($i->path)),
-            'amenities' => $this->amenities->pluck('name'),
+            'amenities' => $this->amenities->map(fn($a) => [
+                'code' => $a->code,
+                'name' => $a->name,
+            ]),
             'rooms' => RoomResource::collection($this->whenLoaded('rooms')),
             'nearby' => [
                 'metro' => $this->nearby?->metro,
