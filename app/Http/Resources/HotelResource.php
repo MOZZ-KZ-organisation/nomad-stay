@@ -29,12 +29,25 @@ class HotelResource extends JsonResource
                 'name' => $a->name,
             ]),
             'rooms' => RoomResource::collection($this->whenLoaded('rooms')),
-            'nearby' => [
-                'metro' => $this->nearby?->metro,
-                'station' => $this->nearby?->station,
-                'attractions' => $this->nearby?->park,
-                'airport' => $this->nearby?->airport,
-            ],
+            'nearby' => collect([
+                [
+                    'key' => 'Метро',
+                    'description' => $this->nearby?->metro,
+                ],
+                [
+                    'key' => 'Станция',
+                    'description' => $this->nearby?->station,
+                ],
+                [
+                    'key' => 'Парк',
+                    'description' => $this->nearby?->park,
+                ],
+                [
+                    'key' => 'Аэропорт',
+                    'description' => $this->nearby?->airport,
+                ],
+            ])->filter(fn($item) => !empty($item['description']))
+            ->values(),
             'is_favorite' => $this->is_favorite,
         ];
     }
