@@ -20,7 +20,10 @@ class RoomResource extends JsonResource
             'stock' => $this->available_stock,
             'images' => $this->images->map(fn($i) => Voyager::image($i->path)),
             'amenities' => $this->hotel
-                ? $this->hotel->amenities->pluck('name')->values() : [],
+                ? $this->hotel->amenities->map(fn($a) => [
+                    'code' => $a->code,
+                    'name' => $a->name,
+                ])->values() : [],
         ];
     }
 }
