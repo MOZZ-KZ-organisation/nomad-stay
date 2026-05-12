@@ -33,6 +33,7 @@ Route::get('hotels/{hotel}/reviews', function (Hotel $hotel) {
 });
 Route::get('search', [SearchController::class, 'index']);
 Route::get('hotels/{hotel}', [HotelController::class, 'show']);
+Route::get('/hotels/{hotel}/details', [HotelController::class, 'details']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/delete-account',[AuthController::class, 'deleteAccount']);

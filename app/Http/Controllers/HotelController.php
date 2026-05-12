@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\HotelShowRequest;
+use App\Http\Resources\HotelDetailsResource;
 use App\Http\Resources\HotelRecentResource;
 use App\Http\Resources\HotelResource;
 use App\Models\Hotel;
@@ -48,5 +49,33 @@ class HotelController extends Controller
             ->inRandomOrder()
             ->limit(6)->get();
         return HotelRecentResource::collection($hotels);
+    }
+
+    public function details(Request $request, Hotel $hotel)
+    {
+        $user = $request->user();
+        $cacheKey = 'hotel_details_only:' . $hotel->id;
+        $hotel = Cache::remember(
+            $cacheKey,
+            now()->addMinutes(5),
+            function () use ($hotel) {
+                return $hotel->load([
+                    'images',
+                    'amenities',
+                    'reviews' => function ($q) {
+                        $q->latest()->limit(10);
+                    },
+                    'nearby',
+                    'city',
+                ]);
+            }
+        );
+        $isFavorite = $user
+            ? $user->favorites()
+                ->where('hotel_id', $hotel->id)
+                ->exists()
+            : false;
+        $hotel->is_favorite = $isFavorite;
+        return new HotelDetailsResource($hotel);
     }
 }
