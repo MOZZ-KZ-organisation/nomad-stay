@@ -8,6 +8,7 @@ use App\Http\Resources\HotelRecentResource;
 use App\Http\Resources\HotelResource;
 use App\Models\Hotel;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Request;
 
 class HotelController extends Controller
 {
