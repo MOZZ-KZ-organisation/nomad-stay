@@ -175,18 +175,15 @@ function icon($name) {
                 <h3>Даты</h3>
 
                 <div class="row-4">
-                    <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div class="label-box">
+                        <div class="label-title">Заезд</div>
+                        <div class="label-value">{{ $booking->start_date->format('d.m.Y') }}</div>
+                        <div class="small">{{ $booking->arrival_time }}</div>
+                    </div>
 
-                        <div class="small" style="display:flex;align-items:center;gap:6px;">
-                            {!! icon('calendar') !!}
-                            Заезд: {{ $booking->start_date->format('d.m.Y') }}
-                        </div>
-
-                        <div class="small" style="display:flex;align-items:center;gap:6px;">
-                            {!! icon('calendar') !!}
-                            Выезд: {{ $booking->end_date->format('d.m.Y') }}
-                        </div>
-
+                    <div class="label-box">
+                        <div class="label-title">Выезд</div>
+                        <div class="label-value">{{ $booking->end_date->format('d.m.Y') }}</div>
                     </div>
 
                     <div class="label-box">
