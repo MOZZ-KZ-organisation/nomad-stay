@@ -76,6 +76,53 @@
 .booking-bar:hover {
     filter: brightness(95%);
 }
+
+.booking-tooltip {
+    position: fixed;
+    width: 320px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    border: 1px solid #e5e7eb;
+    z-index: 99999;
+    overflow: hidden;
+    font-size: 13px;
+    display: none;
+}
+
+.booking-tooltip-header {
+    padding: 12px 14px;
+    border-bottom: 1px solid #ececec;
+}
+
+.booking-tooltip-title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.booking-tooltip-body {
+    padding: 12px 14px;
+}
+
+.booking-tooltip-line {
+    margin-bottom: 6px;
+    color: #444;
+}
+
+.booking-tooltip-debt {
+    color: #dc2626;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.booking-tooltip-footer {
+    background: #f5e7b5;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #444;
+}
 .hover-slot {
     position: absolute;
     top: 0;
@@ -237,7 +284,20 @@
                         $left = ($start/18)*100;
                         $width = (($end-$start)/18)*100;
                     @endphp
-                    <div class="booking-bar" style="left:{{ $left }}%; width:{{ $width }}%; background:{{ $booking->color }};">
+                    <div
+                        class="booking-bar"
+                        style="left:{{ $left }}%; width:{{ $width }}%; background:{{ $booking->color }};"
+                        
+                        data-id="{{ $booking->id }}"
+                        data-guest="{{ $booking->full_name }}"
+                        data-phone="{{ $booking->phone }}"
+                        data-start="{{ \Carbon\Carbon::parse($booking->start_date)->format('d.m.Y') }}"
+                        data-end="{{ \Carbon\Carbon::parse($booking->end_date)->format('d.m.Y') }}"
+                        data-status="{{ $booking->status }}"
+                        data-paid="{{ $booking->is_paid ? 'Оплачено' : 'Долг '.$booking->debt.' ₸' }}"
+                        data-room="{{ $room->number ?? $room->title }}"
+                        data-source="{{ $booking->source }}"
+                    >
                         {{ $booking->full_name }}
                     </div>
                 @endforeach
@@ -245,6 +305,7 @@
         </div>
     @endforeach
 </div>
+<div id="bookingTooltip" class="booking-tooltip"></div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const bell = document.getElementById('notificationBell');
@@ -288,6 +349,76 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('legendPanel').classList.remove('show');
         document.getElementById('filterPanel').classList.remove('show');
     };
+});
+
+const tooltip = document.getElementById('bookingTooltip');
+document.querySelectorAll('.booking-bar').forEach(bar => {
+
+    bar.addEventListener('mouseenter', e => {
+
+        tooltip.innerHTML = `
+            <div class="booking-tooltip-header">
+                <div style="font-size:14px;color:#666;">
+                    Группа апср · 2 👤 · 4👥
+                </div>
+
+                <div style="margin-top:4px;">
+                    <a href="#" style="color:#2563eb;text-decoration:none;">
+                        Посмотреть группу
+                    </a>
+                </div>
+            </div>
+
+            <div class="booking-tooltip-body">
+
+                <div class="booking-tooltip-title">
+                    ${bar.dataset.id}
+                </div>
+
+                <div class="booking-tooltip-line">
+                    <b>${bar.dataset.start}</b> — <b>${bar.dataset.end}</b>
+                </div>
+
+                <div class="booking-tooltip-line">
+                    Номер: ${bar.dataset.room}
+                </div>
+
+                <div class="booking-tooltip-line">
+                    Гость: ${bar.dataset.guest}
+                </div>
+
+                <div class="booking-tooltip-line">
+                    Телефон: ${bar.dataset.phone ?? '-'}
+                </div>
+
+                <div class="booking-tooltip-line">
+                    Источник: ${bar.dataset.source ?? '-'}
+                </div>
+
+                <div class="booking-tooltip-debt">
+                    ${bar.dataset.paid}
+                </div>
+
+            </div>
+
+            <div class="booking-tooltip-footer">
+                Комментарий группы<br>
+                Бронировала Наташа
+            </div>
+        `;
+
+        tooltip.style.display = 'block';
+    });
+
+    bar.addEventListener('mousemove', e => {
+
+        tooltip.style.left = (e.clientX + 18) + 'px';
+        tooltip.style.top = (e.clientY + 18) + 'px';
+    });
+
+    bar.addEventListener('mouseleave', () => {
+        tooltip.style.display = 'none';
+    });
 });
 </script>
 @endsection
