@@ -356,7 +356,7 @@
                     @endphp
                     <div
                         class="booking-bar"
-                        data-url="{{ route('admin.bookings.show', $booking->id) }}"
+                        data-url="{{ route('voyager.bookings.show', $booking->id) }}"
                         style="cursor:pointer; left:{{ $left }}%; width:{{ $width }}%; background:{{ $booking->color }};"
                         
                         data-id="{{ $booking->id }}"
