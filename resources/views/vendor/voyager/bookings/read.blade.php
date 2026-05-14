@@ -106,6 +106,20 @@ hr.soft {
 }
 </style>
 @php
+function icon($name) {
+    return match($name) {
+        'phone' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.86.32 1.7.59 2.5a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.58-1.11a2 2 0 0 1 2.11-.45c.8.27 1.64.47 2.5.59A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2"/></svg>',
+        'mail' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2"/><path d="m4 6 8 6 8-6" stroke="currentColor" stroke-width="2"/></svg>',
+        'users' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>',
+        'bed' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 7v14M21 7v14M3 13h18M7 13V9h10v4" stroke="currentColor" stroke-width="2"/></svg>',
+        'bath' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 10V7a5 5 0 0 1 10 0v3" stroke="currentColor" stroke-width="2"/><path d="M5 10h14v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" stroke="currentColor" stroke-width="2"/></svg>',
+        'money' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="2"/></svg>',
+        'calendar' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 3v3M17 3v3M4 8h16M5 5h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="2"/></svg>',
+        default => ''
+    };
+}
+@endphp
+@php
     /** @var \App\Models\Booking $booking */
     $booking = $dataTypeContent;
 
@@ -161,15 +175,18 @@ hr.soft {
                 <h3>Даты</h3>
 
                 <div class="row-4">
-                    <div class="label-box">
-                        <div class="label-title">Заезд</div>
-                        <div class="label-value">{{ $booking->start_date->format('d.m.Y') }}</div>
-                        <div class="small">{{ $booking->arrival_time }}</div>
-                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
 
-                    <div class="label-box">
-                        <div class="label-title">Выезд</div>
-                        <div class="label-value">{{ $booking->end_date->format('d.m.Y') }}</div>
+                        <div class="small" style="display:flex;align-items:center;gap:6px;">
+                            {!! icon('calendar') !!}
+                            Заезд: {{ $booking->start_date->format('d.m.Y') }}
+                        </div>
+
+                        <div class="small" style="display:flex;align-items:center;gap:6px;">
+                            {!! icon('calendar') !!}
+                            Выезд: {{ $booking->end_date->format('d.m.Y') }}
+                        </div>
+
                     </div>
 
                     <div class="label-box">
@@ -205,8 +222,15 @@ hr.soft {
 
                 <hr class="soft">
 
-                <div class="small">📞 {{ $booking->phone }}</div>
-                <div class="small">✉️ {{ $booking->email }}</div>
+                <div class="small" style="display:flex;align-items:center;gap:6px;">
+                    {!! icon('phone') !!}
+                    {{ $booking->phone }}
+                </div>
+
+                <div class="small" style="display:flex;align-items:center;gap:6px;">
+                    {!! icon('mail') !!}
+                    {{ $booking->email }}
+                </div>
 
                 @if($booking->is_business_trip)
                     <span class="badge badge-gray" style="margin-top:10px;">
@@ -225,10 +249,27 @@ hr.soft {
 
                 <hr class="soft">
 
-                <div class="small">👥 {{ $booking->room->capacity }} гостей</div>
-                <div class="small">🛏 {{ $booking->room->beds }} кровати</div>
-                <div class="small">🛁 {{ $booking->room->bathrooms }} ванная</div>
-                <div class="small">💰 {{ number_format($booking->room->price,0,'',' ') }} ₸ / ночь</div>
+                <div class="small" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        {!! icon('users') !!}
+                        {{ $booking->room->capacity }} гостей
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        {!! icon('bed') !!}
+                        {{ $booking->room->beds }} кровати
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        {!! icon('bath') !!}
+                        {{ $booking->room->bathrooms }} ванная
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        {!! icon('money') !!}
+                        {{ number_format($booking->room->price,0,'',' ') }} ₸ / ночь
+                    </div>
+                </div>
             </div>
 
             @if($booking->special_requests)
