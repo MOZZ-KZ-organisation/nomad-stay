@@ -483,13 +483,7 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
                                     </svg>
                                 </span>
                             `
-                            : `
-                                <span class="booking-icon">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 13h-2v-2h2Zm0-4h-2V7h2Z"/>
-                                    </svg>
-                                </span>
-                            `
+                            : ``
                         }
                         ${bar.dataset.paid}
                     </div>
