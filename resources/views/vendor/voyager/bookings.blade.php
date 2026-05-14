@@ -95,13 +95,19 @@
 }
 
 .booking-tooltip-room {
-    font-size: 30px;
+    font-size: 22px;
     font-weight: 700;
     color: #222;
     line-height: 1;
     margin-bottom: 10px;
 }
 
+.booking-tooltip-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 6px;
+}
 .booking-tooltip-top {
     display: flex;
     justify-content: space-between;
@@ -437,27 +443,31 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
                             ${bar.dataset.start} — ${bar.dataset.end}
                         </span>
 
-                        <span class="booking-tooltip-meta">
+                        <div class="booking-tooltip-meta-row">
 
-                            <span class="booking-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M21 12.79A9 9 0 0 1 11.21 3c0-.34.02-.67.05-1A1 1 0 0 0 10 1a10 10 0 1 0 13 13 1 1 0 0 0-1.21-1.21c-.33.03-.66.05-1 .05Z"/>
-                                </svg>
+                            <span class="booking-tooltip-meta">
+
+                                <span class="booking-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M21 12.79A9 9 0 0 1 11.21 3c0-.34.02-.67.05-1A1 1 0 0 0 10 1a10 10 0 1 0 13 13 1 1 0 0 0-1.21-1.21c-.33.03-.66.05-1 .05Z"/>
+                                    </svg>
+                                </span>
+
+                                ${bar.dataset.nights}
                             </span>
 
-                            ${bar.dataset.nights}
-                        </span>
+                            <span class="booking-tooltip-meta">
 
-                        <span class="booking-tooltip-meta">
+                                <span class="booking-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4Z"/>
+                                    </svg>
+                                </span>
 
-                            <span class="booking-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4Z"/>
-                                </svg>
+                                ${bar.dataset.guests}
                             </span>
 
-                            ${bar.dataset.guests}
-                        </span>
+                        </div>
 
                     </div>
 
