@@ -1,6 +1,110 @@
 @extends('voyager::master')
 
 @section('content')
+<style>
+.page-wrap {
+    max-width: 1100px;
+    margin: 20px auto;
+}
+
+.header-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px 22px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    margin-bottom: 18px;
+}
+
+.title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+.badge-success { background: #dcfce7; color: #166534; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-gray { background: #f3f4f6; color: #374151; }
+
+.grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 18px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+}
+
+.card h3 {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.row-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.label-box {
+    padding: 10px;
+    border-radius: 10px;
+    background: #f9fafb;
+}
+
+.label-title {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.label-value {
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.small {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+hr.soft {
+    border: none;
+    height: 1px;
+    background: #eef2f7;
+    margin: 14px 0;
+}
+
+.guest-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #4f46e5;
+    color: #fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:600;
+}
+</style>
 @php
     /** @var \App\Models\Booking $booking */
     $booking = $dataTypeContent;
@@ -23,127 +127,145 @@
     $status = $statusConfig[$booking->status] ?? $statusConfig['booked'];
 @endphp
 
-<div class="container-fluid" style="padding:20px;">
+<div class="page-wrap">
 
     {{-- HEADER --}}
-    <div class="panel panel-bordered">
-        <div class="panel-body">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div>
-                    <h2 style="margin:0;">Бронь #{{ $booking->id }}</h2>
-                    <small>{{ $booking->source }} / {{ $booking->type }}</small>
+    <div class="header-card">
+        <div class="title-row">
+            <div>
+                <h2 style="margin:0;">Бронь #{{ $booking->id }}</h2>
+                <div class="small">
+                    {{ $booking->source }} / {{ $booking->type }}
                 </div>
+            </div>
 
-                <div>
-                    <span class="label {{ $status['class'] }}">
-                        {{ $status['label'] }}
-                    </span>
+            <div>
+                <span class="badge {{ $status['class'] }}">
+                    {{ $status['label'] }}
+                </span>
 
-                    <span class="label" style="background:{{ $booking->is_paid ? '#dfffe0' : '#ffe0e0' }};color:#000;">
-                        {{ $booking->is_paid ? 'Оплачено' : 'Не оплачено' }}
-                    </span>
-                </div>
+                <span class="badge {{ $booking->is_paid ? 'badge-success' : 'badge-danger' }}">
+                    {{ $booking->is_paid ? 'Оплачено' : 'Не оплачено' }}
+                </span>
             </div>
         </div>
     </div>
 
-    {{-- INFO GRID --}}
-    <div class="row">
+    <div class="grid">
 
         {{-- LEFT --}}
-        <div class="col-md-8">
+        <div>
 
             {{-- DATES --}}
-            <div class="panel panel-bordered">
-                <div class="panel-heading">Даты</div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <b>Заезд</b><br>
-                            {{ $booking->start_date->format('d.m.Y') }}<br>
-                            <small>{{ $booking->arrival_time }}</small>
-                        </div>
+            <div class="card">
+                <h3>Даты</h3>
 
-                        <div class="col-md-3">
-                            <b>Выезд</b><br>
-                            {{ $booking->end_date->format('d.m.Y') }}
-                        </div>
+                <div class="row-4">
+                    <div class="label-box">
+                        <div class="label-title">Заезд</div>
+                        <div class="label-value">{{ $booking->start_date->format('d.m.Y') }}</div>
+                        <div class="small">{{ $booking->arrival_time }}</div>
+                    </div>
 
-                        <div class="col-md-3">
-                            <b>Ночей</b><br>
-                            {{ $nights }}
-                        </div>
+                    <div class="label-box">
+                        <div class="label-title">Выезд</div>
+                        <div class="label-value">{{ $booking->end_date->format('d.m.Y') }}</div>
+                    </div>
 
-                        <div class="col-md-3">
-                            <b>Гостей</b><br>
-                            {{ $booking->guests }}
-                        </div>
+                    <div class="label-box">
+                        <div class="label-title">Ночей</div>
+                        <div class="label-value">{{ $nights }}</div>
+                    </div>
+
+                    <div class="label-box">
+                        <div class="label-title">Гостей</div>
+                        <div class="label-value">{{ $booking->guests }}</div>
                     </div>
                 </div>
             </div>
 
             {{-- GUEST --}}
-            <div class="panel panel-bordered">
-                <div class="panel-heading">Гость</div>
-                <div class="panel-body">
-                    <h4>{{ $booking->full_name }}</h4>
-                    <p>{{ $booking->phone }}</p>
-                    <p>{{ $booking->email }}</p>
-                    <p>{{ $booking->country }}</p>
+            <div class="card">
+                <h3>Гость</h3>
 
-                    @if($booking->is_business_trip)
-                        <span class="label label-info">Командировка</span>
-                    @endif
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <div class="guest-avatar">
+                        {{ mb_substr($booking->first_name,0,1) }}{{ mb_substr($booking->last_name,0,1) }}
+                    </div>
+
+                    <div>
+                        <div style="font-weight:600;">
+                            {{ $booking->full_name }}
+                        </div>
+                        <div class="small">
+                            {{ $booking->country }}
+                        </div>
+                    </div>
                 </div>
+
+                <hr class="soft">
+
+                <div class="small">📞 {{ $booking->phone }}</div>
+                <div class="small">✉️ {{ $booking->email }}</div>
+
+                @if($booking->is_business_trip)
+                    <span class="badge badge-gray" style="margin-top:10px;">
+                        Командировка
+                    </span>
+                @endif
             </div>
 
             {{-- ROOM --}}
-            <div class="panel panel-bordered">
-                <div class="panel-heading">Номер</div>
-                <div class="panel-body">
-                    <h4>{{ $booking->room->title }}</h4>
-                    <p>{{ $booking->hotel->title }}</p>
-                    <p>{{ $booking->hotel->address }}</p>
+            <div class="card">
+                <h3>Номер</h3>
 
-                    <hr>
+                <div style="font-weight:600;">{{ $booking->room->title }}</div>
+                <div class="small">{{ $booking->hotel->title }}</div>
+                <div class="small">{{ $booking->hotel->address }}</div>
 
-                    <p>Вместимость: {{ $booking->room->capacity }}</p>
-                    <p>Кровати: {{ $booking->room->beds }}</p>
-                    <p>Ванные: {{ $booking->room->bathrooms }}</p>
-                    <p>Цена: {{ formatPrice($booking->room->price) }}</p>
-                </div>
+                <hr class="soft">
+
+                <div class="small">👥 {{ $booking->room->capacity }} гостей</div>
+                <div class="small">🛏 {{ $booking->room->beds }} кровати</div>
+                <div class="small">🛁 {{ $booking->room->bathrooms }} ванная</div>
+                <div class="small">💰 {{ number_format($booking->room->price,0,'',' ') }} ₸ / ночь</div>
             </div>
 
-            {{-- REQUESTS --}}
             @if($booking->special_requests)
-            <div class="panel panel-bordered">
-                <div class="panel-heading">Особые пожелания</div>
-                <div class="panel-body">
-                    {{ $booking->special_requests }}
-                </div>
+            <div class="card">
+                <h3>Пожелания</h3>
+                <div class="small">{{ $booking->special_requests }}</div>
             </div>
             @endif
 
         </div>
 
         {{-- RIGHT --}}
-        <div class="col-md-4">
+        <div>
 
             {{-- PAYMENT --}}
-            <div class="panel panel-bordered">
-                <div class="panel-heading">Оплата</div>
-                <div class="panel-body">
-                    <p>Проживание: {{ formatPrice($booking->price_for_period) }}</p>
-                    <p>Налог: {{ formatPrice($booking->tax) }}</p>
+            <div class="card">
+                <h3>Оплата</h3>
 
-                    <hr>
+                <div class="small">Проживание</div>
+                <div style="font-weight:600;">
+                    {{ formatPrice($booking->price_for_period) }}
+                </div>
 
-                    <h3>Итого: {{ formatPrice($booking->total_price) }}</h3>
+                <div class="small" style="margin-top:10px;">Налог</div>
+                <div style="font-weight:600;">
+                    {{ formatPrice($booking->tax) }}
+                </div>
+
+                <hr class="soft">
+
+                <div style="font-size:18px;font-weight:700;">
+                    {{ formatPrice($booking->total_price) }}
                 </div>
             </div>
 
         </div>
-    </div>
 
+    </div>
 </div>
 @endsection
