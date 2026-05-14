@@ -134,7 +134,7 @@
 }
 
 .booking-tooltip-paid {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     color: #111;
     display: flex;
