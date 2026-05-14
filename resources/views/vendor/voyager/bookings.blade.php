@@ -356,7 +356,8 @@
                     @endphp
                     <div
                         class="booking-bar"
-                        style="left:{{ $left }}%; width:{{ $width }}%; background:{{ $booking->color }};"
+                        data-url="{{ route('admin.bookings.show', $booking->id) }}"
+                        style="cursor:pointer; left:{{ $left }}%; width:{{ $width }}%; background:{{ $booking->color }};"
                         
                         data-id="{{ $booking->id }}"
                         data-guest="{{ $booking->full_name }}"
@@ -427,7 +428,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const tooltip = document.getElementById('bookingTooltip');
 document.querySelectorAll('.booking-bar').forEach(bar => {
-
+    bar.addEventListener('click', () => {
+        window.location.href = bar.dataset.url;
+    });
     bar.addEventListener('mouseenter', () => {
 
         tooltip.innerHTML = `
