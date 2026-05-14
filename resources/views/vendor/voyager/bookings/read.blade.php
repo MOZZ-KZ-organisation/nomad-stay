@@ -153,14 +153,22 @@ function icon($name) {
                 </div>
             </div>
 
-            <div>
-                <span class="badge {{ $status['class'] }}">
-                    {{ $status['label'] }}
-                </span>
-
-                <span class="badge {{ $booking->is_paid ? 'badge-success' : 'badge-danger' }}">
-                    {{ $booking->is_paid ? 'Оплачено' : 'Не оплачено' }}
-                </span>
+            <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+                {{-- STATUS --}}
+                <select id="statusSelect" style="padding:6px;border-radius:8px;border:1px solid #ddd;">
+                    <option value="booked" {{ $booking->status == 'booked' ? 'selected' : '' }}>Забронировано</option>
+                    <option value="checked_in" {{ $booking->status == 'checked_in' ? 'selected' : '' }}>Заселено</option>
+                    <option value="checked_out" {{ $booking->status == 'checked_out' ? 'selected' : '' }}>Выселено</option>
+                    <option value="cancelled" {{ $booking->status == 'cancelled' ? 'selected' : '' }}>Отменено</option>
+                </select>
+                {{-- PAID TOGGLE --}}
+                <label style="display:flex;align-items:center;gap:6px;">
+                    <input type="checkbox" id="paidToggle" {{ $booking->is_paid ? 'checked' : '' }}>
+                    Оплачен
+                </label>
+                <button id="saveBtn" class="btn btn-primary btn-sm">
+                    Сохранить
+                </button>
             </div>
         </div>
     </div>
@@ -306,4 +314,26 @@ function icon($name) {
 
     </div>
 </div>
+<script>
+document.getElementById('saveBtn').addEventListener('click', async () => {
+
+    const status = document.getElementById('statusSelect').value;
+    const is_paid = document.getElementById('paidToggle').checked ? 1 : 0;
+
+    const res = await fetch("{{ route('bookings.quick-update', $booking->id) }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ status, is_paid })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        location.reload(); // проще и безопаснее
+    }
+});
+</script>
 @endsection

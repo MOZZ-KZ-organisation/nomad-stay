@@ -132,4 +132,18 @@ class BookingController extends Controller
             $booking->load(['hotel', 'room'])
         );
     }
+
+    public function quickUpdate(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+        $booking->update([
+            'status' => $request->status ?? $booking->status,
+            'is_paid' => $request->is_paid ?? $booking->is_paid,
+        ]);
+        return response()->json([
+            'success' => true,
+            'status' => $booking->status,
+            'is_paid' => $booking->is_paid,
+        ]);
+    }
 }

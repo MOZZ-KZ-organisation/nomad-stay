@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingCalendarController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\VoyagerSupportMessageController;
 use App\Models\Notification;
 
@@ -24,5 +25,7 @@ Route::group(['prefix' => 'admin'], function () {
             ]);
             return response()->json(['success' => true]);
         });
+        Route::post('/bookings/{id}/quick-update', [BookingController::class, 'quickUpdate'])
+            ->name('bookings.quick-update');
     });
 });
