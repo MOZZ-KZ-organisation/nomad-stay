@@ -79,45 +79,106 @@
 
 .booking-tooltip {
     position: fixed;
-    width: 320px;
-    background: #fff;
+    width: 360px;
+    background: #f3f3f3;
+    border: 1px solid #d8d8d8;
     border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.18);
-    border: 1px solid #e5e7eb;
+    box-shadow: 0 8px 24px rgba(0,0,0,.14);
     z-index: 99999;
     overflow: hidden;
-    font-size: 13px;
     display: none;
+    font-family: Arial, sans-serif;
 }
-.booking-tooltip-header {
-    padding: 12px 14px;
-    border-bottom: 1px solid #ececec;
+
+.booking-tooltip-body {
+    padding: 14px;
 }
-.booking-tooltip-title {
-    font-size: 28px;
+
+.booking-tooltip-room {
+    font-size: 42px;
     font-weight: 700;
+    color: #222;
     line-height: 1;
     margin-bottom: 10px;
 }
-.booking-tooltip-body {
-    padding: 12px 14px;
+
+.booking-tooltip-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
 }
-.booking-tooltip-line {
-    margin-bottom: 8px;
-    color: #444;
-}
-.booking-tooltip-price {
-    font-size: 22px;
+
+.booking-tooltip-dates {
+    font-size: 15px;
     font-weight: 700;
-    color: #111827;
+    color: #222;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
-.booking-tooltip-status {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 6px;
-    background: #f3f4f6;
-    font-size: 12px;
-    margin-top: 6px;
+
+.booking-tooltip-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #222;
+    font-weight: 600;
+}
+
+.booking-tooltip-paid {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.booking-tooltip-times {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+    color: #8a8a8a;
+    font-size: 13px;
+}
+
+.booking-tooltip-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.booking-tooltip-line {
+    color: #737373;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.booking-tooltip-line b {
+    color: #5b5b5b;
+    font-weight: 600;
+}
+
+.booking-tooltip-footer {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    color: #777;
+    font-size: 13px;
+}
+
+.booking-icon {
+    width: 14px;
+    height: 14px;
+    display: inline-flex;
+}
+
+.booking-icon svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
 }
 .hover-slot {
     position: absolute;
@@ -296,6 +357,7 @@
                         data-hotel="{{ $room->hotel->title }}"
                         data-source="{{ $booking->source }}"
                         data-guests="{{ $booking->guests }}"
+                        data-nights="{{ \Carbon\Carbon::parse($booking->start_date)->diffInDays($booking->end_date) }}"
                     >
                         {{ $booking->full_name }}
                     </div>
@@ -355,55 +417,101 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
 
     bar.addEventListener('mouseenter', () => {
 
+        const start = new Date(bar.dataset.start);
+        const end = new Date(bar.dataset.end);
+
+        const nights = Math.ceil(
+            (end - start) / (1000 * 60 * 60 * 24)
+        );
+
         tooltip.innerHTML = `
-            <div class="booking-tooltip-header">
-
-                <div style="font-size:14px;color:#6b7280;">
-                    ${bar.dataset.hotel}
-                </div>
-
-                <div class="booking-tooltip-title">
-                    #${bar.dataset.id}
-                </div>
-
-            </div>
-
             <div class="booking-tooltip-body">
+
+                <div class="booking-tooltip-room">
+                    ${bar.dataset.room}
+                </div>
+
+                <div class="booking-tooltip-top">
+
+                    <div class="booking-tooltip-dates">
+
+                        <span>
+                            ${bar.dataset.start} — ${bar.dataset.end}
+                        </span>
+
+                        <span class="booking-tooltip-meta">
+
+                            <span class="booking-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M21 7h-1V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v1H3a1 1 0 0 0 0 2h1v7a2 2 0 0 0 2 2h1v1a1 1 0 1 0 2 0v-1h6v1a1 1 0 1 0 2 0v-1h1a2 2 0 0 0 2-2V9h1a1 1 0 1 0 0-2ZM6 6h12v7H6V6Zm12 11H6v-2h12v2Z"/>
+                                </svg>
+                            </span>
+
+                            ${nights}
+                        </span>
+
+                        <span class="booking-tooltip-meta">
+
+                            <span class="booking-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4Z"/>
+                                </svg>
+                            </span>
+
+                            ${bar.dataset.guests}
+                        </span>
+
+                    </div>
+
+                    <div class="booking-tooltip-paid">
+
+                        <span class="booking-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.2 4.8 12 3.4 13.4 9 19l12-12-1.4-1.4z"/>
+                            </svg>
+                        </span>
+
+                        ${bar.dataset.paid}
+                    </div>
+
+                </div>
+
+                <div class="booking-tooltip-times">
+
+                    <div class="booking-tooltip-time">
+
+                        <span class="booking-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M10 17l5-5-5-5v10z"/>
+                            </svg>
+                        </span>
+
+                        14:00
+                    </div>
+
+                    <div class="booking-tooltip-time">
+
+                        <span class="booking-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M14 7l-5 5 5 5V7z"/>
+                            </svg>
+                        </span>
+
+                        12:00
+                    </div>
+
+                </div>
 
                 <div class="booking-tooltip-line">
                     <b>Гость:</b> ${bar.dataset.guest}
                 </div>
 
                 <div class="booking-tooltip-line">
-                    <b>Телефон:</b> ${bar.dataset.phone || '-'}
+                    <b>Контактное лицо:</b> ${bar.dataset.guest}
                 </div>
 
-                <div class="booking-tooltip-line">
-                    <b>Номер:</b> ${bar.dataset.room}
-                </div>
-
-                <div class="booking-tooltip-line">
-                    <b>Гостей:</b> ${bar.dataset.guests}
-                </div>
-
-                <div class="booking-tooltip-line">
-                    <b>Заезд:</b> ${bar.dataset.start}
-                </div>
-
-                <div class="booking-tooltip-line">
-                    <b>Выезд:</b> ${bar.dataset.end}
-                </div>
-
-                <div class="booking-tooltip-line">
-                    <b>Источник:</b> ${bar.dataset.source || '-'}
-                </div>
-
-                <div class="booking-tooltip-price">
-                    ${bar.dataset.total}
-                </div>
-
-                <div class="booking-tooltip-status">
-                    ${bar.dataset.paid}
+                <div class="booking-tooltip-footer">
+                    Источник: ${bar.dataset.source || '-'}
                 </div>
 
             </div>
@@ -414,8 +522,8 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
 
     bar.addEventListener('mousemove', e => {
 
-        tooltip.style.left = (e.clientX + 16) + 'px';
-        tooltip.style.top = (e.clientY + 16) + 'px';
+        tooltip.style.left = (e.clientX + 18) + 'px';
+        tooltip.style.top = (e.clientY + 18) + 'px';
     });
 
     bar.addEventListener('mouseleave', () => {
