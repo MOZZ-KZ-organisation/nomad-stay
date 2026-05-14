@@ -95,7 +95,7 @@
 }
 
 .booking-tooltip-room {
-    font-size: 42px;
+    font-size: 30px;
     font-weight: 700;
     color: #222;
     line-height: 1;
@@ -138,7 +138,7 @@
 
 .booking-tooltip-times {
     display: flex;
-    gap: 14px;
+    gap: 16px;
     margin-bottom: 12px;
     color: #8a8a8a;
     font-size: 13px;
@@ -147,7 +147,7 @@
 .booking-tooltip-time {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
 }
 
 .booking-tooltip-line {
@@ -161,14 +161,19 @@
     font-weight: 600;
 }
 
-.booking-tooltip-footer {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #ddd;
-    color: #777;
-    font-size: 13px;
+.booking-icon {
+    width: 14px;
+    height: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
+.booking-icon svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+}
 .booking-icon {
     width: 14px;
     height: 14px;
@@ -417,13 +422,6 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
 
     bar.addEventListener('mouseenter', () => {
 
-        const start = new Date(bar.dataset.start);
-        const end = new Date(bar.dataset.end);
-
-        const nights = Math.ceil(
-            (end - start) / (1000 * 60 * 60 * 24)
-        );
-
         tooltip.innerHTML = `
             <div class="booking-tooltip-body">
 
@@ -443,11 +441,11 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
 
                             <span class="booking-icon">
                                 <svg viewBox="0 0 24 24">
-                                    <path d="M21 7h-1V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v1H3a1 1 0 0 0 0 2h1v7a2 2 0 0 0 2 2h1v1a1 1 0 1 0 2 0v-1h6v1a1 1 0 1 0 2 0v-1h1a2 2 0 0 0 2-2V9h1a1 1 0 1 0 0-2ZM6 6h12v7H6V6Zm12 11H6v-2h12v2Z"/>
+                                    <path d="M21 12.79A9 9 0 0 1 11.21 3c0-.34.02-.67.05-1A1 1 0 0 0 10 1a10 10 0 1 0 13 13 1 1 0 0 0-1.21-1.21c-.33.03-.66.05-1 .05Z"/>
                                 </svg>
                             </span>
 
-                            ${nights}
+                            ${bar.dataset.nights}
                         </span>
 
                         <span class="booking-tooltip-meta">
@@ -482,7 +480,7 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
 
                         <span class="booking-icon">
                             <svg viewBox="0 0 24 24">
-                                <path d="M10 17l5-5-5-5v10z"/>
+                                <path d="M7 3v2H5a2 2 0 0 0-2 2v3h18V7a2 2 0 0 0-2-2h-2V3h-2v2H9V3H7Zm14 9H3v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5Z"/>
                             </svg>
                         </span>
 
@@ -493,7 +491,7 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
 
                         <span class="booking-icon">
                             <svg viewBox="0 0 24 24">
-                                <path d="M14 7l-5 5 5 5V7z"/>
+                                <path d="M17 3v2h2a2 2 0 0 1 2 2v3H3V7a2 2 0 0 1 2-2h2V3h2v2h6V3h2Zm4 9v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5h18Zm-5 2h-4v2h4v-2Z"/>
                             </svg>
                         </span>
 
@@ -508,10 +506,6 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
 
                 <div class="booking-tooltip-line">
                     <b>Контактное лицо:</b> ${bar.dataset.guest}
-                </div>
-
-                <div class="booking-tooltip-footer">
-                    Источник: ${bar.dataset.source || '-'}
                 </div>
 
             </div>
