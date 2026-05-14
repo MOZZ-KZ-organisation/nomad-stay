@@ -95,7 +95,7 @@
 }
 
 .booking-tooltip-room {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 700;
     color: #222;
     line-height: 1;
@@ -134,12 +134,14 @@
 }
 
 .booking-tooltip-paid {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: #111;
     display: flex;
     align-items: center;
     gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .booking-tooltip-times {
@@ -512,10 +514,6 @@ document.querySelectorAll('.booking-bar').forEach(bar => {
 
                 <div class="booking-tooltip-line">
                     <b>Гость:</b> ${bar.dataset.guest}
-                </div>
-
-                <div class="booking-tooltip-line">
-                    <b>Контактное лицо:</b> ${bar.dataset.guest}
                 </div>
 
             </div>
