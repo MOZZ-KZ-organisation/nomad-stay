@@ -26,7 +26,7 @@
     display:flex;
     align-items:center;
     gap:14px;
-    margin-bottom:20px;
+    margin:10px;
 }
 
 .back-btn{
@@ -52,6 +52,7 @@
     font-size:28px;
     font-weight:700;
     color:#111827;
+    padding-left: 1rem;
 }
 
 .form-grid{
