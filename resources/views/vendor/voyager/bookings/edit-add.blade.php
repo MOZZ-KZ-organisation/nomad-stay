@@ -467,13 +467,15 @@
 
                     <div class="checkbox-wrap">
 
+                        <input type="hidden" name="is_business_trip" value="0">
+
                         <input
                             type="checkbox"
                             id="is_business_trip"
                             name="is_business_trip"
                             value="1"
                             {{
-                                old('is_business_trip', $booking->is_business_trip)
+                                old('is_business_trip', $booking->is_business_trip ?? 0)
                                 ? 'checked'
                                 : ''
                             }}
@@ -523,17 +525,19 @@
 
                     <div class="checkbox-wrap">
 
-                        <input
-                            type="checkbox"
-                            id="is_paid"
-                            name="is_paid"
-                            value="1"
-                            {{
-                                old('is_paid', $booking->is_paid)
-                                ? 'checked'
-                                : ''
-                            }}
-                        >
+                    <input type="hidden" name="is_paid" value="0">
+
+                    <input
+                        type="checkbox"
+                        id="is_paid"
+                        name="is_paid"
+                        value="1"
+                        {{
+                            old('is_paid', $booking->is_paid ?? 0)
+                            ? 'checked'
+                            : ''
+                        }}
+                    >
 
                         <label for="is_paid">
                             Оплачено
