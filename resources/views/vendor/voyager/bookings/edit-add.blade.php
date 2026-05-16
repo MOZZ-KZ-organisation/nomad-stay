@@ -273,19 +273,26 @@
                                 class="select"
                                 required
                             >
-                                <option
-                                    value="{{ $room->id }}"
-                                    data-hotel="{{ $room->hotel_id }}"
-                                    {{
-                                        old('room_id',
-                                        request('room_id', $booking->room_id ?? ''))
-                                        == $room->id
-                                        ? 'selected'
-                                        : ''
-                                    }}
-                                >
-                                    {{ $room->title }} — {{ $room->hotel->title }}
+                                <option value="">
+                                    Выберите номер
                                 </option>
+
+                                @foreach($rooms as $room)
+                                    <option
+                                        value="{{ $room->id }}"
+                                        data-hotel="{{ $room->hotel_id }}"
+                                        {{
+                                            old(
+                                                'room_id',
+                                                request('room_id', $booking->room_id ?? '')
+                                            ) == $room->id
+                                            ? 'selected'
+                                            : ''
+                                        }}
+                                    >
+                                        {{ $room->title }} — {{ $room->hotel->title }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
