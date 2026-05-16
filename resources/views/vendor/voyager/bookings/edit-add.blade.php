@@ -534,38 +534,30 @@
 
                     <div style="height:18px;"></div>
 
-                    <div class="field">
-                        <label>Стоимость проживания</label>
+                    @if($isEdit)
 
-                        <input
-                            type="number"
-                            name="price_for_period"
-                            class="input"
-                            value="{{ old('price_for_period', $booking->price_for_period ?? 0) }}"
-                        >
-                    </div>
+                        <div class="info-line">
+                            <span>Стоимость</span>
+                            <strong>
+                                {{ number_format($booking->price_for_period ?? 0, 0, '.', ' ') }} ₸
+                            </strong>
+                        </div>
 
-                    <div class="field" style="margin-top:14px;">
-                        <label>Налог</label>
+                        <div class="info-line">
+                            <span>Налог</span>
+                            <strong>
+                                {{ number_format($booking->tax ?? 0, 0, '.', ' ') }} ₸
+                            </strong>
+                        </div>
 
-                        <input
-                            type="number"
-                            name="tax"
-                            class="input"
-                            value="{{ old('tax', $booking->tax ?? 0) }}"
-                        >
-                    </div>
+                        <div class="info-line">
+                            <span>Итого</span>
+                            <strong>
+                                {{ number_format($booking->total_price ?? 0, 0, '.', ' ') }} ₸
+                            </strong>
+                        </div>
 
-                    <div class="field" style="margin-top:14px;">
-                        <label>Итого</label>
-
-                        <input
-                            type="number"
-                            name="total_price"
-                            class="input"
-                            value="{{ old('total_price', $booking->total_price ?? 0) }}"
-                        >
-                    </div>
+                    @endif
 
                     <div style="margin-top:22px;">
 
