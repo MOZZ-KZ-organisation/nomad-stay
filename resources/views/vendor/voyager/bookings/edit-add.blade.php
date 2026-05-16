@@ -320,9 +320,11 @@
                                     'end_date',
                                     isset($booking->end_date)
                                         ? \Carbon\Carbon::parse($booking->end_date)->format('Y-m-d')
-                                        : request('start_date')
-                                            ? \Carbon\Carbon::parse(request('start_date'))->addDay()->format('Y-m-d')
-                                            : ''
+                                        : (
+                                            request('start_date')
+                                                ? \Carbon\Carbon::parse(request('start_date'))->addDay()->format('Y-m-d')
+                                                : ''
+                                        )
                                 ) }}"
                             >
                         </div>
