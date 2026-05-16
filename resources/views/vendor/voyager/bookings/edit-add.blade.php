@@ -258,30 +258,34 @@
 
                     <div class="grid-4">
 
+                        <input
+                            type="hidden"
+                            name="hotel_id"
+                            id="hotel_id"
+                            value="{{ old('hotel_id', $booking->hotel_id ?? '') }}"
+                        >
                         <div class="field">
                             <label>Номер</label>
 
                             <select
                                 name="room_id"
+                                id="room_select"
                                 class="select"
                                 required
                             >
-                                <option value="">Выберите номер</option>
-
-                                @foreach($rooms as $room)
-                                    <option
-                                        value="{{ $room->id }}"
-                                        {{
-                                            old('room_id',
-                                            request('room_id', $booking->room_id ?? ''))
-                                            == $room->id
-                                            ? 'selected'
-                                            : ''
-                                        }}
-                                    >
-                                        {{ $room->title }} — {{ $room->hotel->title }}
-                                    </option>
-                                @endforeach
+                                <option
+                                    value="{{ $room->id }}"
+                                    data-hotel="{{ $room->hotel_id }}"
+                                    {{
+                                        old('room_id',
+                                        request('room_id', $booking->room_id ?? ''))
+                                        == $room->id
+                                        ? 'selected'
+                                        : ''
+                                    }}
+                                >
+                                    {{ $room->title }} — {{ $room->hotel->title }}
+                                </option>
                             </select>
                         </div>
 
@@ -576,4 +580,21 @@
     </form>
 
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const roomSelect = document.getElementById('room_select');
+    const hotelInput = document.getElementById('hotel_id');
+
+    function syncHotel() {
+        const option = roomSelect.options[roomSelect.selectedIndex];
+
+        hotelInput.value = option.dataset.hotel || '';
+    }
+
+    syncHotel();
+
+    roomSelect.addEventListener('change', syncHotel);
+});
+</script>
 @endsection
