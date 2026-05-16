@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
@@ -97,5 +98,43 @@ class Booking extends Model
         return $nights > 0
             ? $this->total_price / $nights
             : $this->total_price;
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function ($booking) {
+            $room = Room::find($booking->room_id);
+            if (!$room) {
+                return;
+            }
+            $booking->hotel_id = $room->hotel_id;
+            $nights = Carbon::parse($booking->start_date)
+                ->diffInDays(Carbon::parse($booking->end_date));
+            $basePrice = $room->price * $nights;
+            $tax = $basePrice * env('BOOKING_TAX_RATE', 0);
+            $booking->price_for_period = $basePrice;
+            $booking->tax = $tax;
+            $booking->total_price = $basePrice + $tax;
+        });
+        static::updating(function ($booking) {
+            if (
+                $booking->isDirty('room_id') ||
+                $booking->isDirty('start_date') ||
+                $booking->isDirty('end_date')
+            ) {
+                $room = Room::find($booking->room_id);
+                if (!$room) {
+                    return;
+                }
+                $booking->hotel_id = $room->hotel_id;
+                $nights = Carbon::parse($booking->start_date)
+                    ->diffInDays(Carbon::parse($booking->end_date));
+                $basePrice = $room->price * $nights;
+                $tax = $basePrice * env('BOOKING_TAX_RATE', 0);
+                $booking->price_for_period = $basePrice;
+                $booking->tax = $tax;
+                $booking->total_price = $basePrice + $tax;
+            }
+        });
     }
 }
