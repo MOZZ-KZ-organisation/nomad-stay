@@ -343,7 +343,14 @@
                     </div>
                 @endforeach
                 @for($i = 0; $i < 18-1; $i++)
-                    <div class="hover-slot" style="left:{{ (($i+0.5)/18)*100 }}%; width:{{ (1/18)*100 }}%;"></div>
+                    @php
+                        $slotDate = $dates[$i]->format('Y-m-d');
+                    @endphp
+                    <div
+                        class="hover-slot"
+                        data-url="{{ route('voyager.bookings.create') }}?room_id={{ $room->id }}&start_date={{ $slotDate }}"
+                        style="left:{{ (($i+0.5)/18)*100 }}%; width:{{ (1/18)*100 }}%;"
+                    ></div>
                 @endfor
                 @foreach($bookings->where('room_id', $room->id) as $booking)
                     @php
@@ -382,6 +389,11 @@
 </div>
 <div id="bookingTooltip" class="booking-tooltip"></div>
 <script>
+document.querySelectorAll('.hover-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+        window.location.href = slot.dataset.url;
+    });
+});
 document.addEventListener('DOMContentLoaded', () => {
     const bell = document.getElementById('notificationBell');
     const panel = document.getElementById('notificationPanel');
