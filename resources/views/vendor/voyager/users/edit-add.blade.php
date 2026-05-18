@@ -66,24 +66,21 @@
                                 @endphp
 
                                 @if($isReadonly)
-                                    {{-- Показываем значение, но не даём редактировать --}}
                                     <label class="control-label">{{ $row->getTranslatedAttribute('display_name') }}</label>
                                     <p class="form-control-static" style="padding-top:7px; color:#555;">
                                         {{ $dataTypeContent->{$row->field} }}
                                     </p>
-                                    {{-- Скрытый input чтобы значение всё равно прошло в POST --}}
                                     <input type="hidden" name="{{ $row->field }}" value="{{ $dataTypeContent->{$row->field} }}">
                                 @else
-                                    {{-- Обычный рендер как было --}}
                                     {{ $row->slugify }}
                                     <label class="control-label" for="name">{{ $row->getTranslatedAttribute('display_name') }}</label>
                                     @include('voyager::multilingual.input-hidden-bread-edit-add')
                                     @if ($add && isset($row->details->view_add))
-                                        @include($row->details->view_add, ...)
+                                        @include($row->details->view_add, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'view' => 'add', 'options' => $row->details])
                                     @elseif ($edit && isset($row->details->view_edit))
-                                        @include($row->details->view_edit, ...)
+                                        @include($row->details->view_edit, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'view' => 'edit', 'options' => $row->details])
                                     @elseif (isset($row->details->view))
-                                        @include($row->details->view, ...)
+                                        @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $dataTypeContent->{$row->field}, 'action' => ($edit ? 'edit' : 'add'), 'view' => ($edit ? 'edit' : 'add'), 'options' => $row->details])
                                     @elseif ($row->type == 'relationship')
                                         @include('voyager::formfields.relationship', ['options' => $row->details])
                                     @else
