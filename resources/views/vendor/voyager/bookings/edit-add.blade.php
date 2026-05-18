@@ -467,8 +467,6 @@
 
                     <div class="checkbox-wrap">
 
-                        <input type="hidden" name="is_business_trip" value="0">
-
                         <input
                             type="checkbox"
                             id="is_business_trip"
@@ -524,8 +522,6 @@
                     </div>
 
                     <div class="checkbox-wrap">
-
-                    <input type="hidden" name="is_paid" value="0">
 
                     <input
                         type="checkbox"

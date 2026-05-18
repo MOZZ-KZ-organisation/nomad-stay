@@ -104,8 +104,6 @@ class Booking extends Model
     protected static function booted(): void
     {
         static::creating(function ($booking) {
-            $booking->is_paid = (bool) $booking->is_paid;
-            $booking->is_business_trip = (bool) $booking->is_business_trip;
             $room = Room::find($booking->room_id);
             if (!$room) {
                 return;
@@ -120,8 +118,7 @@ class Booking extends Model
             $booking->total_price = $basePrice + $tax;
         });
         static::updating(function ($booking) {
-            $booking->is_paid = (bool) $booking->is_paid;
-            $booking->is_business_trip = (bool) $booking->is_business_trip;
+            dd(request()->all());
             if (
                 $booking->isDirty('room_id') ||
                 $booking->isDirty('start_date') ||
