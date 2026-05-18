@@ -32,6 +32,7 @@ class Booking extends Model
     ];
 
     protected $casts = [
+        'is_paid' => 'boolean',
         'is_business_trip' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date',
