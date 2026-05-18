@@ -465,28 +465,25 @@
                         >{{ old('special_requests', $booking->special_requests) }}</textarea>
                     </div>
 
-                    <div class="field">
-                        <label>Командировка</label>
+                <div class="checkbox-wrap">
 
-                        <select
-                            name="is_business_trip"
-                            class="select"
-                        >
-                            <option
-                                value="0"
-                                {{ old('is_business_trip', $booking->is_business_trip ?? 0) == 0 ? 'selected' : '' }}
-                            >
-                                Нет
-                            </option>
+                    <input
+                        type="checkbox"
+                        id="is_business_trip"
+                        name="is_business_trip"
+                        value="1"
+                        {{
+                            old('is_business_trip', $booking->is_business_trip ?? 0)
+                            ? 'checked'
+                            : ''
+                        }}
+                    >
 
-                            <option
-                                value="1"
-                                {{ old('is_business_trip', $booking->is_business_trip ?? 0) == 1 ? 'selected' : '' }}
-                            >
-                                Да
-                            </option>
-                        </select>
-                    </div>
+                    <label for="is_business_trip">
+                        Командировка
+                    </label>
+
+                </div>
 
                 </div>
 
@@ -524,27 +521,24 @@
                         </select>
                     </div>
 
-                    <div class="field">
-                        <label>Оплачено</label>
+                    <div class="checkbox-wrap">
 
-                        <select
+                        <input
+                            type="checkbox"
+                            id="is_paid"
                             name="is_paid"
-                            class="select"
+                            value="1"
+                            {{
+                                old('is_paid', $booking->is_paid ?? 0)
+                                ? 'checked'
+                                : ''
+                            }}
                         >
-                            <option
-                                value="0"
-                                {{ old('is_paid', $booking->is_paid ?? 0) == 0 ? 'selected' : '' }}
-                            >
-                                Нет
-                            </option>
 
-                            <option
-                                value="1"
-                                {{ old('is_paid', $booking->is_paid ?? 0) == 1 ? 'selected' : '' }}
-                            >
-                                Да
-                            </option>
-                        </select>
+                        <label for="is_paid">
+                            Оплачено
+                        </label>
+
                     </div>
 
                     <div style="height:18px;"></div>
