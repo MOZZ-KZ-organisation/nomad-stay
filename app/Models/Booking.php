@@ -118,7 +118,6 @@ class Booking extends Model
             $booking->total_price = $basePrice + $tax;
         });
         static::updating(function ($booking) {
-            dd(request()->all());
             if (
                 $booking->isDirty('room_id') ||
                 $booking->isDirty('start_date') ||
@@ -136,6 +135,26 @@ class Booking extends Model
                 $booking->price_for_period = $basePrice;
                 $booking->tax = $tax;
                 $booking->total_price = $basePrice + $tax;
+            }
+        });
+        static::saving(function ($booking) {
+
+            $request = request();
+            \Log::info('BOOKING REQUEST', [
+                'all' => $request->all(),
+                'has_is_paid' => $request->has('is_paid'),
+                'is_paid' => $request->input('is_paid'),
+
+                'has_is_business_trip' => $request->has('is_business_trip'),
+                'is_business_trip' => $request->input('is_business_trip'),
+            ]);
+
+            if ($request->has('is_paid')) {
+                $booking->is_paid = (int) $request->input('is_paid');
+            }
+
+            if ($request->has('is_business_trip')) {
+                $booking->is_business_trip = (int) $request->input('is_business_trip');
             }
         });
     }
