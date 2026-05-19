@@ -72,7 +72,7 @@
         .btn {
             width: 100%;
             padding: 12px;
-            background: #6366f1;
+            background: #6397f1;
             color: #fff;
             border: none;
             border-radius: 8px;
@@ -81,7 +81,7 @@
             cursor: pointer;
             margin-top: 8px;
         }
-        .btn:hover { background: #4f46e5; }
+        .btn:hover { background: #5383d5; }
         .error {
             background: #fef2f2;
             border: 1px solid #fecaca;
