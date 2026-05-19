@@ -50,6 +50,11 @@ class User extends \TCG\Voyager\Models\User
         return $this->role_id === \TCG\Voyager\Models\Role::where('name', 'hotel_manager')->value('id');
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->role_id === \TCG\Voyager\Models\Role::where('name', 'admin')->value('id');
+    }
+
     public function favorites()
     {
         return $this->belongsToMany(Hotel::class, 'favorites', 'user_id', 'hotel_id')
