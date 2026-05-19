@@ -3,16 +3,19 @@
 @section('content')
 @php
     $isEdit = isset($dataTypeContent->id);
-
     $booking = $dataTypeContent;
+    $user = auth()->user();
 
-    $rooms = \App\Models\Room::with('hotel')->get();
+    // Менеджер видит только свои номера
+    $rooms = $user->isHotelManager()
+        ? \App\Models\Room::with('hotel')->where('hotel_id', $user->managedHotel?->id)->get()
+        : \App\Models\Room::with('hotel')->get();
 
     $statuses = [
-        'booked' => 'Забронировано',
-        'checked_in' => 'Заселено',
+        'booked'      => 'Забронировано',
+        'checked_in'  => 'Заселено',
         'checked_out' => 'Выселено',
-        'cancelled' => 'Отменено',
+        'cancelled'   => 'Отменено',
     ];
 @endphp
 
