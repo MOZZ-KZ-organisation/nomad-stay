@@ -102,7 +102,7 @@
 </head>
 <body>
     <div class="card">
-        <div class="logo">🏨 Nomad Hotels</div>
+        <div class="logo">Nomad Hotels</div>
         <div class="subtitle">Регистрация менеджера отеля</div>
 
         @if ($errors->any())
