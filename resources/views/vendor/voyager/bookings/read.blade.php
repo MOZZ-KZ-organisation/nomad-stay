@@ -4,336 +4,381 @@
 <style>
 .page-wrap {
     max-width: 1100px;
-    margin: 20px auto;
+    margin: 24px auto;
 }
-
-.header-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 18px 22px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-    margin-bottom: 18px;
-}
-
-.title-row {
+.page-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 14px;
+    margin: 10px 10px 18px;
 }
-
-.badge {
-    display: inline-flex;
+.back-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    display: flex;
     align-items: center;
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    margin-left: 6px;
+    justify-content: center;
+    color: #111;
+    text-decoration: none;
+    transition: .2s;
 }
-
-.badge-success { background: #dcfce7; color: #166534; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-danger { background: #fee2e2; color: #991b1b; }
-.badge-gray { background: #f3f4f6; color: #374151; }
-
-.grid {
+.back-btn:hover {
+    background: #f8fafc;
+    transform: translateY(-1px);
+}
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    padding-left: 1rem;
+}
+.form-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 18px;
 }
-
 .card {
     background: #fff;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-    margin-bottom: 16px;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    margin-bottom: 18px;
 }
-
-.card h3 {
-    font-size: 14px;
-    margin-bottom: 12px;
-    color: #6b7280;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .5px;
+.card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: #111827;
 }
-
-.row-4 {
+.grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: 14px;
 }
-
-.label-box {
-    padding: 10px;
-    border-radius: 10px;
-    background: #f9fafb;
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
 }
-
-.label-title {
-    font-size: 12px;
-    color: #6b7280;
+.field {
+    display: flex;
+    flex-direction: column;
 }
-
-.label-value {
-    font-weight: 600;
-    margin-top: 4px;
-}
-
-.small {
+.field label {
     font-size: 13px;
-    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 7px;
+    color: #374151;
 }
-
+.field-value {
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
+    font-size: 14px;
+    color: #111827;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+}
+.select {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    padding: 12px 14px;
+    font-size: 14px;
+    transition: .2s;
+}
+.select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99,102,241,.08);
+}
+.side-card {
+    position: sticky;
+    top: 20px;
+}
+.info-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+}
+.info-line:last-child {
+    border-bottom: none;
+}
+.submit-btn {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 14px;
+    background: #111827;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+}
+.submit-btn:hover {
+    background: #000;
+}
+.guest-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #111827;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.badge-gray { background: #f3f4f6; color: #374151; }
 hr.soft {
     border: none;
     height: 1px;
-    background: #eef2f7;
+    background: #f1f5f9;
     margin: 14px 0;
 }
-
-.guest-avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: #4f46e5;
-    color: #fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:600;
+.small {
+    font-size: 13px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+@media(max-width:900px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .grid-4, .grid-2 { grid-template-columns: 1fr 1fr; }
 }
 </style>
-@php
-function icon($name) {
-    return match($name) {
-        'phone' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.86.32 1.7.59 2.5a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.58-1.11a2 2 0 0 1 2.11-.45c.8.27 1.64.47 2.5.59A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2"/></svg>',
-        'mail' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2"/><path d="m4 6 8 6 8-6" stroke="currentColor" stroke-width="2"/></svg>',
-        'users' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>',
-        'bed' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 7v14M21 7v14M3 13h18M7 13V9h10v4" stroke="currentColor" stroke-width="2"/></svg>',
-        'bath' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 10V7a5 5 0 0 1 10 0v3" stroke="currentColor" stroke-width="2"/><path d="M5 10h14v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" stroke="currentColor" stroke-width="2"/></svg>',
-        'money' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="2"/></svg>',
-        'calendar' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 3v3M17 3v3M4 8h16M5 5h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="2"/></svg>',
-        default => ''
-    };
-}
-@endphp
+
 @php
     /** @var \App\Models\Booking $booking */
     $booking = $dataTypeContent;
-
     $booking->load(['room', 'hotel']);
-
     $nights = $booking->start_date->diffInDays($booking->end_date);
-
-    function formatPrice($price) {
-        return number_format($price, 0, '.', ' ') . ' ₸';
-    }
-
-    $statusConfig = [
-        'booked' => ['label' => 'Забронировано', 'class' => 'label-warning'],
-        'checked_in' => ['label' => 'Заселён', 'class' => 'label-success'],
-        'checked_out' => ['label' => 'Выселен', 'class' => 'label-default'],
-        'cancelled' => ['label' => 'Отменено', 'class' => 'label-danger'],
-    ];
-
-    $status = $statusConfig[$booking->status] ?? $statusConfig['booked'];
 @endphp
 
 <div class="page-wrap">
 
     {{-- HEADER --}}
-    <div class="header-card">
-        <div class="title-row">
-            <div>
-                <h2 style="margin:0;">Бронь #{{ $booking->id }}</h2>
-                <div class="small">
-                    {{ $booking->source }} / {{ $booking->type }}
-                </div>
-            </div>
-
-            <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-                {{-- STATUS --}}
-                <select id="statusSelect" style="padding:6px;border-radius:8px;border:1px solid #ddd;">
-                    <option value="booked" {{ $booking->status == 'booked' ? 'selected' : '' }}>Забронировано</option>
-                    <option value="checked_in" {{ $booking->status == 'checked_in' ? 'selected' : '' }}>Заселено</option>
-                    <option value="checked_out" {{ $booking->status == 'checked_out' ? 'selected' : '' }}>Выселено</option>
-                    <option value="cancelled" {{ $booking->status == 'cancelled' ? 'selected' : '' }}>Отменено</option>
-                </select>
-                {{-- PAID TOGGLE --}}
-                <label style="display:flex;align-items:center;gap:6px;">
-                    <input type="checkbox" id="paidToggle" {{ $booking->is_paid ? 'checked' : '' }}>
-                    Оплачен
-                </label>
-                <button id="saveBtn" class="btn btn-primary btn-sm">
-                    Сохранить
-                </button>
-            </div>
-        </div>
+    <div class="page-header">
+        <a href="{{ route('voyager.bookings.index') }}" class="back-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </a>
+        <div class="page-title">Бронь #{{ $booking->id }}</div>
     </div>
 
-    <div class="grid">
+    <div class="form-grid">
 
         {{-- LEFT --}}
         <div>
 
-            {{-- DATES --}}
+            {{-- ДАТЫ --}}
             <div class="card">
-                <h3>Даты</h3>
-
-                <div class="row-4">
-                    <div class="label-box">
-                        <div class="label-title">Заезд</div>
-                        <div class="label-value">{{ $booking->start_date->format('d.m.Y') }}</div>
-                        <div class="small">{{ $booking->arrival_time }}</div>
+                <div class="card-title">Номер и даты</div>
+                <div class="grid-4">
+                    <div class="field">
+                        <label>Номер</label>
+                        <div class="field-value">{{ $booking->room->title }}</div>
                     </div>
-
-                    <div class="label-box">
-                        <div class="label-title">Выезд</div>
-                        <div class="label-value">{{ $booking->end_date->format('d.m.Y') }}</div>
+                    <div class="field">
+                        <label>Заезд</label>
+                        <div class="field-value">{{ $booking->start_date->format('d.m.Y') }}</div>
                     </div>
-
-                    <div class="label-box">
-                        <div class="label-title">Ночей</div>
-                        <div class="label-value">{{ $nights }}</div>
+                    <div class="field">
+                        <label>Выезд</label>
+                        <div class="field-value">{{ $booking->end_date->format('d.m.Y') }}</div>
                     </div>
-
-                    <div class="label-box">
-                        <div class="label-title">Гостей</div>
-                        <div class="label-value">{{ $booking->guests }}</div>
+                    <div class="field">
+                        <label>Гостей</label>
+                        <div class="field-value">{{ $booking->guests }}</div>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top:14px;">
+                    <div class="field">
+                        <label>Ночей</label>
+                        <div class="field-value">{{ $nights }}</div>
+                    </div>
+                    <div class="field">
+                        <label>Время заезда</label>
+                        <div class="field-value">{{ $booking->arrival_time ?? '14:00' }}</div>
                     </div>
                 </div>
             </div>
 
-            {{-- GUEST --}}
+            {{-- ГОСТЬ --}}
             <div class="card">
-                <h3>Гость</h3>
-
-                <div style="display:flex; gap:12px; align-items:center;">
+                <div class="card-title">Данные гостя</div>
+                <div style="display:flex; gap:14px; align-items:center; margin-bottom:16px;">
                     <div class="guest-avatar">
                         {{ mb_substr($booking->first_name,0,1) }}{{ mb_substr($booking->last_name,0,1) }}
                     </div>
-
                     <div>
-                        <div style="font-weight:600;">
-                            {{ $booking->full_name }}
-                        </div>
-                        <div class="small">
-                            {{ $booking->country }}
-                        </div>
+                        <div style="font-weight:700; font-size:16px;">{{ $booking->full_name }}</div>
+                        <div class="small">{{ $booking->country }}</div>
+                        @if($booking->is_business_trip)
+                            <span class="badge badge-gray" style="margin-top:6px;">Командировка</span>
+                        @endif
                     </div>
                 </div>
-
                 <hr class="soft">
-
-                <div class="small" style="display:flex;align-items:center;gap:6px;">
-                    {!! icon('phone') !!}
-                    {{ $booking->phone }}
+                <div class="grid-2">
+                    <div class="field">
+                        <label>Email</label>
+                        <div class="field-value">{{ $booking->email }}</div>
+                    </div>
+                    <div class="field">
+                        <label>Телефон</label>
+                        <div class="field-value">{{ $booking->phone }}</div>
+                    </div>
                 </div>
-
-                <div class="small" style="display:flex;align-items:center;gap:6px;">
-                    {!! icon('mail') !!}
-                    {{ $booking->email }}
-                </div>
-
-                @if($booking->is_business_trip)
-                    <span class="badge badge-gray" style="margin-top:10px;">
-                        Командировка
-                    </span>
-                @endif
             </div>
 
-            {{-- ROOM --}}
+            {{-- НОМЕР --}}
             <div class="card">
-                <h3>Номер</h3>
-
-                <div style="font-weight:600;">{{ $booking->room->title }}</div>
+                <div class="card-title">Номер</div>
+                <div style="font-weight:700; font-size:15px;">{{ $booking->room->title }}</div>
                 <div class="small">{{ $booking->hotel->title }}</div>
                 <div class="small">{{ $booking->hotel->address }}</div>
-
                 <hr class="soft">
-
-                <div class="small" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        {!! icon('users') !!}
-                        {{ $booking->room->capacity }} гостей
+                <div class="grid-2">
+                    <div class="field">
+                        <label>Вместимость</label>
+                        <div class="field-value">{{ $booking->room->capacity }} гостей</div>
                     </div>
-
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        {!! icon('bed') !!}
-                        {{ $booking->room->beds }} кровати
+                    <div class="field">
+                        <label>Кроватей</label>
+                        <div class="field-value">{{ $booking->room->beds }}</div>
                     </div>
-
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        {!! icon('bath') !!}
-                        {{ $booking->room->bathrooms }} ванная
+                    <div class="field">
+                        <label>Ванных</label>
+                        <div class="field-value">{{ $booking->room->bathrooms }}</div>
                     </div>
-
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        {!! icon('money') !!}
-                        {{ number_format($booking->room->price,0,'',' ') }} ₸ / ночь
+                    <div class="field">
+                        <label>Цена за ночь</label>
+                        <div class="field-value">{{ number_format($booking->room->price, 0, '', ' ') }} ₸</div>
                     </div>
                 </div>
             </div>
 
-            @if($booking->special_requests)
+            {{-- ИСТОЧНИК --}}
             <div class="card">
-                <h3>Пожелания</h3>
-                <div class="small">{{ $booking->special_requests }}</div>
+                <div class="card-title">Дополнительно</div>
+                <div class="grid-2">
+                    <div class="field">
+                        <label>Источник</label>
+                        <div class="field-value">{{ $booking->source }}</div>
+                    </div>
+                    <div class="field">
+                        <label>Тип</label>
+                        <div class="field-value">{{ $booking->type ?? '—' }}</div>
+                    </div>
+                </div>
+                @if($booking->special_requests)
+                    <div class="field" style="margin-top:14px;">
+                        <label>Особые пожелания</label>
+                        <div class="field-value" style="align-items:flex-start; min-height:80px;">
+                            {{ $booking->special_requests }}
+                        </div>
+                    </div>
+                @endif
             </div>
-            @endif
 
         </div>
 
         {{-- RIGHT --}}
         <div>
+            <div class="card side-card">
+                <div class="card-title">Статус и оплата</div>
 
-            {{-- PAYMENT --}}
-            <div class="card">
-                <h3>Оплата</h3>
-
-                <div class="small">Проживание</div>
-                <div style="font-weight:600;">
-                    {{ formatPrice($booking->price_for_period) }}
+                <div class="field" style="margin-bottom:14px;">
+                    <label>Статус</label>
+                    <select id="statusSelect" class="select">
+                        <option value="booked"      {{ $booking->status == 'booked'      ? 'selected' : '' }}>Забронировано</option>
+                        <option value="checked_in"  {{ $booking->status == 'checked_in'  ? 'selected' : '' }}>Заселено</option>
+                        <option value="checked_out" {{ $booking->status == 'checked_out' ? 'selected' : '' }}>Выселено</option>
+                        <option value="cancelled"   {{ $booking->status == 'cancelled'   ? 'selected' : '' }}>Отменено</option>
+                    </select>
                 </div>
 
-                <div class="small" style="margin-top:10px;">Налог</div>
-                <div style="font-weight:600;">
-                    {{ formatPrice($booking->tax) }}
+                <div class="field" style="margin-bottom:14px;">
+                    <label>Оплачено</label>
+                    <select id="paidSelect" class="select">
+                        <option value="0" {{ !$booking->is_paid ? 'selected' : '' }}>Нет</option>
+                        <option value="1" {{ $booking->is_paid  ? 'selected' : '' }}>Да</option>
+                    </select>
                 </div>
 
                 <hr class="soft">
 
-                <div style="font-size:18px;font-weight:700;">
-                    {{ formatPrice($booking->total_price) }}
+                <div class="info-line">
+                    <span>Проживание</span>
+                    <strong>{{ number_format($booking->price_for_period ?? 0, 0, '.', ' ') }} ₸</strong>
+                </div>
+                <div class="info-line">
+                    <span>Налог</span>
+                    <strong>{{ number_format($booking->tax ?? 0, 0, '.', ' ') }} ₸</strong>
+                </div>
+                <div class="info-line" style="font-size:16px;">
+                    <span style="font-weight:700;">Итого</span>
+                    <strong>{{ number_format($booking->total_price ?? 0, 0, '.', ' ') }} ₸</strong>
+                </div>
+
+                <div style="margin-top:22px;">
+                    <button id="saveBtn" class="submit-btn">Сохранить</button>
+                </div>
+
+                <div style="margin-top:10px;">
+                    <a href="{{ route('voyager.bookings.edit', $booking->id) }}"
+                       style="display:block; text-align:center; padding:12px; border:1px solid #e5e7eb;
+                              border-radius:14px; font-size:14px; font-weight:600; color:#374151;
+                              text-decoration:none; transition:.2s;"
+                       onmouseover="this.style.background='#f9fafb'"
+                       onmouseout="this.style.background='transparent'">
+                        Редактировать
+                    </a>
                 </div>
             </div>
-
         </div>
 
     </div>
 </div>
 <script>
 document.getElementById('saveBtn').addEventListener('click', async () => {
-
-    const status = document.getElementById('statusSelect').value;
-    const is_paid = document.getElementById('paidToggle').checked ? 1 : 0;
+    const status  = document.getElementById('statusSelect').value;
+    const is_paid = document.getElementById('paidSelect').value;
 
     const res = await fetch("{{ route('bookings.quick-update', $booking->id) }}", {
-        method: "POST",
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
         body: JSON.stringify({ status, is_paid })
     });
 
     const data = await res.json();
-
-    if (data.success) {
-        location.reload(); // проще и безопаснее
-    }
+    if (data.success) location.reload();
 });
 </script>
 @endsection

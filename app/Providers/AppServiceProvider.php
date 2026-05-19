@@ -19,6 +19,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \App\Models\Booking::addGlobalScope('manager_scope', function (\Illuminate\Database\Eloquent\Builder $builder) {
+            if (!app()->runningInConsole() && request()->is('admin/*')) {
+                $user = auth()->user();
+                if ($user && $user->isHotelManager()) {
+                    $hotelId = $user->managedHotel?->id;
+                    $builder->whereIn('room_id', function ($query) use ($hotelId) {
+                        $query->select('id')
+                            ->from('rooms')
+                            ->where('hotel_id', $hotelId);
+                    });
+                }
+            }
+        });
     }
 }
