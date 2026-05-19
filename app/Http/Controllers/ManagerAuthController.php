@@ -54,6 +54,6 @@ class ManagerAuthController extends Controller
 
         auth()->login($user);
 
-        return redirect()->route('manager.calendar');
+        return redirect()->route('admin.bookings.calendar');
     }
 }
