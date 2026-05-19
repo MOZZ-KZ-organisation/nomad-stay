@@ -2,6 +2,14 @@
     $edit = !is_null($dataTypeContent->getKey());
     $add  = is_null($dataTypeContent->getKey());
     $hotel = $dataTypeContent;
+
+    // Хелпер: безопасно получить editRow
+    $getRow = fn(string $field) => $dataType->editRows->firstWhere('field', $field);
+    $renderField = function(string $field) use ($dataType, $dataTypeContent, $getRow) {
+        $row = $getRow($field);
+        if (!$row) return '';
+        return app('voyager')->formField($row, $dataType, $dataTypeContent);
+    };
 @endphp
 
 @extends('voyager::master')
@@ -287,12 +295,18 @@
                             <div class="field-group">
                                 <label class="field-label">Тип</label>
                                 @php $row = $dataType->editRows->firstWhere('field', 'type') @endphp
-                                {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                                @if($row) {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!} @endif
                             </div>
                             <div class="field-group">
                                 <label class="field-label">Мин. цена (₸)</label>
                                 @php $row = $dataType->editRows->firstWhere('field', 'min_price') @endphp
-                                {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                                @if($row)
+                                    {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                                @else
+                                    <p class="form-control-static" style="padding-top:7px; color:#555;">
+                                        {{ $hotel->min_price ? number_format($hotel->min_price, 0, '.', ' ').' ₸' : '—' }}
+                                    </p>
+                                @endif
                             </div>
                         </div>
 
@@ -300,12 +314,12 @@
                             <div class="field-group">
                                 <label class="field-label">Цена отмены брони (₸)</label>
                                 @php $row = $dataType->editRows->firstWhere('field', 'cancellation_fee') @endphp
-                                {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                                @if($row) {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!} @endif
                             </div>
                             <div class="field-group">
                                 <label class="field-label">Звёзды</label>
                                 @php $row = $dataType->editRows->firstWhere('field', 'stars') @endphp
-                                {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                                @if($row) {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!} @endif
                             </div>
                         </div>
 
@@ -313,12 +327,12 @@
                             <div class="field-group">
                                 <label class="field-label">Широта</label>
                                 @php $row = $dataType->editRows->firstWhere('field', 'latitude') @endphp
-                                {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                                @if($row) {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!} @endif
                             </div>
                             <div class="field-group">
                                 <label class="field-label">Долгота</label>
                                 @php $row = $dataType->editRows->firstWhere('field', 'longitude') @endphp
-                                {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                                @if($row) {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!} @endif
                             </div>
                         </div>
 
