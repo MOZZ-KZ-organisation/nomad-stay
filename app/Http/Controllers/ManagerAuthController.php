@@ -16,28 +16,44 @@ class ManagerAuthController extends Controller
 
     public function register(Request $request)
     {
-        $data = $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|unique:users',
-            'password'       => 'required|confirmed|min:8',
-            'hotel_title'    => 'required|string|max:255',
-            'hotel_address'  => 'nullable|string|max:500',
+        $request->validate([
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email',
+            'password'      => 'required|confirmed|min:8',
+            'hotel_title'   => 'required|string|max:255',
+            'hotel_address' => 'nullable|string|max:500',
+        ], [
+            'name.required'        => 'Введите ваше имя',
+            'email.required'       => 'Введите email',
+            'email.email'          => 'Введите корректный email',
+            'email.unique'         => 'Этот email уже зарегистрирован',
+            'password.required'    => 'Введите пароль',
+            'password.confirmed'   => 'Пароли не совпадают',
+            'password.min'         => 'Пароль должен содержать минимум 8 символов',
+            'hotel_title.required' => 'Введите название отеля',
         ]);
+
         $managerRole = Role::where('name', 'hotel_manager')->firstOrFail();
+
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => bcrypt($data['password']),
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => bcrypt($request->password),
             'role_id'  => $managerRole->id,
         ]);
+
         Hotel::create([
             'manager_id' => $user->id,
-            'title'      => $data['hotel_title'],
-            'address'    => $data['hotel_address'] ?? '',
-            'slug'       => \Str::slug($data['hotel_title']),
-            'is_active'  => false, 
+            'title'      => $request->hotel_title,
+            'slug'       => \Str::slug($request->hotel_title),
+            'address'    => $request->hotel_address ?? null,
+            'stars'      => 0,
+            'is_active'  => false,
+            'cancellation_fee' => 0,
         ]);
+
         auth()->login($user);
+
         return redirect()->route('manager.calendar');
     }
 }
