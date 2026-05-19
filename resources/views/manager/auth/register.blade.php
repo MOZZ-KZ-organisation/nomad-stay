@@ -155,7 +155,7 @@
         </form>
 
         <div class="login-link">
-            Уже есть аккаунт? <a href="{{ route('admin.login') }}">Войти</a>
+            Уже есть аккаунт? <a href="{{ route('voyager.login') }}">Войти</a>
         </div>
     </div>
 </body>
