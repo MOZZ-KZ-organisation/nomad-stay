@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingCalendarController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ManagerAuthController;
 use App\Http\Controllers\VoyagerSupportMessageController;
 use App\Models\Notification;
 
@@ -28,4 +29,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/bookings/{id}/quick-update', [BookingController::class, 'quickUpdate'])
             ->name('bookings.quick-update');
     });
+});
+
+Route::prefix('manager')->name('manager.')->group(function () {
+    Route::get('/register',  [ManagerAuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [ManagerAuthController::class, 'register']);
 });

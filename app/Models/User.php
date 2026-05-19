@@ -22,7 +22,8 @@ class User extends \TCG\Voyager\Models\User
         'address',
         'email',
         'avatar',
-        'password'
+        'password',
+        'role_id'
     ];
 
     protected $hidden = [
@@ -37,6 +38,16 @@ class User extends \TCG\Voyager\Models\User
             'password' => 'hashed',
             'birth_date' => 'date',
         ];
+    }
+
+    public function managedHotel()
+    {
+        return $this->hasOne(Hotel::class, 'manager_id');
+    }
+
+    public function isHotelManager(): bool
+    {
+        return $this->role_id === \TCG\Voyager\Models\Role::where('name', 'hotel_manager')->value('id');
     }
 
     public function favorites()

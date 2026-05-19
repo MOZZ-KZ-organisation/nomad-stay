@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('hotels', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->foreignId('manager_id')
+                ->nullable()->constrained('users')->nullOnDelete();
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description')->nullable();

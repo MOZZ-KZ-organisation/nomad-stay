@@ -10,11 +10,16 @@ class Hotel extends Model
 {
     use HandlesImages;
     protected $fillable = [
-        'title','slug','description','address','city_id',
+        'manager_id', 'title','slug','description','address','city_id',
         'latitude','longitude','stars','is_active','min_price', 'cancellation_fee','type'
     ];
     protected $appends = ['location'];
     protected $casts = ['is_active' => 'boolean'];
+
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
 
     public function rooms() { return $this->hasMany(Room::class); }
     public function amenities()
