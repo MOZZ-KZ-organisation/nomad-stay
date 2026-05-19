@@ -2,6 +2,8 @@
     $edit = !is_null($dataTypeContent->getKey());
     $add  = is_null($dataTypeContent->getKey());
     $hotel = $dataTypeContent;
+    $isAdmin = auth()->user()->isAdmin();
+    $isManager = auth()->user()->isHotelManager();
 
     // Хелпер: безопасно получить editRow
     $getRow = fn(string $field) => $dataType->editRows->firstWhere('field', $field);
@@ -251,7 +253,7 @@
 
             {{-- ЛЕВАЯ КОЛОНКА --}}
             <div>
-
+                @if($isManager)
                 {{-- Основная информация --}}
                 <div class="card-section">
                     <div class="card-section-header">Основная информация</div>
@@ -367,7 +369,51 @@
                         @endif
                     </div>
                 </div>
-
+                    @else
+                    {{-- Админ видит данные только для чтения --}}
+                    <div class="card-section">
+                        <div class="card-section-header">Информация об отеле</div>
+                        <div class="card-section-body">
+                            <div class="field-group">
+                                <label class="field-label">Название</label>
+                                <p style="font-size:15px; font-weight:600; color:#111; margin:0;">{{ $hotel->title }}</p>
+                                <input type="hidden" name="title" value="{{ $hotel->title }}">
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Адрес</label>
+                                <p style="font-size:14px; color:#374151; margin:0;">{{ $hotel->address ?: '—' }}</p>
+                                <input type="hidden" name="address" value="{{ $hotel->address }}">
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Тип</label>
+                                <p style="font-size:14px; color:#374151; margin:0;">{{ $hotel->type ?: '—' }}</p>
+                                <input type="hidden" name="type" value="{{ $hotel->type }}">
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Звёзды</label>
+                                <p style="font-size:14px; color:#374151; margin:0;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <span style="color:{{ $i <= $hotel->stars ? '#facc15' : '#d1d5db' }}; font-size:18px;">★</span>
+                                    @endfor
+                                </p>
+                                <input type="hidden" name="stars" value="{{ $hotel->stars }}">
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Мин. цена</label>
+                                <p style="font-size:14px; color:#374151; margin:0;">
+                                    {{ $hotel->min_price ? number_format($hotel->min_price, 0, '.', ' ').' ₸' : '—' }}
+                                </p>
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Описание</label>
+                                <p style="font-size:14px; color:#374151; margin:0; line-height:1.6;">
+                                    {{ $hotel->description ?: '—' }}
+                                </p>
+                                <input type="hidden" name="description" value="{{ $hotel->description }}">
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             {{-- ПРАВАЯ КОЛОНКА --}}
@@ -387,7 +433,15 @@
                                 {{ $isActive ? 'Активен' : 'Неактивен' }}
                             </span>
                         </div>
-                        {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+
+                        @if($isAdmin && $row)
+                            {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                        @else
+                            <input type="hidden" name="is_active" value="{{ $hotel->is_active ? 1 : 0 }}">
+                            <p style="font-size:13px; color:#6b7280; margin:0;">
+                                {{ $isActive ? 'Отель активен и виден пользователям' : 'Ожидает активации администратором' }}
+                            </p>
+                        @endif
                     </div>
                 </div>
 
