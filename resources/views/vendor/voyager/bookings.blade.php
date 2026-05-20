@@ -280,7 +280,7 @@
             <div><span class="legend checked-out"></span> Выселено</div>
         </div>
     </div>
-    <div class="notifications-wrapper">
+    {{-- <div class="notifications-wrapper">
         <button id="notificationBell" class="icon-btn">🔔
             <span id="notificationCount"></span>
         </button>
@@ -291,7 +291,7 @@
             </div>
             <div id="notificationsList"></div>
         </div>
-    </div>
+    </div> --}}
     <div class="filters-wrapper">
         <button id="filterBtn" class="btn btn-default">⚙️ Фильтр</button>
         <div id="filterPanel" class="filter-panel">
@@ -395,34 +395,34 @@ document.querySelectorAll('.hover-slot').forEach(slot => {
     });
 });
 document.addEventListener('DOMContentLoaded', () => {
-    const bell = document.getElementById('notificationBell');
-    const panel = document.getElementById('notificationPanel');
-    const count = document.getElementById('notificationCount');
-    const list = document.getElementById('notificationsList');
-    async function loadNotifications() {
-        const res = await fetch('/admin/notifications');
-        const data = await res.json();
-        let unread = 0;
-        list.innerHTML = '';
-        data.forEach(n => {
-            if(!n.is_read) unread++;
-            list.innerHTML += `<div class="notify-item">${n.title}</div>`;
-        });
-        count.textContent = unread || '';
-        count.style.display = unread ? 'block' : 'none';
-    }
-    loadNotifications();
-    bell.onclick = async e => {
-        e.stopPropagation();
-        panel.classList.toggle('show');
-        if(panel.classList.contains('show')){
-            await fetch('/admin/notifications/mark-read',{
-                method:'POST',
-                headers:{'X-CSRF-TOKEN':document.querySelector('meta[name=csrf-token]').content}
-            });
-            count.style.display='none';
-        }
-    };
+    // const bell = document.getElementById('notificationBell');
+    // const panel = document.getElementById('notificationPanel');
+    // const count = document.getElementById('notificationCount');
+    // const list = document.getElementById('notificationsList');
+    // async function loadNotifications() {
+    //     const res = await fetch('/admin/notifications');
+    //     const data = await res.json();
+    //     let unread = 0;
+    //     list.innerHTML = '';
+    //     data.forEach(n => {
+    //         if(!n.is_read) unread++;
+    //         list.innerHTML += `<div class="notify-item">${n.title}</div>`;
+    //     });
+    //     count.textContent = unread || '';
+    //     count.style.display = unread ? 'block' : 'none';
+    // }
+    // loadNotifications();
+    // bell.onclick = async e => {
+    //     e.stopPropagation();
+    //     panel.classList.toggle('show');
+    //     if(panel.classList.contains('show')){
+    //         await fetch('/admin/notifications/mark-read',{
+    //             method:'POST',
+    //             headers:{'X-CSRF-TOKEN':document.querySelector('meta[name=csrf-token]').content}
+    //         });
+    //         count.style.display='none';
+    //     }
+    // };
     document.getElementById('legendBtn').onclick = e => { e.stopPropagation(); document.getElementById('legendPanel').classList.toggle('show'); };
     document.getElementById('filterBtn').onclick = e => { e.stopPropagation(); document.getElementById('filterPanel').classList.toggle('show'); };
     document.getElementById('filtersForm').onclick = e => e.stopPropagation();
@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
         location.search = params;
     };
     document.onclick = () => {
-        panel.classList.remove('show');
+        // panel.classList.remove('show');
         document.getElementById('legendPanel').classList.remove('show');
         document.getElementById('filterPanel').classList.remove('show');
     };
