@@ -124,7 +124,16 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 
 <!-- Javascript Libs -->
 
-
+@if(auth()->user()->isAdmin())
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Логируем все ссылки в сайдбаре
+    document.querySelectorAll('.side-menu a').forEach(function(link) {
+        console.log(link.getAttribute('href'));
+    });
+});
+</script>
+@endif
 <script type="text/javascript" src="{{ voyager_asset('js/app.js') }}"></script>
 
 <script>
