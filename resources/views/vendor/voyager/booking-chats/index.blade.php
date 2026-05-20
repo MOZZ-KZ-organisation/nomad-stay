@@ -1,14 +1,4 @@
 @extends('voyager::master')
-@section('css')
-    @if(auth()->user()->isAdmin())
-        <style>
-            /* Скрываем пункт чатов для админа */
-            .nav-item a[href="{{ url('/admin/booking-chats') }}"] {
-                display: none !important;
-            }
-        </style>
-    @endif
-@endsection
 @section('content')
 <div style="max-width:900px; margin:24px auto;">
 
