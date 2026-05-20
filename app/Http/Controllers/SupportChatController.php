@@ -27,8 +27,7 @@ class SupportChatController extends Controller
     {
         $hotelId = $request->input('hotel_id');
         $chat = SupportChat::firstOrCreate([
-            'user_id' => auth()->id(),
-            'hotel_id' => $hotelId,
+            'user_id' => auth()->id()
         ]);
         $chat->messages()
             ->where('read', false)

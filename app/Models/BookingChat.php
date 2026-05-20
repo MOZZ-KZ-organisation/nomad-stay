@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class BookingChat extends Model
 {
     protected $fillable = [
-        'booking_id',
+        // 'booking_id',
         'user_id',
         'hotel_id',
         'last_message_at'
@@ -17,7 +17,7 @@ class BookingChat extends Model
         'last_message_at' => 'datetime',
     ];
 
-    public function booking() { return $this->belongsTo(Booking::class); }
+    // public function booking() { return $this->belongsTo(Booking::class); }
     public function user() { return $this->belongsTo(User::class); }
     public function hotel() { return $this->belongsTo(Hotel::class); }
 

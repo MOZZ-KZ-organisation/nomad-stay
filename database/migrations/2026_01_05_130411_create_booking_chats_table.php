@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('booking_chats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('booking_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('hotel_id')->constrained()->cascadeOnDelete();
             $table->timestamp('last_message_at')->nullable();

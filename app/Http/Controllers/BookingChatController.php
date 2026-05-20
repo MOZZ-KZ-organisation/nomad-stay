@@ -18,13 +18,15 @@ class BookingChatController extends Controller
         return BookingChatResource::collection($chats);
     }
 
-    public function create(Booking $booking)
+    public function create(Request $request)
     {
-        abort_if($booking->user_id !== auth()->id(), 403);
+        $request->validate([
+            'hotel_id' => 'required|exists:hotels,id',
+        ]);
+
         $chat = BookingChat::firstOrCreate([
-            'booking_id' => $booking->id,
-            'user_id' => auth()->id(),
-            'hotel_id' => $booking->hotel_id,
+            'user_id'  => auth()->id(),
+            'hotel_id' => $request->hotel_id,
         ]);
         return new BookingChatResource($chat);
     }

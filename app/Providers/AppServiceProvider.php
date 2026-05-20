@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
         });
-        \App\Models\SupportChat::addGlobalScope('manager_scope', function (\Illuminate\Database\Eloquent\Builder $builder) {
+        \App\Models\BookingChat::addGlobalScope('manager_scope', function (\Illuminate\Database\Eloquent\Builder $builder) {
             if (!app()->runningInConsole() && request()->is('admin/*')) {
                 $user = auth()->user();
                 if ($user && $user->isHotelManager()) {

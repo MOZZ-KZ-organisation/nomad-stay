@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreBookingMessageRequest extends FormRequest
+class StoreSupportMessageRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,8 +14,7 @@ class StoreBookingMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body' => ['required', 'string', 'max:5000'],
-            'hotel_id' => 'required|exists:hotels,id',
+            'body' => 'required|string|max:1000',
         ];
     }
 }

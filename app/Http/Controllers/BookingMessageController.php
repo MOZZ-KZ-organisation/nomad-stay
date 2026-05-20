@@ -13,36 +13,52 @@ use Illuminate\Support\Facades\Storage;
 
 class BookingMessageController extends Controller
 {
-    public function index(Booking $booking)
+    public function index(Request $request)
     {
-        $chat = BookingChat::where('booking_id', $booking->id)->first();
+        $chat = BookingChat::where('hotel_id', $request->hotel_id)
+            ->where('user_id', auth()->id())
+            ->first();
+
         if (!$chat) {
             return response()->json([
                 'messages' => [],
-                'meta' => [
-                    'current_page' => 1,
-                    'has_more' => false,
-                ],
+                'meta' => ['current_page' => 1, 'has_more' => false],
             ]);
         }
         $chat->messages()
             ->where('read', false)
             ->where('sender_id', '!=', auth()->id())
             ->update(['read' => true]);
-        $messages = $chat->messages()
-            ->latest()
-            ->paginate(20);
+        $messages = $chat->messages()->latest()->paginate(20);
         return response()->json([
             'hotel' => [
-                'name' => $chat->hotel->title,
+                'name'   => $chat->hotel->title,
                 'avatar' => url(Storage::url($chat->hotel->images->first()?->path)),
             ],
             'messages' => $this->groupMessagesByDate($messages),
             'meta' => [
                 'current_page' => $messages->currentPage(),
-                'has_more' => $messages->hasMorePages(),
+                'has_more'     => $messages->hasMorePages(),
             ],
         ]);
+    }
+
+    public function store(StoreBookingMessageRequest $request)
+    {
+        $chat = BookingChat::firstOrCreate(
+            [
+                'user_id'  => auth()->id(),
+                'hotel_id' => $request->hotel_id,
+            ],
+            ['last_message_at' => now()]
+        );
+        $message = $chat->messages()->create([
+            'sender_id' => auth()->id(),
+            'body'      => $request->body,
+        ]);
+        $chat->update(['last_message_at' => now()]);
+        broadcast(new BookingMessageSent($message))->toOthers();
+        return new BookingMessageResource($message);
     }
 
     protected function groupMessagesByDate($paginator)
@@ -52,7 +68,7 @@ class BookingMessageController extends Controller
             ->map(function ($messages, $date) {
                 $carbonDate = Carbon::parse($date);
                 return [
-                    'date' => $this->humanDate($carbonDate),
+                    'date'     => $this->humanDate($carbonDate),
                     'messages' => BookingMessageResource::collection($messages),
                 ];
             })
@@ -61,30 +77,8 @@ class BookingMessageController extends Controller
 
     protected function humanDate(Carbon $date): string
     {
-        if ($date->isToday()) {
-            return 'Сегодня';
-        }
-        if ($date->isYesterday()) {
-            return 'Вчера';
-        }
+        if ($date->isToday()) return 'Сегодня';
+        if ($date->isYesterday()) return 'Вчера';
         return $date->format('d.m.Y');
-    }
-
-    public function store(StoreBookingMessageRequest $request, Booking $booking)
-    {
-        $chat = BookingChat::firstOrCreate(
-            ['booking_id' => $booking->id],
-            [
-                'user_id' => auth()->id(),
-                'hotel_id' => $booking->hotel_id,
-            ]
-        );
-        $message = $chat->messages()->create([
-            'sender_id' => auth()->id(),
-            'body' => $request->body,
-        ]);
-        $chat->update(['last_message_at' => now()]);
-        broadcast(new BookingMessageSent($message))->toOthers();
-        return new BookingMessageResource($message);
     }
 }

@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Events\SupportMessageSent;
-use App\Http\Requests\StoreBookingMessageRequest;
+use App\Http\Requests\StoreSupportMessageRequest;
 use App\Http\Resources\SupportMessageResource;
 use App\Models\SupportChat;
 use Illuminate\Http\Request;
 
 class SupportMessageController extends Controller
 {
-    public function store(StoreBookingMessageRequest $request)
+    public function store(StoreSupportMessageRequest $request)
     {
         $chat = SupportChat::firstOrCreate([
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id()
         ]);
         $message = $chat->messages()->create([
             'sender_id' => auth()->id(),
