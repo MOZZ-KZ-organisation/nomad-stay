@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminBookingChatController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingCalendarController;
 use App\Http\Controllers\BookingController;
@@ -28,6 +29,13 @@ Route::group(['prefix' => 'admin'], function () {
         });
         Route::post('/bookings/{id}/quick-update', [BookingController::class, 'quickUpdate'])
             ->name('bookings.quick-update');
+        Route::get('/booking-chats', [AdminBookingChatController::class, 'index'])
+            ->name('admin.booking-chats.index');
+        Route::get('/booking-chats/{chat}', [AdminBookingChatController::class, 'show'])
+            ->name('admin.booking-chats.show');
+        Route::post('/booking-chats/{chat}/reply', [AdminBookingChatController::class, 'reply'])
+            ->name('admin.booking-chats.reply');
+
     });
 });
 
