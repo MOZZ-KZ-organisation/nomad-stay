@@ -48,16 +48,16 @@
 
         {{-- Регистрация менеджера --}}
         <div style="margin-top:24px; padding-top:20px; border-top:1px solid #87878b; text-align:center;">
-            <p style="color:#545464; font-size:13px; margin-bottom:12px;">
+            <p style="color:#021018; font-size:13px; margin-bottom:12px;">
                 Вы менеджер отеля?
             </p>
             <a href="{{ route('manager.register') }}"
             style="display:inline-block; padding:9px 24px;
-                    background:#6b583c; border:1px solid #6b583c;
-                    border-radius:6px; color:#f5f8ff; font-size:13px; font-weight:600;
+                    background:#22A7F0; border:1px solid #22A7F0;
+                    border-radius:6px; color:#fff; font-size:13px; font-weight:600;
                     text-decoration:none; transition:all 0.2s ease;"
-            onmouseover="this.style.background='#4a5a80'; this.style.color='#fff';"
-            onmouseout="this.style.background='#3d4a6b'; this.style.color='#c8d4f0';">
+            onmouseover="this.style.background='#22A7F0'; this.style.color='#fff';"
+            onmouseout="this.style.background='#22A7F0'; this.style.color='#fff';">
                 Зарегистрировать отель
             </a>
         </div>
