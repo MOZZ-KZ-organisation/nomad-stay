@@ -152,15 +152,5 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 @if(!empty(config('voyager.additional_js')))<!-- Additional Javascript -->
     @foreach(config('voyager.additional_js') as $js)<script type="text/javascript" src="{{ asset($js) }}"></script>@endforeach
 @endif
-@if(auth()->user()->isAdmin())
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Логируем все ссылки в сайдбаре
-    document.querySelectorAll('.side-menu a').forEach(function(link) {
-        console.log(link.getAttribute('href'));
-    });
-});
-</script>
-@endif
 </body>
 </html>
