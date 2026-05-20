@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\HotelShowRequest;
 use App\Http\Resources\HotelDetailsResource;
+use App\Http\Resources\HotelOfferResource;
 use App\Http\Resources\HotelRecentResource;
 use App\Http\Resources\HotelResource;
 use App\Models\Hotel;
@@ -78,5 +79,18 @@ class HotelController extends Controller
             : false;
         $hotel->is_favorite = $isFavorite;
         return new HotelDetailsResource($hotel);
+    }
+
+    public function offers()
+    {
+        $hotels = Hotel::query()
+            ->where('is_active', true)
+            ->whereHas('discount', function ($query) {
+                $query->where('discount_percent', '>', 0);
+            })->with(['discount', 'city'])
+            ->join('hotel_discounts', 'hotels.id', '=', 'hotel_discounts.hotel_id')
+            ->orderByDesc('hotel_discounts.discount_percent')
+            ->select('hotels.*')->paginate(10);
+        return HotelOfferResource::collection($hotels);
     }
 }
