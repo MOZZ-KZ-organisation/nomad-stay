@@ -15,13 +15,15 @@ class HotelDiscount extends Model
     protected static function booted()
     {
         static::saving(function (HotelDiscount $discount) {
-            if (!$discount->hotel_id || !$discount->discount_percent) {
+            if (!$discount->hotel_id || is_null($discount->discount_percent)) {
                 return;
             }
             $hotel = $discount->hotel()->select('id', 'min_price')->first();
-            $discount->price_override = (int) round(
-                $hotel->min_price * (1 - $discount->discount_percent / 100)
-            );
+            if ($hotel) {
+                $discount->price_override = (int) round(
+                    $hotel->min_price * (1 - $discount->discount_percent / 100)
+                );
+            }
         });
     }
 
