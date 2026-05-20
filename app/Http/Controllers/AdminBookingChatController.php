@@ -26,7 +26,7 @@ class AdminBookingChatController extends Controller
             ->where('read', false)
             ->where('sender_id', '!=', auth()->id())
             ->update(['read' => true]);
-        $messages = $chat->messages()->with('sender')->oldest()->get();
+        $messages = $chat->messages()->with('userSender')->oldest()->get();
         return view('vendor.voyager.booking-chats.show', compact('chat', 'messages'));
     }
 
