@@ -14,7 +14,7 @@ class BookingChatResource extends JsonResource
         $lastMessage = $this->whenLoaded('lastMessage');
         return [
             'id' => $this->id,
-            'booking_id' => $this->booking_id,
+            // 'booking_id' => $this->booking_id,
             'hotel' => [
                 'title' => $this->hotel->title,
                 'icon' => url(Storage::url($this->hotel->images->first()?->path)),
