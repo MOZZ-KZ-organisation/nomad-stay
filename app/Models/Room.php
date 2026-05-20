@@ -27,14 +27,22 @@ class Room extends Model
             }
         });
         static::saved(function ($room) {
-            $room->hotel?->update([
-                'min_price' => $room->hotel->rooms()->min('price')
-            ]);
+            $hotel = $room->hotel;
+            if ($hotel) {
+                $hotel->update([
+                    'min_price' => $room->hotel->rooms()->min('price')
+                ]);
+                $hotel->discount?->touch();
+            }
         });
         static::deleted(function ($room) {
-            $room->hotel?->update([
-                'min_price' => $room->hotel->rooms()->min('price')
-            ]);
+            $hotel = $room->hotel;
+            if ($hotel) {
+                $hotel->update([
+                    'min_price' => $hotel->rooms()->min('price') ?? 0
+                ]);
+                $hotel->discount?->touch();
+            }
         });
         static::deleting(function ($room) {
             $room->images()->each(function ($image) {
