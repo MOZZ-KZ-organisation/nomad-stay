@@ -8,6 +8,7 @@ class SupportChat extends Model
 {
     protected $fillable = [
         'user_id',
+        'hotel_id',
         'last_message_at',
     ];
 
@@ -18,6 +19,11 @@ class SupportChat extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function hotel()
+    {
+        return $this->belongsTo(Hotel::class);
     }
 
     public function messages()

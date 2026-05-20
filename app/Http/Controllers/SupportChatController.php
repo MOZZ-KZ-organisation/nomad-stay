@@ -23,10 +23,12 @@ class SupportChatController extends Controller
         return SupportChatResource::collection(collect([$chat]));
     }
 
-    public function show()
+    public function show(Request $request)
     {
+        $hotelId = $request->input('hotel_id');
         $chat = SupportChat::firstOrCreate([
             'user_id' => auth()->id(),
+            'hotel_id' => $hotelId,
         ]);
         $chat->messages()
             ->where('read', false)
