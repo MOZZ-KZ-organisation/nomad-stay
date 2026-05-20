@@ -40,6 +40,12 @@ class Hotel extends Model
                 $hotel->slug = \Str::slug($hotel->title);
             }
         });
+        static::created(function ($hotel) {
+            $hotel->discount()->create([
+                'discount_percent' => 0,
+                'price_override'   => $hotel->min_price ?? 0, // Подхватит логику, если min_price есть
+            ]);
+        });
         static::saved(function ($hotel) {
             Cache::flush();
         });
