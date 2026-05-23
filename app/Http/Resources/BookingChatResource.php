@@ -16,6 +16,7 @@ class BookingChatResource extends JsonResource
             'id' => $this->id,
             // 'booking_id' => $this->booking_id,
             'hotel' => [
+                'id' => $this->hotel->id,
                 'title' => $this->hotel->title,
                 'icon' => url(Storage::url($this->hotel->images->first()?->path)),
             ],
