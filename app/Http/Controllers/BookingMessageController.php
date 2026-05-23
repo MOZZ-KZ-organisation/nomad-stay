@@ -30,10 +30,11 @@ class BookingMessageController extends Controller
             ->where('sender_id', '!=', auth()->id())
             ->update(['read' => true]);
         $messages = $chat->messages()->latest()->paginate(20);
+        $firstImagePath = $chat->hotel->images->first()?->path;
         return response()->json([
             'hotel' => [
                 'name'   => $chat->hotel->title,
-                'avatar' => url(Storage::url($chat->hotel->images->first()?->path)),
+                'avatar' => $firstImagePath ? url(Storage::url($firstImagePath)) : null,
             ],
             'messages' => $this->groupMessagesByDate($messages),
             'meta' => [
