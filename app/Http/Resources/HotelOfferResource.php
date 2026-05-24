@@ -13,6 +13,8 @@ class HotelOfferResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'city_id' => $this->city_id,
+            'stars' => $this->stars,
             'min_price' => $this->min_price,
             'discount' => $this->discount ? [
                 'percent' => $this->discount->discount_percent,
