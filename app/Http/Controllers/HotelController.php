@@ -7,6 +7,7 @@ use App\Http\Resources\HotelDetailsResource;
 use App\Http\Resources\HotelOfferResource;
 use App\Http\Resources\HotelRecentResource;
 use App\Http\Resources\HotelResource;
+use App\Http\Resources\PopularDestinationResource;
 use App\Models\Hotel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -92,5 +93,17 @@ class HotelController extends Controller
             ->orderByDesc('hotel_discounts.discount_percent')
             ->select('hotels.*')->paginate(10);
         return HotelOfferResource::collection($hotels);
+    }
+
+    public function popularDestinations()
+    {
+        $hotels = Hotel::query()
+            ->where('is_active', true)
+            ->with(['images' => function ($q) {
+                $q->orderByDesc('is_main');
+            }])->withCount('reviews')
+            ->orderByDesc('reviews_count')
+            ->limit(10)->get();
+        return PopularDestinationResource::collection($hotels);
     }
 }

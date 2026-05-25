@@ -25,6 +25,7 @@ Route::post('/verify-otp', [AuthController::class, 'verifyCode']);
 
 Route::get('/hotels/recent', [HotelController::class, 'recent']);
 Route::get('/hotels/offers', [HotelController::class, 'offers']); 
+Route::get('/hotels/popular', [HotelController::class, 'popularDestinations']);
 
 Route::get('/amenities', [AmenityController::class, 'index']);
 Route::get('/cities', [CityController::class, 'index']);
