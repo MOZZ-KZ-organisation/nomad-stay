@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingChatController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BookingMessageController;
+use App\Http\Controllers\BookingPdfController;
 use App\Http\Controllers\BookingPriceController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\FavoriteController;
@@ -48,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('bookings', [BookingController::class, 'store']);
     Route::get('user/bookings', [BookingController::class, 'userBookings']);
     Route::get('/bookings/{booking}', [BookingController::class, 'show']);
+    Route::get('/bookings/{booking}/download-pdf', [BookingPdfController::class, 'download']);
     Route::patch('/bookings/{booking}/dates', [BookingController::class, 'updateDates']);
     Route::post('bookings/{booking}/cancel', [BookingController::class, 'cancel']);
     Route::post('reviews', [ReviewController::class, 'store']);

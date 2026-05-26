@@ -11,6 +11,7 @@ class Booking extends Model
         'user_id',
         'hotel_id',
         'room_id',
+        'booking_number',
         'start_date',
         'end_date',
         'guests',
@@ -101,9 +102,21 @@ class Booking extends Model
             : $this->total_price;
     }
 
+    public static function generateBookingNumber(): string
+    {
+        do {
+            $year = date('Y');
+            $random = strtoupper(substr(md5(uniqid(rand(), true)), 0, 6));
+            $bookingNumber = "NS-{$year}-{$random}";
+        } while (self::where('booking_number', $bookingNumber)->exists());
+ 
+        return $bookingNumber;
+    }
+
     protected static function booted(): void
     {
         static::creating(function ($booking) {
+            $booking->booking_number = self::generateBookingNumber();
             $room = Room::find($booking->room_id);
             if (!$room) {
                 return;
