@@ -12,6 +12,7 @@ class BookingResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'booking_number' => $this->booking_number,
             'hotel' => new HotelMiniResource($this->whenLoaded('hotel')),
             'room' => new RoomMiniResource($this->whenLoaded('room')),
             'start_date' => Carbon::parse($this->start_date)->format('d.m.Y'),
