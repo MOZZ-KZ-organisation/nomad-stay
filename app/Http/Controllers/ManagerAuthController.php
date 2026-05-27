@@ -22,6 +22,7 @@ class ManagerAuthController extends Controller
             'password'      => 'required|confirmed|min:8',
             'hotel_title'   => 'required|string|max:255',
             'hotel_address' => 'nullable|string|max:500',
+            'hotel_email'   => 'nullable|email|max:255',
         ], [
             'name.required'        => 'Введите ваше имя',
             'email.required'       => 'Введите email',
@@ -31,6 +32,7 @@ class ManagerAuthController extends Controller
             'password.confirmed'   => 'Пароли не совпадают',
             'password.min'         => 'Пароль должен содержать минимум 8 символов',
             'hotel_title.required' => 'Введите название отеля',
+            'hotel_email.email'    => 'Введите корректный email отеля',
         ]);
 
         $managerRole = Role::where('name', 'hotel_manager')->firstOrFail();
@@ -47,6 +49,7 @@ class ManagerAuthController extends Controller
             'title'      => $request->hotel_title,
             'slug'       => \Str::slug($request->hotel_title),
             'address'    => $request->hotel_address ?? null,
+            'email'      => $request->hotel_email ?? null,
             'stars'      => 0,
             'is_active'  => false,
             'cancellation_fee' => 0,

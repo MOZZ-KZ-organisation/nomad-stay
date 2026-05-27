@@ -151,6 +151,11 @@
                 <input type="text" name="hotel_address" value="{{ old('hotel_address') }}" placeholder="г. Алматы, ул. Абая 1">
             </div>
 
+             <div class="form-group">
+                <label>Email отеля</label>
+                <input type="email" name="hotel_email" value="{{ old('hotel_email') }}" placeholder="info@hotel.kz">
+            </div>
+            
             <button type="submit" class="btn">Зарегистрироваться</button>
         </form>
 
