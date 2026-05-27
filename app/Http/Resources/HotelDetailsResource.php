@@ -16,6 +16,7 @@ class HotelDetailsResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'address' => $this->address,
+            'email' => $this->email,
             'city' => $this->city->location,
             'lat' => (float) $this->latitude,
             'lng' => (float) $this->longitude,

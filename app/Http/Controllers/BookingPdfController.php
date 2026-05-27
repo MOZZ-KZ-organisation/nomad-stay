@@ -23,6 +23,7 @@ class BookingPdfController extends Controller
             'room' => $booking->room,
             'city' => $booking->hotel->city,
             'country' => $booking->hotel->city->country,
+            'hotel_email' => $booking->hotel->email,
         ];
         return view('pdf.booking-confirmation', $data);
     }

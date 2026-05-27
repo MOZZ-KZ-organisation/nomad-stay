@@ -354,6 +354,16 @@
                         @endfor
                     </div>
                     <div class="address">{{ $hotel->address }}, {{ $city->name }}, {{ $country->name }}</div>
+                    @if($hotel_email)
+                        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.08);">
+                            <div class="info-item">
+                                <div class="info-label">Email отеля</div>
+                                <a href="mailto:{{ $hotel_email }}" style="color: #4A90E2; text-decoration: none; font-size: 14px; font-weight: 500;">
+                                    {{ $hotel_email }}
+                                </a>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->string('address')->nullable();
+            $table->string('email')->nullable();
             $table->string('city')->index();
             $table->string('country')->index();
             $table->decimal('latitude', 10, 7)->nullable();
