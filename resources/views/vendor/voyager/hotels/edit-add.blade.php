@@ -280,6 +280,16 @@
                         </div>
 
                         <div class="field-group">
+                            <label class="field-label">Email отеля</label>
+                            @php $row = $dataType->editRows->firstWhere('field', 'email') @endphp
+                            @if($row)
+                                {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
+                            @else
+                                <input type="email" name="email" class="form-control" value="{{ $hotel->email ?? '' }}" placeholder="info@hotel.kz">
+                            @endif
+                        </div>
+
+                        <div class="field-group">
                             <label class="field-label">Описание</label>
                             @php $row = $dataType->editRows->firstWhere('field', 'description') @endphp
                             {!! app('voyager')->formField($row, $dataType, $dataTypeContent) !!}
