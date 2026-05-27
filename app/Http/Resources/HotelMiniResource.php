@@ -15,6 +15,7 @@ class HotelMiniResource extends JsonResource
             'title' => $this->title,
             'city' => $this->city->location,
             'address' => $this->address,
+            'email' => $this->email,
             'stars' => $this->stars,
             'main_image' => $this->images->first()?->path
                 ? Voyager::image($this->images->first()->path)
