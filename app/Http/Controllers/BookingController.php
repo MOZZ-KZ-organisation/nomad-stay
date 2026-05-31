@@ -54,8 +54,18 @@ class BookingController extends Controller
 
     public function userBookings(Request $request)
     {
-        $bookings = $request->user()->bookings()->with('hotel')->latest()->paginate(10);
-        return BookingMiniResource::collection($bookings);
+        $allowedStatuses = ['booked', 'checked_in', 'checked_out', 'cancelled'];
+        $query = $request->user()->bookings()->with('hotel')->latest();
+        if ($request->filled('status')) {
+            $statuses = array_filter(
+                explode(',', $request->query('status')),
+                fn($s) => in_array(trim($s), $allowedStatuses)
+            );
+            if (!empty($statuses)) {
+                $query->whereIn('status', $statuses);
+            }
+        }
+        return BookingMiniResource::collection($query->paginate(10));
     }
 
     public function show(Booking $booking)
