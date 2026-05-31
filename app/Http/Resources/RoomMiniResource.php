@@ -17,7 +17,12 @@ class RoomMiniResource extends JsonResource
             'beds' => $this->beds,
             'capacity' => $this->capacity,
             'bathrooms' => $this->bathrooms,
-            'images' => $this->images->map(fn($i) => Voyager::image($i->path))
+            'images' => $this->images->map(fn($i) => Voyager::image($i->path)),
+            'amenities' => $this->hotel
+                ? $this->hotel->amenities->map(fn($a) => [
+                    'code' => $a->code,
+                    'name' => $a->name,
+                ])->values() : [],
         ];
     }
 }

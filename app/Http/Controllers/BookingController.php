@@ -70,7 +70,7 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        $booking->load(['hotel', 'room']);
+        $booking->load(['hotel', 'room.hotel.amenities']);
         return new BookingResource($booking);
     }
 
