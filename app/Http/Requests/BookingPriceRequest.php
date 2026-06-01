@@ -16,7 +16,8 @@ class BookingPriceRequest extends FormRequest
         return [
             'room_id' => 'required|exists:rooms,id',
             'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date'
+            'end_date' => 'required|date|after:start_date',
+            'booking_id' => 'sometimes|exists:bookings,id',
         ];
     }
 }
