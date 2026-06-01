@@ -13,8 +13,7 @@ class ReviewController extends Controller
     public function userReviews(Request $request)
     {
         $reviews = $request->user()
-            ->reviews()
-            ->with(['hotel:id,title,slug', 'images'])
+            ->reviews()->with(['hotel:id,title,slug', 'images'])
             ->latest()->paginate(10);
         return ReviewResource::collection($reviews);
     }
