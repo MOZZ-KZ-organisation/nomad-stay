@@ -20,6 +20,7 @@ class HotelFavListResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'city_id' => $this->city_id,
             'location' => "{$this->city->name}, {$this->city->country->name}",
             'stars' => $this->stars,
             'rating' => round($this->reviews()->avg('rating') ?? 0, 2),
