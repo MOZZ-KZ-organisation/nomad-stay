@@ -24,7 +24,7 @@ class ReviewController extends Controller
         $user = $request->user();
         $hasCompletedBooking = $user->bookings()
             ->where('hotel_id', $data['hotel_id'])
-            ->where('status', 'completed') 
+            ->where('status', 'checked_out') 
             ->exists();
         if (!$hasCompletedBooking) {
             return response()->json(['message' => 'Вы можете оставить отзыв только после завершённого бронирования.'], 403);
@@ -37,16 +37,8 @@ class ReviewController extends Controller
                 $review->images()->create(['path' => $path]);
             }
         }
-        $mediaUrls = $review->images()->get()->map(fn($m) => url(Storage::url($m->path)))->toArray();
-        return response()->json([
-			'data' => [
-				'id' => $review->id,
-				'user' => ['id' => $user->id, 'name' => $user->name],
-				'rating' => $review->rating,
-				'comment' => $review->comment,
-				'created_at' => $review->created_at->format('d.m.Y H:i'),
-				'media' => $mediaUrls,
-			]
-		], 201);
+        $review->load('images');
+        return (new ReviewResource($review))
+            ->response()->setStatusCode(201);  
     }
 }
