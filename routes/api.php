@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/bookings/{booking}/dates', [BookingController::class, 'updateDates']);
     Route::post('bookings/{booking}/cancel', [BookingController::class, 'cancel']);
     Route::post('reviews', [ReviewController::class, 'store']);
+    Route::get('user/reviews', [ReviewController::class, 'userReviews']);
 
     Route::get('/booking-chats', [BookingChatController::class, 'index']);
     Route::get('/booking-chats/messages', [BookingMessageController::class, 'index']);

@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Storage;
 
 class ReviewController extends Controller
 {
+    public function userReviews(Request $request)
+    {
+        $reviews = $request->user()
+            ->reviews()
+            ->with(['hotel:id,title,slug', 'images'])
+            ->latest()->paginate(10);
+        return ReviewResource::collection($reviews);
+    }
+
     public function store(StoreReviewRequest $request)
     {
         $data = $request->validated();
