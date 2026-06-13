@@ -22,8 +22,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     // Route::get('/notifications', [AdminDashboardController::class, 'notifications']);
     // Route::patch('/notifications/read-all', [AdminDashboardController::class, 'markAllRead']);
     // Route::patch('/notifications/{id}/read', [AdminDashboardController::class, 'markRead']);
-    // Route::get('/bookings/calendar', [AdminBookingController::class, 'calendar']);
-    // Route::apiResource('/bookings', AdminBookingController::class);
+    Route::get('/bookings/calendar', [AdminBookingController::class, 'calendar']);
+    Route::apiResource('/bookings', AdminBookingController::class);
     // Route::apiResource('/hotels', AdminHotelController::class);
     // Route::post('/hotels/{id}/images', [AdminHotelController::class, 'uploadImages']);
     // Route::delete('/hotels/{hotelId}/images/{imageId}', [AdminHotelController::class, 'deleteImage']);
