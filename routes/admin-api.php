@@ -24,11 +24,12 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     // Route::patch('/notifications/{id}/read', [AdminDashboardController::class, 'markRead']);
     Route::get('/bookings/calendar', [AdminBookingController::class, 'calendar']);
     Route::apiResource('/bookings', AdminBookingController::class);
-    // Route::apiResource('/hotels', AdminHotelController::class);
-    // Route::post('/hotels/{id}/images', [AdminHotelController::class, 'uploadImages']);
-    // Route::delete('/hotels/{hotelId}/images/{imageId}', [AdminHotelController::class, 'deleteImage']);
-    // Route::patch('/hotels/{id}/nearby', [AdminHotelController::class, 'updateNearby']);
-    // Route::patch('/hotels/{id}/discount', [AdminHotelController::class, 'updateDiscount']);
+    Route::get('/my-hotel', [AdminHotelController::class, 'show']);
+    Route::patch('/my-hotel', [AdminHotelController::class, 'update']);
+    Route::post('/my-hotel/images', [AdminHotelController::class, 'uploadImages']);
+    Route::delete('/my-hotel/images/{imageId}', [AdminHotelController::class, 'deleteImage']);
+    Route::patch('/my-hotel/nearby', [AdminHotelController::class, 'updateNearby']);
+    Route::patch('/my-hotel/discount', [AdminHotelController::class, 'updateDiscount']);
     // Route::apiResource('/rooms', AdminRoomController::class);
     // Route::post('/rooms/{id}/images', [AdminRoomController::class, 'uploadImages']);
     // Route::delete('/rooms/{roomId}/images/{imageId}', [AdminRoomController::class, 'deleteImage']);
