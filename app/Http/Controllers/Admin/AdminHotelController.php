@@ -79,12 +79,16 @@ class AdminHotelController extends Controller
 
     public function deleteImage(Request $request, $imageId)
     {
-        $hotel = $this->getManagerHotel($request);
-        $image = $hotel->images()->findOrFail($imageId);
+        $hotel    = $this->getManagerHotel($request);
+        $image    = $hotel->images()->findOrFail($imageId);
+        $wasMain  = (bool) $image->is_main;
         if ($image->path && Storage::disk('public')->exists($image->path)) {
             Storage::disk('public')->delete($image->path);
         }
         $image->delete();
+        if ($wasMain) {
+            $hotel->images()->first()?->update(['is_main' => true]);
+        }
         return response()->json(['message' => 'Фото удалено']);
     }
 
