@@ -30,9 +30,9 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::delete('/my-hotel/images/{imageId}', [AdminHotelController::class, 'deleteImage']);
     Route::patch('/my-hotel/nearby', [AdminHotelController::class, 'updateNearby']);
     Route::patch('/my-hotel/discount', [AdminHotelController::class, 'updateDiscount']);
-    // Route::apiResource('/rooms', AdminRoomController::class);
-    // Route::post('/rooms/{id}/images', [AdminRoomController::class, 'uploadImages']);
-    // Route::delete('/rooms/{roomId}/images/{imageId}', [AdminRoomController::class, 'deleteImage']);
+    Route::apiResource('/rooms', AdminRoomController::class);
+    Route::post('/rooms/{id}/images', [AdminRoomController::class, 'uploadImages']);
+    Route::delete('/rooms/{roomId}/images/{imageId}', [AdminRoomController::class, 'deleteImage']);
     // Route::prefix('/reports')->group(function () {
     //     Route::get('/revenue', [AdminReportController::class, 'revenue']);
     //     Route::get('/occupancy', [AdminReportController::class, 'occupancy']);
