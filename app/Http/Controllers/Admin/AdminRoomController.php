@@ -85,7 +85,7 @@ class AdminRoomController extends Controller
 
         return response()->json([
             'message' => 'Номер создан',
-            'data'    => $this->formatRoom($room->load(['hotel:id,title', 'images'])),
+            'data'    => $this->formatRoom($room->load(['hotel:id,title', 'images']), true),
         ], 201);
     }
 
@@ -116,7 +116,7 @@ class AdminRoomController extends Controller
 
         return response()->json([
             'message' => 'Номер обновлён',
-            'data'    => $this->formatRoom($room->fresh(['hotel:id,title', 'images'])),
+            'data'    => $this->formatRoom($room->fresh(['hotel:id,title', 'images']), true),
         ]);
     }
 
