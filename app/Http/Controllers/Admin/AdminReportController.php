@@ -148,21 +148,21 @@ class AdminReportController extends Controller
         $user      = $request->user();
         $isManager = $user->isHotelManager();
         $hotelId   = $isManager ? $user->managedHotel?->id : $request->hotel_id;
-
+ 
         $query = Review::query();
         if ($hotelId) {
             $query->where('hotel_id', $hotelId);
         }
-
+ 
         $summary = [
-            'total'      => $query->count(),
-            'avg_rating' => round($query->avg('rating') ?? 0, 2),
-            'by_rating'  => $query->select('rating', DB::raw('count(*) as count'))
+            'total'      => (clone $query)->count(),
+            'avg_rating' => round((clone $query)->avg('rating') ?? 0, 2),
+            'by_rating'  => (clone $query)->select('rating', DB::raw('count(*) as count'))
                 ->groupBy('rating')
                 ->orderBy('rating')
                 ->get(),
         ];
-
+ 
         $latest = (clone $query)->with(['user:id,name', 'hotel:id,title'])
             ->latest()->limit(10)->get()
             ->map(fn($r) => [
@@ -173,7 +173,7 @@ class AdminReportController extends Controller
                 'hotel'      => $r->hotel?->title,
                 'created_at' => $r->created_at->format('d.m.Y'),
             ]);
-
+ 
         return response()->json(['summary' => $summary, 'latest' => $latest]);
     }
 }
