@@ -18,10 +18,10 @@ Route::post('/register', [AdminAuthController::class, 'register']);
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/logout', [AdminAuthController::class, 'logout']);
     Route::get('/me', [AdminAuthController::class, 'me']);
-    // Route::get('/dashboard', [AdminDashboardController::class, 'index']);
-    // Route::get('/notifications', [AdminDashboardController::class, 'notifications']);
-    // Route::patch('/notifications/read-all', [AdminDashboardController::class, 'markAllRead']);
-    // Route::patch('/notifications/{id}/read', [AdminDashboardController::class, 'markRead']);
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    Route::get('/notifications', [AdminDashboardController::class, 'notifications']);
+    Route::patch('/notifications/read-all', [AdminDashboardController::class, 'markAllRead']);
+    Route::patch('/notifications/{id}/read', [AdminDashboardController::class, 'markRead']);
     Route::get('/bookings/calendar', [AdminBookingController::class, 'calendar']);
     Route::apiResource('/bookings', AdminBookingController::class);
     Route::get('/my-hotel', [AdminHotelController::class, 'show']);
