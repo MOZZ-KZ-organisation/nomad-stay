@@ -33,12 +33,12 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('/rooms', AdminRoomController::class);
     Route::post('/rooms/{id}/images', [AdminRoomController::class, 'uploadImages']);
     Route::delete('/rooms/{roomId}/images/{imageId}', [AdminRoomController::class, 'deleteImage']);
-    // Route::prefix('/reports')->group(function () {
-    //     Route::get('/revenue', [AdminReportController::class, 'revenue']);
-    //     Route::get('/occupancy', [AdminReportController::class, 'occupancy']);
-    //     Route::get('/bookings-by-source', [AdminReportController::class, 'bySource']);
-    //     Route::get('/reviews', [AdminReportController::class, 'reviews']);
-    // });
+    Route::prefix('/reports')->group(function () {
+        Route::get('/revenue', [AdminReportController::class, 'revenue']);
+        Route::get('/occupancy', [AdminReportController::class, 'occupancy']);
+        Route::get('/bookings-by-source', [AdminReportController::class, 'bySource']);
+        Route::get('/reviews', [AdminReportController::class, 'reviews']);
+    });
     // Route::get('/guests', [AdminGuestController::class, 'index']);
     // Route::get('/guests/{id}', [AdminGuestController::class, 'show']);
     // Route::patch('/guests/{id}/block', [AdminGuestController::class, 'toggleBlock']);
