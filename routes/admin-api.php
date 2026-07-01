@@ -42,8 +42,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/guests', [AdminGuestController::class, 'index']);
     Route::get('/guests/{id}', [AdminGuestController::class, 'show']);
     Route::patch('/guests/{id}/block', [AdminGuestController::class, 'toggleBlock']);
-    // Route::get('/reviews', [AdminReviewController::class, 'index']);
-    // Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy']);
+    Route::get('/reviews', [AdminReviewController::class, 'index']);
+    Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy']);
     // Route::get('/support-chats', [AdminSupportController::class, 'index']);
     // Route::get('/support-chats/{id}', [AdminSupportController::class, 'show']);
     // Route::post('/support-chats/{id}/messages', [AdminSupportController::class, 'reply']);
