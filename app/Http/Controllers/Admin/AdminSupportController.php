@@ -177,7 +177,7 @@ class AdminSupportController extends Controller
                 'body'       => $m->body,
                 'sender_id'  => $m->sender_id,
                 'sender_name'=> $m->userSender?->name,
-                'is_admin'   => $m->sender_id === auth()->id(),
+                'is_hotel_manager'   => $m->sender_id === auth()->id(),
                 'read'       => $m->read,
                 'created_at' => $m->created_at->format('d.m.Y H:i'),
             ]),
@@ -214,7 +214,7 @@ class AdminSupportController extends Controller
                 'id'         => $message->id,
                 'body'       => $message->body,
                 'sender_id'  => $message->sender_id,
-                'is_admin'   => true,
+                'is_hotel_manager'   => true,
                 'created_at' => $message->created_at->format('d.m.Y H:i'),
             ],
         ], 201);
