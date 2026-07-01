@@ -44,12 +44,12 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::patch('/guests/{id}/block', [AdminGuestController::class, 'toggleBlock']);
     Route::get('/reviews', [AdminReviewController::class, 'index']);
     Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy']);
-    // Route::get('/support-chats', [AdminSupportController::class, 'index']);
-    // Route::get('/support-chats/{id}', [AdminSupportController::class, 'show']);
-    // Route::post('/support-chats/{id}/messages', [AdminSupportController::class, 'reply']);
-    // Route::get('/booking-chats', [AdminSupportController::class, 'bookingChats']);
-    // Route::get('/booking-chats/{id}', [AdminSupportController::class, 'showBookingChat']);
-    // Route::post('/booking-chats/{id}/messages', [AdminSupportController::class, 'replyBookingChat']);
+    Route::get('/support-chats', [AdminSupportController::class, 'index']);
+    Route::get('/support-chats/{id}', [AdminSupportController::class, 'show']);
+    Route::post('/support-chats/{id}/messages', [AdminSupportController::class, 'reply']);
+    Route::get('/booking-chats', [AdminSupportController::class, 'bookingChats']);
+    Route::get('/booking-chats/{id}', [AdminSupportController::class, 'showBookingChat']);
+    Route::post('/booking-chats/{id}/messages', [AdminSupportController::class, 'replyBookingChat']);
     // Route::get('/cities', [AdminContentController::class, 'cities']);
     // Route::post('/cities', [AdminContentController::class, 'storeCity']);
     // Route::patch('/cities/{id}', [AdminContentController::class, 'updateCity']);
