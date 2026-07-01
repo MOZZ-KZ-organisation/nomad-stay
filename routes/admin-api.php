@@ -39,9 +39,9 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::get('/bookings-by-source', [AdminReportController::class, 'bySource']);
         Route::get('/reviews', [AdminReportController::class, 'reviews']);
     });
-    // Route::get('/guests', [AdminGuestController::class, 'index']);
-    // Route::get('/guests/{id}', [AdminGuestController::class, 'show']);
-    // Route::patch('/guests/{id}/block', [AdminGuestController::class, 'toggleBlock']);
+    Route::get('/guests', [AdminGuestController::class, 'index']);
+    Route::get('/guests/{id}', [AdminGuestController::class, 'show']);
+    Route::patch('/guests/{id}/block', [AdminGuestController::class, 'toggleBlock']);
     // Route::get('/reviews', [AdminReviewController::class, 'index']);
     // Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy']);
     // Route::get('/support-chats', [AdminSupportController::class, 'index']);
