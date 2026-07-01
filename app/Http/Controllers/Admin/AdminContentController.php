@@ -218,6 +218,7 @@ class AdminContentController extends Controller
         $data = $request->validate([
             'city_id' => 'required|exists:cities,id',
             'title'    => 'required|string|max:255',
+            'description' => 'required|string:max:255',
             'image'   => 'nullable|image|mimes:jpeg,png,webp|max:3072',
         ]);
         if ($request->hasFile('image')) {
