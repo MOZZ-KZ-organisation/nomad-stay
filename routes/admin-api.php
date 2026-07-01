@@ -52,7 +52,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/booking-chats/{id}/messages', [AdminSupportController::class, 'replyBookingChat']);
     Route::get('/cities', [AdminContentController::class, 'cities']);
     Route::post('/cities', [AdminContentController::class, 'storeCity']);
-    Route::patch('/cities/{id}', [AdminContentController::class, 'updateCity']);
+    Route::post('/cities/{id}', [AdminContentController::class, 'updateCity']);
     Route::delete('/cities/{id}', [AdminContentController::class, 'destroyCity']);
     Route::get('/countries', [AdminContentController::class, 'countries']);
     Route::post('/countries', [AdminContentController::class, 'storeCountry']);
