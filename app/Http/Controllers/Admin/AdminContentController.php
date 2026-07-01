@@ -203,8 +203,8 @@ class AdminContentController extends Controller
                 'id'      => $a->id,
                 'city_id' => $a->city_id,
                 'city'    => $a->city?->name,
-                'name'    => $a->name,
-                'image'   => $a->image ? url(Storage::url($a->image)) : null,
+                'title'    => $a->title,
+                'image'   => $a->image_path ? url(Storage::url($a->image_path)) : null,
             ]),
         ]);
     }
@@ -217,11 +217,11 @@ class AdminContentController extends Controller
         abort_if(!$request->user()->isAdmin(), 403);
         $data = $request->validate([
             'city_id' => 'required|exists:cities,id',
-            'name'    => 'required|string|max:255',
+            'title'    => 'required|string|max:255',
             'image'   => 'nullable|image|mimes:jpeg,png,webp|max:3072',
         ]);
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('attractions', 'public');
+            $data['image_path'] = $request->file('image')->store('attractions', 'public');
         }
         $attraction = CityAttraction::create($data);
         return response()->json(['message' => 'Достопримечательность добавлена', 'data' => $attraction], 201);
