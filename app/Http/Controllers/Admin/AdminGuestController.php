@@ -135,10 +135,9 @@ class AdminGuestController extends Controller
             'citizenship'    => $u->citizenship,
             'birth_date'     => $u->birth_date?->format('d.m.Y'),
             'avatar'         => $u->avatar ? url(Storage::url($u->avatar)) : null,
-            'is_blocked'     => (bool) $u->deleted_at,
+            // 'is_blocked'     => (bool) $u->deleted_at,
             'bookings_count' => $u->bookings_count ?? 0,
             'reviews_count'  => $u->reviews_count ?? 0,
-            'created_at'     => $u->created_at?->format('d.m.Y'),
         ];
     }
 }
