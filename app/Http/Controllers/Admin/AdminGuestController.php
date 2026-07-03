@@ -171,6 +171,7 @@ class AdminGuestController extends Controller
     {
         return [
             'id'             => $u->id,
+            'type'           => 'registered',
             'name'           => $u->name,
             'email'          => $u->email,
             'phone'          => $u->phone,
@@ -199,10 +200,8 @@ class AdminGuestController extends Controller
             'citizenship'    => $booking->country,
             'birth_date'     => null,
             'avatar'         => null,
-            'is_blocked'     => false,
             'bookings_count' => $bookingsCount,
             'reviews_count'  => 0,
-            'created_at'     => null,
         ];
     }
 }
