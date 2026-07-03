@@ -96,7 +96,7 @@ class AdminGuestController extends Controller
             ],
         ]);
     }
-    
+
     /**
      * GET /admin-api/guests/{id}
      * Профиль гостя + история бронирований.
@@ -180,6 +180,29 @@ class AdminGuestController extends Controller
             // 'is_blocked'     => (bool) $u->deleted_at,
             'bookings_count' => $u->bookings_count ?? 0,
             'reviews_count'  => $u->reviews_count ?? 0,
+        ];
+    }
+
+    protected function formatAnonymousGuest($booking, int $hotelId): array
+    {
+        $bookingsCount = Booking::where('hotel_id', $hotelId)
+            ->whereNull('user_id')
+            ->where('email', $booking->email)
+            ->count();
+ 
+        return [
+            'id'             => null,
+            'type'           => 'anonymous',
+            'name'           => trim("{$booking->first_name} {$booking->last_name}"),
+            'email'          => $booking->email,
+            'phone'          => $booking->phone,
+            'citizenship'    => $booking->country,
+            'birth_date'     => null,
+            'avatar'         => null,
+            'is_blocked'     => false,
+            'bookings_count' => $bookingsCount,
+            'reviews_count'  => 0,
+            'created_at'     => null,
         ];
     }
 }
