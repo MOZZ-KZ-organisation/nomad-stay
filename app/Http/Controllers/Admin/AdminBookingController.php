@@ -28,9 +28,11 @@ class AdminBookingController extends Controller
             'start_date'       => 'required|date|after_or_equal:today',
             'end_date'         => 'required|date|after:start_date',
             'guests'           => 'required|integer|min:1',
-            'first_name'       => 'required|string|max:100',
-            'last_name'        => 'required|string|max:100',
-            'email'            => 'required|email',
+            // Если передан user_id — данные гостя подтянутся автоматически
+            'user_id'          => 'nullable|exists:users,id',
+            'first_name'       => 'required_without:user_id|string|max:100',
+            'last_name'        => 'required_without:user_id|string|max:100',
+            'email'            => 'required_without:user_id|email',
             'phone'            => 'nullable|string|max:30',
             'country'          => 'nullable|string|max:100',
             'is_business_trip' => 'boolean',
@@ -40,11 +42,22 @@ class AdminBookingController extends Controller
             'status'           => 'nullable|string|in:booked,checked_in',
             'is_paid'          => 'boolean',
         ]);
+        // Если выбран существующий гость — подтягиваем его данные
+        if (!empty($data['user_id'])) {
+            $guest = \App\Models\User::findOrFail($data['user_id']);
+            $nameParts = explode(' ', $guest->name, 2);
+            $data['first_name'] = $data['first_name'] ?? $nameParts[0];
+            $data['last_name']  = $data['last_name']  ?? ($nameParts[1] ?? '');
+            $data['email']      = $data['email']       ?? $guest->email;
+            $data['phone']      = $data['phone']       ?? $guest->phone;
+        }
         $room = Room::findOrFail($data['room_id']);
         $user = $request->user();
+        // Менеджер может создавать только для своего отеля
         if ($user->isHotelManager()) {
             $this->authorizeHotel($user, $room->hotel_id);
         }
+        // Проверка доступности
         $bookedCount = Booking::where('room_id', $room->id)
             ->whereIn('status', ['booked', 'checked_in'])
             ->where('end_date', '>', $data['start_date'])

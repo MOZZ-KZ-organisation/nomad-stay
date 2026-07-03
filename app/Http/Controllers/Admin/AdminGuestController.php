@@ -19,29 +19,71 @@ class AdminGuestController extends Controller
     {
         $user      = $request->user();
         $isManager = $user->isHotelManager();
+        $hotelId   = $user->managedHotel?->id;
+        $search    = $request->get('search');
+ 
         if ($isManager) {
-            // Берём user_id из броней своего отеля (только зарегистрированные)
-            $userIds = Booking::where('hotel_id', $user->managedHotel?->id)
+            // 1. Зарегистрированные гости отеля
+            $registeredIds = Booking::where('hotel_id', $hotelId)
                 ->whereNotNull('user_id')
                 ->distinct()
                 ->pluck('user_id');
-            $query = User::withCount(['bookings', 'reviews'])
-                ->whereIn('id', $userIds)
-                ->latest();
-        } else {
-            $query = User::withCount(['bookings', 'reviews'])
-                ->where(function ($q) {
-                    $q->whereHas('role', fn($r) => $r->where('name', 'user'))
-                      ->orWhereNull('role_id');
-                })
-                ->latest();
+            $registeredQuery = User::withCount(['bookings', 'reviews'])
+                ->whereIn('id', $registeredIds);
+            if ($search) {
+                $registeredQuery->where(fn($q) => $q
+                    ->where('name',  'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                );
+            }
+            $registered = $registeredQuery->get()->map(fn($u) => $this->formatGuest($u));
+ 
+            // 2. Анонимные гости (user_id = null) — уникальные по email
+            $anonymousQuery = Booking::where('hotel_id', $hotelId)
+                ->whereNull('user_id')
+                ->select('first_name', 'last_name', 'email', 'phone', 'country')
+                ->groupBy('email', 'first_name', 'last_name', 'phone', 'country');
+ 
+            if ($search) {
+                $anonymousQuery->where(fn($q) => $q
+                    ->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name',  'like', "%{$search}%")
+                    ->orWhere('email',      'like', "%{$search}%")
+                    ->orWhere('phone',      'like', "%{$search}%")
+                );
+            }
+            $anonymous = $anonymousQuery->get()->map(fn($b) => $this->formatAnonymousGuest($b, $hotelId));
+ 
+            // Объединяем и пагинируем вручную
+            $all     = $registered->concat($anonymous)->sortByDesc('created_at')->values();
+            $perPage = $request->get('per_page', 20);
+            $page    = $request->get('page', 1);
+            $paged   = $all->forPage($page, $perPage);
+ 
+            return response()->json([
+                'data' => $paged->values(),
+                'meta' => [
+                    'total'        => $all->count(),
+                    'current_page' => (int) $page,
+                    'last_page'    => (int) ceil($all->count() / $perPage),
+                ],
+            ]);
         }
-        if ($request->filled('search')) {
-            $s = $request->search;
+ 
+        // Admin — только зарегистрированные пользователи
+        $query = User::withCount(['bookings', 'reviews'])
+            ->where(fn($q) => $q
+                ->whereHas('role', fn($r) => $r->where('name', 'user'))
+                ->orWhereNull('role_id')
+            )
+            ->latest();
+ 
+        if ($search) {
             $query->where(fn($q) => $q
-                ->where('name', 'like', "%{$s}%")
-                ->orWhere('email', 'like', "%{$s}%")
-                ->orWhere('phone', 'like', "%{$s}%")
+                ->where('name',  'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('phone', 'like', "%{$search}%")
             );
         }
         $users = $query->paginate($request->get('per_page', 20));
@@ -54,7 +96,7 @@ class AdminGuestController extends Controller
             ],
         ]);
     }
- 
+    
     /**
      * GET /admin-api/guests/{id}
      * Профиль гостя + история бронирований.
