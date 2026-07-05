@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AdminHotelController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminRoomController;
+use App\Http\Controllers\Admin\AdminRoomPeriodController;
 use App\Http\Controllers\Admin\AdminSupportController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('/rooms', AdminRoomController::class);
     Route::post('/rooms/{id}/images', [AdminRoomController::class, 'uploadImages']);
     Route::delete('/rooms/{roomId}/images/{imageId}', [AdminRoomController::class, 'deleteImage']);
+    Route::get('/rooms/{roomId}/periods', [AdminRoomPeriodController::class, 'index']);
+    Route::post('/rooms/{roomId}/periods', [AdminRoomPeriodController::class, 'store']);
+    Route::patch('/rooms/{roomId}/periods/{id}', [AdminRoomPeriodController::class, 'update']);
+    Route::delete('/rooms/{roomId}/periods/{id}', [AdminRoomPeriodController::class, 'destroy']);
     Route::prefix('/reports')->group(function () {
         Route::get('/revenue', [AdminReportController::class, 'revenue']);
         Route::get('/occupancy', [AdminReportController::class, 'occupancy']);
