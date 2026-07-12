@@ -178,4 +178,100 @@ class AdminReportController extends Controller
  
         return response()->json(['summary' => $summary, 'latest' => $latest]);
     }
+
+    public function roomStatuses(Request $request)
+    {
+        $user    = $request->user();
+        $hotelId = $user->isHotelManager() ? $user->managedHotel?->id : $request->hotel_id;
+        $date    = Carbon::parse($request->get('date', now()))->toDateString();
+ 
+        // Все номера отеля
+        $roomsQuery = \App\Models\Room::query();
+        if ($hotelId) {
+            $roomsQuery->where('hotel_id', $hotelId);
+        }
+        $rooms      = $roomsQuery->get();
+        $totalRooms = $rooms->sum('stock'); // stock = кол-во номеров данного типа
+ 
+        // Ремонт и уборка из room_periods на дату
+        $periods = \App\Models\RoomPeriod::whereIn('room_id', $rooms->pluck('id'))
+            ->where('start_date', '<=', $date)
+            ->where('end_date', '>=', $date)
+            ->whereIn('status', ['maintenance', 'cleaning'])
+            ->get();
+ 
+        $maintenance = $periods->where('status', 'maintenance')->count();
+        $cleaning    = $periods->where('status', 'cleaning')->count();
+ 
+        // Заселено (checked_in) и Забронировано (booked) из bookings на дату
+        $bookings = Booking::whereIn('room_id', $rooms->pluck('id'))
+            ->where('start_date', '<=', $date)
+            ->where('end_date', '>', $date)
+            ->whereIn('status', ['checked_in', 'booked'])
+            ->get();
+ 
+        $checkedIn = $bookings->where('status', 'checked_in')->count();
+        $booked    = $bookings->where('status', 'booked')->count();
+ 
+        $occupied = $maintenance + $cleaning + $checkedIn + $booked;
+        $free     = max(0, $totalRooms - $occupied);
+ 
+        return response()->json([
+            'data' => [
+                'date'        => $date,
+                'total_rooms' => $totalRooms,
+                'statuses'    => [
+                    'free'        => $free,
+                    'booked'      => $booked,
+                    'checked_in'  => $checkedIn,
+                    'cleaning'    => $cleaning,
+                    'maintenance' => $maintenance,
+                ],
+            ],
+        ]);
+    }
+ 
+    /**
+     * GET /admin-api/reports/bookings-by-source
+     * Уже существует — но добавим улучшенную версию с total и структурой как просили.
+     * GET /admin-api/reports/sources-summary
+     */
+    public function sourcesSummary(Request $request)
+    {
+        $user    = $request->user();
+        $hotelId = $user->isHotelManager() ? $user->managedHotel?->id : $request->hotel_id;
+ 
+        $from = $request->get('from', now()->startOfMonth()->toDateString());
+        $to   = $request->get('to',   now()->endOfMonth()->toDateString());
+ 
+        $query = Booking::query()
+            ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59']);
+ 
+        if ($hotelId) {
+            $query->where('hotel_id', $hotelId);
+        }
+ 
+        $total = (clone $query)->count();
+ 
+        // Группируем по источнику
+        $bySource = (clone $query)
+            ->select('source', DB::raw('COUNT(*) as count'), DB::raw('SUM(total_price) as revenue'))
+            ->groupBy('source')
+            ->get()
+            ->keyBy('source');
+ 
+        // Все возможные источники — чтобы фронт всегда получал все ключи
+        $sources = ['site', 'booking.com', 'manual', 'phone'];
+ 
+        $result = ['total' => $total];
+        foreach ($sources as $source) {
+            $key          = str_replace('.', '_', str_replace('-', '_', $source)); // booking.com -> booking_com
+            $result[$key] = [
+                'count'   => $bySource[$source]->count   ?? 0,
+                'revenue' => $bySource[$source]->revenue ?? 0,
+            ];
+        }
+ 
+        return response()->json(['data' => $result]);
+    }
 }

@@ -42,6 +42,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::get('/revenue', [AdminReportController::class, 'revenue']);
         Route::get('/occupancy', [AdminReportController::class, 'occupancy']);
         Route::get('/bookings-by-source', [AdminReportController::class, 'bySource']);
+        Route::get('/room-statuses', [AdminReportController::class, 'roomStatuses']);
+        Route::get('/sources-summary', [AdminReportController::class, 'sourcesSummary']);
         Route::get('/reviews', [AdminReportController::class, 'reviews']);
     });
     Route::get('/guests', [AdminGuestController::class, 'index']);
