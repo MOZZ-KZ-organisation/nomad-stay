@@ -261,7 +261,7 @@ class AdminReportController extends Controller
             ->keyBy('source');
  
         // Все возможные источники — чтобы фронт всегда получал все ключи
-        $sources = ['site', 'booking.com', 'manual', 'phone'];
+        $sources = ['site', 'booking.com', 'manual'];
  
         $result = ['total' => $total];
         foreach ($sources as $source) {
