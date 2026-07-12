@@ -103,6 +103,63 @@ class AdminBookingController extends Controller
         ]);
     }
 
+    /**
+     * GET /admin-api/bookings
+     * Список бронирований с пагинацией для табличного вида.
+     */
+    public function index(Request $request)
+    {
+        $user      = $request->user();
+        $isManager = $user->isHotelManager();
+ 
+        $query = Booking::with(['hotel:id,title', 'room:id,title'])
+            ->latest();
+ 
+        if ($isManager) {
+            $query->where('hotel_id', $user->managedHotel?->id);
+        } elseif ($request->filled('hotel_id')) {
+            $query->where('hotel_id', $request->hotel_id);
+        }
+ 
+        if ($request->filled('status')) {
+            $query->whereIn('status', explode(',', $request->status));
+        }
+        if ($request->filled('source')) {
+            $query->where('source', $request->source);
+        }
+        if ($request->filled('is_paid')) {
+            $query->where('is_paid', filter_var($request->is_paid, FILTER_VALIDATE_BOOLEAN));
+        }
+        if ($request->filled('date_from')) {
+            $query->whereDate('start_date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('start_date', '<=', $request->date_to);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(fn($q) => $q
+                ->where('booking_number', 'like', "%{$s}%")
+                ->orWhere('first_name',   'like', "%{$s}%")
+                ->orWhere('last_name',    'like', "%{$s}%")
+                ->orWhere('email',        'like', "%{$s}%")
+                ->orWhere('phone',        'like', "%{$s}%")
+            );
+        }
+ 
+        $bookings = $query->paginate($request->get('per_page', 20));
+ 
+        return response()->json([
+            'data' => $bookings->map(fn($b) => $this->formatBooking($b)),
+            'meta' => [
+                'total'        => $bookings->total(),
+                'current_page' => $bookings->currentPage(),
+                'last_page'    => $bookings->lastPage(),
+                'per_page'     => $bookings->perPage(),
+            ],
+        ]);
+    }
+
     public function calendar(Request $request)
     {
         $user = $request->user();
