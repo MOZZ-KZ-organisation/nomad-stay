@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\RoomPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -125,6 +126,10 @@ class AdminBookingController extends Controller
             ->when($request->filled('source'), fn($q) => $q->where('source', $request->source))
             ->when($request->filled('is_paid'), fn($q) => $q->where('is_paid', (bool) $request->is_paid))
             ->get();
+        $periods = RoomPeriod::whereIn('room_id', $rooms->pluck('id'))
+            ->where('end_date', '>=', $start)
+            ->where('start_date', '<=', $end)
+            ->get();
         return response()->json([
             'rooms' => $rooms->map(fn($room) => [
                 'id'       => $room->id,
@@ -148,6 +153,15 @@ class AdminBookingController extends Controller
                 'guests'         => $b->guests,
                 'arrival_time'   => $b->arrival_time?->format('H:i'),
                 'special_requests' => $b->special_requests,
+            ]),
+            'periods' => $periods->map(fn($p) => [
+                'id'         => $p->id,
+                'room_id'    => $p->room_id,
+                'status'     => $p->status,
+                'color'      => $p->color,
+                'start_date' => $p->start_date->format('Y-m-d'),
+                'end_date'   => $p->end_date->format('Y-m-d'),
+                'comment'    => $p->comment,
             ]),
         ]);
     }
