@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminBookingController;
 use App\Http\Controllers\Admin\AdminContentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminEnumController;
 use App\Http\Controllers\Admin\AdminGuestController;
 use App\Http\Controllers\Admin\AdminHotelController;
 use App\Http\Controllers\Admin\AdminReportController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\AdminRoomPeriodController;
 use App\Http\Controllers\Admin\AdminSupportController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/enums', [AdminEnumController::class, 'index']);
 Route::post('/login', [AdminAuthController::class, 'login']);
 Route::post('/register', [AdminAuthController::class, 'register']);
 
