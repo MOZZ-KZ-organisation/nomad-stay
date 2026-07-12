@@ -90,7 +90,8 @@ class AdminReportController extends Controller
             $nights = $start->diffInDays($end);
             $roomNights[$b->room_id] = ($roomNights[$b->room_id] ?? 0) + $nights;
         }
-
+        $rooms = \App\Models\Room::whereIn('id', array_keys($roomNights))
+            ->pluck('title', 'id');
         $totalDays = $from->diffInDays($to) + 1;
 
         return response()->json([
@@ -98,6 +99,7 @@ class AdminReportController extends Controller
                 'period_days'     => $totalDays,
                 'rooms_data'      => collect($roomNights)->map(fn($nights, $roomId) => [
                     'room_id'        => $roomId,
+                    'room_title'      => $rooms[$roomId] ?? null,
                     'occupied_nights' => $nights,
                     'occupancy_rate'  => $totalDays > 0 ? round($nights / $totalDays * 100, 1) : 0,
                 ])->values(),
