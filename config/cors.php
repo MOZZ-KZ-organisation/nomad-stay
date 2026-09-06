@@ -19,6 +19,7 @@ return [
     'allowed_origins' => [
         'https://nomad.apiapp.kz',
         'https://admin.nomad.apiapp.kz',
+        'https://app.nomad.apiapp.kz',
     ],
 
     'allowed_origins_patterns' => [],
