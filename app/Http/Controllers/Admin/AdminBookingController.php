@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomPeriod;
+use App\Services\BookingPriceCalculator;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -17,12 +18,14 @@ class AdminBookingController extends Controller
             'hotel:id,title,slug,address,email',
             'room:id,title,price',
             'user:id,name,email,phone',
+            'services.service:id,title,unit',
+            'payments.user:id,name',
         ])->findOrFail($id);
         $this->authorizeHotel($request->user(), $booking->hotel_id);
         return response()->json(['data' => $this->formatBooking($booking, true)]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, BookingPriceCalculator $calculator)
     {
         $data = $request->validate([
             'room_id'          => 'required|exists:rooms,id',
@@ -39,6 +42,9 @@ class AdminBookingController extends Controller
             'is_business_trip' => 'boolean',
             'special_requests' => 'nullable|string|max:1000',
             'arrival_time'     => 'nullable|date_format:H:i',
+            // --- новое: точное плановое время заезда/выезда для расчёта доплат ---
+            'planned_check_in_time'  => 'nullable|date_format:H:i',
+            'planned_check_out_time' => 'nullable|date_format:H:i',
             'source'           => 'nullable|string|in:site,booking.com,manual,phone',
             'status'           => 'nullable|string|in:booked,checked_in',
             'is_paid'          => 'boolean',
@@ -67,25 +73,40 @@ class AdminBookingController extends Controller
         if ($bookedCount >= $room->stock) {
             return response()->json(['message' => 'Номер недоступен на выбранные даты'], 422);
         }
-        $nights    = Carbon::parse($data['start_date'])->diffInDays(Carbon::parse($data['end_date']));
-        $basePrice = $room->price * $nights;
-        $tax       = $basePrice * env('BOOKING_TAX_RATE', 0.0);
+
+        [$plannedCheckIn, $plannedCheckOut] = $this->resolvePlannedTimes(
+            $room,
+            $data['start_date'],
+            $data['end_date'],
+            $data['planned_check_in_time'] ?? $data['arrival_time'] ?? null,
+            $data['planned_check_out_time'] ?? null
+        );
+
+        $breakdown = $calculator->calculate($room, $plannedCheckIn, $plannedCheckOut);
+        $tax = $breakdown['accommodation'] * env('BOOKING_TAX_RATE', 0.0);
+
         $booking = Booking::create(array_merge($data, [
             'hotel_id'         => $room->hotel_id,
-            'price_for_period' => $basePrice,
+            'price_for_period' => $breakdown['accommodation'],
             'tax'              => $tax,
-            'total_price'      => $basePrice + $tax,
+            'early_check_in_amount' => $breakdown['early_check_in'],
+            'late_check_out_amount' => $breakdown['late_check_out'],
+            'services_amount'  => 0,
+            'total_price'      => $breakdown['accommodation'] + $tax
+                + $breakdown['early_check_in'] + $breakdown['late_check_out'],
+            'planned_check_in_at'  => $plannedCheckIn,
+            'planned_check_out_at' => $plannedCheckOut,
             'status'           => $data['status'] ?? 'booked',
             'source'           => $data['source'] ?? 'manual',
             'type'             => 'booking',
         ]));
         return response()->json([
             'message' => 'Бронирование создано',
-            'data'    => $this->formatBooking($booking->load(['hotel', 'room'])),
+            'data'    => $this->formatBooking($booking->load(['hotel', 'room']), true),
         ], 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, BookingPriceCalculator $calculator)
     {
         $booking = Booking::findOrFail($id);
         $this->authorizeHotel($request->user(), $booking->hotel_id);
@@ -95,11 +116,45 @@ class AdminBookingController extends Controller
             'start_date' => 'sometimes|date',
             'end_date'   => 'sometimes|date|after:start_date',
             'special_requests' => 'sometimes|nullable|string|max:1000',
+            // --- новое ---
+            'planned_check_in_time'  => 'nullable|date_format:H:i',
+            'planned_check_out_time' => 'nullable|date_format:H:i',
+            'actual_check_in_at'  => 'nullable|date',
+            'actual_check_out_at' => 'nullable|date',
         ]);
-        $booking->update($data);
+
+        $recalcDates = $request->hasAny(['start_date', 'end_date', 'planned_check_in_time', 'planned_check_out_time']);
+
+        $booking->fill($data);
+
+        if ($recalcDates) {
+            [$plannedCheckIn, $plannedCheckOut] = $this->resolvePlannedTimes(
+                $booking->room,
+                $booking->start_date,
+                $booking->end_date,
+                $request->input('planned_check_in_time'),
+                $request->input('planned_check_out_time'),
+                $booking
+            );
+            $breakdown = $calculator->calculate($booking->room, $plannedCheckIn, $plannedCheckOut);
+            $tax = $breakdown['accommodation'] * env('BOOKING_TAX_RATE', 0.0);
+
+            $booking->planned_check_in_at = $plannedCheckIn;
+            $booking->planned_check_out_at = $plannedCheckOut;
+            $booking->price_for_period = $breakdown['accommodation'];
+            $booking->tax = $tax;
+            $booking->early_check_in_amount = $breakdown['early_check_in'];
+            $booking->late_check_out_amount = $breakdown['late_check_out'];
+            $booking->total_price = $breakdown['accommodation'] + $tax
+                + $breakdown['early_check_in'] + $breakdown['late_check_out']
+                + $booking->services_amount;
+        }
+
+        $booking->save();
+
         return response()->json([
             'message' => 'Бронирование обновлено',
-            'data'    => $this->formatBooking($booking->fresh(['hotel', 'room'])),
+            'data'    => $this->formatBooking($booking->fresh(['hotel', 'room']), true),
         ]);
     }
 
@@ -240,7 +295,17 @@ class AdminBookingController extends Controller
             'guests'         => $b->guests,
             'price_for_period' => $b->price_for_period,
             'tax'            => $b->tax,
+            // --- новое: расшифровка суммы ---
+            'early_check_in_amount' => $b->early_check_in_amount,
+            'late_check_out_amount' => $b->late_check_out_amount,
+            'services_amount'       => $b->services_amount,
             'total_price'    => $b->total_price,
+            'paid_amount'    => $b->paid_amount,
+            'balance_due'    => $b->balance_due,
+            'planned_check_in_at'  => $b->planned_check_in_at?->format('Y-m-d H:i'),
+            'planned_check_out_at' => $b->planned_check_out_at?->format('Y-m-d H:i'),
+            'actual_check_in_at'   => $b->actual_check_in_at?->format('Y-m-d H:i'),
+            'actual_check_out_at'  => $b->actual_check_out_at?->format('Y-m-d H:i'),
             'hotel'          => $b->hotel ? ['id' => $b->hotel->id, 'title' => $b->hotel->title] : null,
             'room'           => $b->room  ? ['id' => $b->room->id,  'title' => $b->room->title]  : null,
             'guest' => [
@@ -262,8 +327,48 @@ class AdminBookingController extends Controller
                 'email' => $b->user->email,
                 'phone' => $b->user->phone,
             ] : null;
+            if ($b->relationLoaded('services')) {
+                $data['services'] = $b->services->map(fn($s) => [
+                    'id' => $s->id,
+                    'service' => $s->service?->title,
+                    'quantity' => $s->quantity,
+                    'price' => $s->price,
+                    'amount' => $s->amount,
+                ]);
+            }
+            if ($b->relationLoaded('payments')) {
+                $data['payments'] = $b->payments->map(fn($p) => [
+                    'id' => $p->id,
+                    'amount' => (float) $p->amount,
+                    'method' => $p->method,
+                    'status' => $p->status,
+                    'paid_at' => $p->paid_at?->format('Y-m-d H:i'),
+                ]);
+            }
         }
         return $data;
+    }
+
+    /**
+     * Собирает плановые дату+время заезда/выезда из даты брони + времени
+     * (переданного или стандартного времени отеля).
+     */
+    protected function resolvePlannedTimes(
+        Room $room,
+        $startDate,
+        $endDate,
+        ?string $checkInTime,
+        ?string $checkOutTime,
+        ?Booking $existing = null
+    ): array {
+        $hotel = $room->hotel;
+        $checkInTime  = $checkInTime  ?? ($existing?->planned_check_in_at?->format('H:i')) ?? $hotel?->standard_check_in_time ?? '14:00';
+        $checkOutTime = $checkOutTime ?? ($existing?->planned_check_out_at?->format('H:i')) ?? $hotel?->standard_check_out_time ?? '12:00';
+
+        $plannedCheckIn  = Carbon::parse(Carbon::parse($startDate)->toDateString() . ' ' . $checkInTime);
+        $plannedCheckOut = Carbon::parse(Carbon::parse($endDate)->toDateString() . ' ' . $checkOutTime);
+
+        return [$plannedCheckIn, $plannedCheckOut];
     }
 
     protected function authorizeHotel($user, int $hotelId): void

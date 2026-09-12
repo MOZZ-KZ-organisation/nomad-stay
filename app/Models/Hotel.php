@@ -12,7 +12,8 @@ class Hotel extends Model
     protected $fillable = [
         'manager_id', 'title','slug','description','address','city_id',
         'latitude','longitude','stars','is_active','min_price', 'cancellation_fee',
-        'type', 'email'
+        'type', 'email',
+        'standard_check_in_time', 'standard_check_out_time',
     ];
     protected $appends = ['location'];
     protected $casts = ['is_active' => 'boolean'];
@@ -33,6 +34,16 @@ class Hotel extends Model
         return $this->hasOne(HotelNearby::class);
     }
     public function reviews() { return $this->hasMany(Review::class); }
+
+    public function rateRules()
+    {
+        return $this->hasMany(RateRule::class);
+    }
+
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
 
     protected static function booted()
     {

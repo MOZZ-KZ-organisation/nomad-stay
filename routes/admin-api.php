@@ -11,7 +11,11 @@ use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminRoomController;
 use App\Http\Controllers\Admin\AdminRoomPeriodController;
-use App\Http\Controllers\Admin\AdminSupportController;
+use App\Http\Controllers\Admin\AdminSupportController;use App\Http\Controllers\Admin\AdminRoomTransferController;
+use App\Http\Controllers\Admin\AdminRateRuleController;
+use App\Http\Controllers\Admin\AdminServiceController;
+use App\Http\Controllers\Admin\AdminBookingServiceController;
+use App\Http\Controllers\Admin\AdminPaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/enums', [AdminEnumController::class, 'index']);
@@ -27,6 +31,32 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::patch('/notifications/{id}/read', [AdminDashboardController::class, 'markRead']);
     Route::get('/bookings/calendar', [AdminBookingController::class, 'calendar']);
     Route::apiResource('/bookings', AdminBookingController::class);
+    Route::get('/bookings/{id}/room-transfers', [AdminRoomTransferController::class, 'index']);
+    Route::post('/bookings/{id}/room-transfers', [AdminRoomTransferController::class, 'store']);
+    
+    // Тарифные правила (расчётные часы / полусутки / ранний заезд / поздний выезд)
+    Route::get('/rate-rules', [AdminRateRuleController::class, 'index']);
+    Route::post('/rate-rules', [AdminRateRuleController::class, 'store']);
+    Route::patch('/rate-rules/{id}', [AdminRateRuleController::class, 'update']);
+    Route::delete('/rate-rules/{id}', [AdminRateRuleController::class, 'destroy']);
+    
+    // Справочник дополнительных услуг отеля
+    Route::get('/services', [AdminServiceController::class, 'index']);
+    Route::post('/services', [AdminServiceController::class, 'store']);
+    Route::patch('/services/{id}', [AdminServiceController::class, 'update']);
+    Route::delete('/services/{id}', [AdminServiceController::class, 'destroy']);
+    
+    // Услуги, добавленные в конкретную бронь
+    Route::get('/bookings/{id}/services', [AdminBookingServiceController::class, 'index']);
+    Route::post('/bookings/{id}/services', [AdminBookingServiceController::class, 'store']);
+    Route::patch('/bookings/{bookingId}/services/{id}', [AdminBookingServiceController::class, 'update']);
+    Route::delete('/bookings/{bookingId}/services/{id}', [AdminBookingServiceController::class, 'destroy']);
+    
+    // Оплаты по брони (частичные оплаты, возвраты)
+    Route::get('/bookings/{id}/payments', [AdminPaymentController::class, 'index']);
+    Route::post('/bookings/{id}/payments', [AdminPaymentController::class, 'store']);
+    Route::patch('/bookings/{bookingId}/payments/{id}', [AdminPaymentController::class, 'update']);
+
     Route::get('/my-hotel', [AdminHotelController::class, 'show']);
     Route::patch('/my-hotel', [AdminHotelController::class, 'update']);
     Route::post('/my-hotel/images', [AdminHotelController::class, 'uploadImages']);

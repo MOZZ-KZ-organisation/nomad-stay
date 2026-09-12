@@ -39,6 +39,8 @@ class AdminHotelController extends Controller
             'cancellation_fee' => 'nullable|integer|min:0',
             'amenity_ids'      => 'nullable|array',
             'amenity_ids.*'    => 'exists:amenities,id',
+            'standard_check_in_time'  => 'sometimes|date_format:H:i',
+            'standard_check_out_time' => 'sometimes|date_format:H:i',
         ]);
         $hotel->update(array_diff_key($data, ['amenity_ids' => true]));
         if ($request->has('amenity_ids')) {
@@ -147,6 +149,8 @@ class AdminHotelController extends Controller
             'is_active'        => $h->is_active,
             'min_price'        => $h->min_price,
             'cancellation_fee' => $h->cancellation_fee,
+            'standard_check_in_time'  => $h->standard_check_in_time,
+            'standard_check_out_time' => $h->standard_check_out_time,
             'discount'         => $h->discount ? [
                 'percent'        => $h->discount->discount_percent,
                 'price_override' => $h->discount->price_override,

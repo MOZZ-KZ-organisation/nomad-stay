@@ -18,10 +18,10 @@ class Booking extends Model
         'price_for_period',
         'tax',
         'total_price',
-        'status',      
-        'is_paid',   
-        'type',             
-        'source',           
+        'status',
+        'is_paid',
+        'type',
+        'source',
         'first_name',
         'last_name',
         'email',
@@ -30,6 +30,14 @@ class Booking extends Model
         'is_business_trip',
         'special_requests',
         'arrival_time',
+        // --- новые поля ---
+        'planned_check_in_at',
+        'planned_check_out_at',
+        'actual_check_in_at',
+        'actual_check_out_at',
+        'early_check_in_amount',
+        'late_check_out_amount',
+        'services_amount',
     ];
 
     protected $casts = [
@@ -38,6 +46,10 @@ class Booking extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'arrival_time' => 'datetime:H:i',
+        'planned_check_in_at' => 'datetime',
+        'planned_check_out_at' => 'datetime',
+        'actual_check_in_at' => 'datetime',
+        'actual_check_out_at' => 'datetime',
     ];
 
     public function user()
@@ -61,6 +73,25 @@ class Booking extends Model
             ->where('user_id', $this->user_id);
     }
 
+    /**
+     * История переселений гостя по номерам. Текущий "активный" сегмент —
+     * тот, у которого check_out_at = null (или последний по check_in_at).
+     */
+    public function roomSegments()
+    {
+        return $this->hasMany(BookingRoomSegment::class)->orderBy('check_in_at');
+    }
+
+    public function services()
+    {
+        return $this->hasMany(BookingService::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->last_name}");
@@ -75,6 +106,22 @@ class Booking extends Model
             'cancelled'   => '#EB5757',
             default       => '#E5E7EB',
         };
+    }
+
+    /**
+     * Сколько фактически оплачено (сумма завершённых платежей).
+     */
+    public function getPaidAmountAttribute(): float
+    {
+        return (float) $this->payments()->where('status', 'completed')->sum('amount');
+    }
+
+    /**
+     * Остаток к оплате = итоговая сумма брони - оплачено.
+     */
+    public function getBalanceDueAttribute(): float
+    {
+        return round((float) $this->total_price - $this->paid_amount, 2);
     }
 
     public function scopeOverlapping($query, $start, $end)
@@ -128,7 +175,10 @@ class Booking extends Model
             $tax = $basePrice * env('BOOKING_TAX_RATE', 0);
             $booking->price_for_period = $basePrice;
             $booking->tax = $tax;
-            $booking->total_price = $basePrice + $tax;
+            $booking->total_price = $basePrice + $tax
+                + ($booking->early_check_in_amount ?? 0)
+                + ($booking->late_check_out_amount ?? 0)
+                + ($booking->services_amount ?? 0);
         });
         static::updating(function ($booking) {
             if (
@@ -147,7 +197,10 @@ class Booking extends Model
                 $tax = $basePrice * env('BOOKING_TAX_RATE', 0);
                 $booking->price_for_period = $basePrice;
                 $booking->tax = $tax;
-                $booking->total_price = $basePrice + $tax;
+                $booking->total_price = $basePrice + $tax
+                    + ($booking->early_check_in_amount ?? 0)
+                    + ($booking->late_check_out_amount ?? 0)
+                    + ($booking->services_amount ?? 0);
             }
         });
         static::saving(function ($booking) {
