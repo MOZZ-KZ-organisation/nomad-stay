@@ -11,7 +11,8 @@ use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminRoomController;
 use App\Http\Controllers\Admin\AdminRoomPeriodController;
-use App\Http\Controllers\Admin\AdminSupportController;use App\Http\Controllers\Admin\AdminRoomTransferController;
+use App\Http\Controllers\Admin\AdminSupportController;
+use App\Http\Controllers\Admin\AdminRoomTransferController;
 use App\Http\Controllers\Admin\AdminRateRuleController;
 use App\Http\Controllers\Admin\AdminServiceController;
 use App\Http\Controllers\Admin\AdminBookingServiceController;
@@ -39,7 +40,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/rate-rules', [AdminRateRuleController::class, 'store']);
     Route::patch('/rate-rules/{id}', [AdminRateRuleController::class, 'update']);
     Route::delete('/rate-rules/{id}', [AdminRateRuleController::class, 'destroy']);
-    
+    Route::post('/rate-rules/{id}/restore', [AdminRateRuleController::class, 'restore']);
+
     // Справочник дополнительных услуг отеля
     Route::get('/services', [AdminServiceController::class, 'index']);
     Route::post('/services', [AdminServiceController::class, 'store']);

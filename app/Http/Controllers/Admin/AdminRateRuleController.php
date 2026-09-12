@@ -11,11 +11,16 @@ class AdminRateRuleController extends Controller
     /**
      * GET /admin-api/rate-rules
      * Список тарифных правил своего отеля (менеджер) или отеля из ?hotel_id= (админ).
+     * ?with_trashed=1 — включить в список удалённые правила (для аудита истории цен).
      */
     public function index(Request $request)
     {
         $hotelId = $this->resolveHotelId($request);
-        $rules = RateRule::where('hotel_id', $hotelId)->orderBy('type')->orderBy('from_time')->get();
+        $query = RateRule::where('hotel_id', $hotelId);
+        if ($request->boolean('with_trashed')) {
+            $query->withTrashed();
+        }
+        $rules = $query->orderBy('type')->orderBy('from_time')->get();
 
         return response()->json(['data' => $rules->map(fn ($r) => $this->format($r))]);
     }
@@ -64,13 +69,41 @@ class AdminRateRuleController extends Controller
         ]);
     }
 
+    /**
+     * Правило никогда не удаляется физически (soft delete): бронь не хранит
+     * ссылку на конкретное rate_rule, только уже посчитанную сумму, поэтому
+     * доказать "использовалось / не использовалось" правило нельзя — в
+     * отличие от services (там есть booking_services.service_id). Soft
+     * delete снимает правило из расчётов новых/пересчитываемых броней, но
+     * сохраняет запись для аудита и восстановления.
+     */
     public function destroy(Request $request, $id)
     {
         $hotelId = $this->resolveHotelId($request);
         $rule = RateRule::where('hotel_id', $hotelId)->findOrFail($id);
-        $rule->delete();
+        $rule->delete(); // soft delete — см. миграцию add_soft_deletes_to_rate_rules_table
 
-        return response()->json(['message' => 'Правило удалено']);
+        return response()->json(['message' => 'Правило удалено из активных (запись сохранена для аудита)']);
+    }
+
+    /**
+     * POST /admin-api/rate-rules/{id}/restore
+     * Вернуть ранее удалённое правило обратно в расчёт.
+     */
+    public function restore(Request $request, $id)
+    {
+        $hotelId = $this->resolveHotelId($request);
+        $rule = RateRule::withTrashed()->where('hotel_id', $hotelId)->findOrFail($id);
+
+        if (!$rule->trashed()) {
+            return response()->json(['message' => 'Правило и так активно'], 422);
+        }
+        $rule->restore();
+
+        return response()->json([
+            'message' => 'Правило восстановлено',
+            'data' => $this->format($rule),
+        ]);
     }
 
     protected function format(RateRule $r): array
@@ -84,6 +117,7 @@ class AdminRateRuleController extends Controller
             'value' => (float) $r->value,
             'currency' => $r->currency,
             'is_active' => $r->is_active,
+            'deleted_at' => $r->deleted_at?->format('Y-m-d H:i'),
         ];
     }
 

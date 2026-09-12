@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('currency', 3)->default('KZT');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['hotel_id', 'type', 'is_active']);
         });
