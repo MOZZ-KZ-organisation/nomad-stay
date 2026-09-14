@@ -13,6 +13,7 @@ use App\Http\Controllers\HotelController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SupportChatController;
 use App\Http\Controllers\SupportMessageController;
 use App\Http\Resources\ReviewResource;
@@ -29,6 +30,7 @@ Route::get('/hotels/offers', [HotelController::class, 'offers']);
 Route::get('/hotels/popular', [HotelController::class, 'popularDestinations']);
 
 Route::get('/amenities', [AmenityController::class, 'index']);
+Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/cities', [CityController::class, 'index']);
 Route::get('rooms/{room}', [RoomController::class, 'show']);
 Route::get('hotels/{hotel}/reviews', function (Hotel $hotel) {

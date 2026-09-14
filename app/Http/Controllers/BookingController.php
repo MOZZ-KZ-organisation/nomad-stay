@@ -8,10 +8,14 @@ use App\Http\Requests\UpdateBookingDatesRequest;
 use App\Http\Resources\BookingMiniResource;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
+use App\Models\BookingService;
 use App\Models\Notification;
 use App\Models\Room;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class BookingController extends Controller
 {
@@ -31,6 +35,8 @@ class BookingController extends Controller
         $basePrice = $room->price * $nights;
         $tax = $basePrice * env('BOOKING_TAX_RATE', 0.0);
         $totalPrice = $basePrice + $tax;
+        $servicesInput = $data['services'] ?? [];
+        unset($data['services']);
         $data += [
             'user_id' => $request->user()->id,
             'hotel_id' => $room->hotel_id,
@@ -41,7 +47,40 @@ class BookingController extends Controller
             'type' => 'booking',
             'source' => 'site'
         ];
-        $booking = Booking::create($data);
+
+        $booking = DB::transaction(function () use ($data, $servicesInput, $room) {
+            $booking = Booking::create($data);
+
+            if (!empty($servicesInput)) {
+                foreach ($servicesInput as $item) {
+                    // Услуга должна принадлежать тому же отелю, что и номер, и быть активной.
+                    $service = Service::where('hotel_id', $room->hotel_id)
+                        ->where('id', $item['service_id'])
+                        ->first();
+
+                    if (!$service || !$service->is_active) {
+                        throw ValidationException::withMessages([
+                            'services' => ["Услуга с id {$item['service_id']} недоступна или неактивна"],
+                        ]);
+                    }
+
+                    BookingService::create([
+                        'booking_id' => $booking->id,
+                        'service_id' => $service->id,
+                        'quantity' => $item['quantity'],
+                        // Цена фиксируется на момент брони — снимок из справочника,
+                        // изменение services.price в будущем на неё не влияет.
+                        'price' => $service->price,
+                        'comment' => $item['comment'] ?? null,
+                    ]);
+                }
+
+                $this->recalcServicesAmount($booking);
+            }
+
+            return $booking;
+        });
+
         $notification = Notification::create([
             'type' => 'booking_created',
             'title' => 'Новая бронь',
@@ -49,7 +88,20 @@ class BookingController extends Controller
             'source' => $booking->source
         ]);
         broadcast(new NewNotification($notification))->toOthers();
-        return new BookingResource($booking->load(['hotel', 'room']));
+        return new BookingResource($booking->load(['hotel', 'room', 'services.service']));
+    }
+
+    /**
+     * Пересчитывает services_amount и total_price брони после добавления услуг.
+     */
+    protected function recalcServicesAmount(Booking $booking): void
+    {
+        $servicesAmount = (int) $booking->services()->sum('amount');
+        $booking->services_amount = $servicesAmount;
+        $booking->total_price = $booking->price_for_period + $booking->tax
+            + $booking->early_check_in_amount + $booking->late_check_out_amount
+            + $servicesAmount;
+        $booking->saveQuietly();
     }
 
     public function userBookings(Request $request)
@@ -70,7 +122,7 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        $booking->load(['hotel', 'room.hotel.amenities']);
+        $booking->load(['hotel', 'room.hotel.amenities', 'services.service']);
         return new BookingResource($booking);
     }
 

@@ -20,6 +20,8 @@ class BookingResource extends JsonResource
             'guests' => $this->guests,
             'price_for_period' => $this->price_for_period,
             'tax' => $this->tax,
+            'services' => BookingServiceResource::collection($this->whenLoaded('services')),
+            'services_amount' => (float) $this->services_amount,
             'total_price' => $this->total_price,
             'status' => $this->status,
             'guest' => [
