@@ -186,10 +186,17 @@ class AdminGuestController extends Controller
 
     protected function formatAnonymousGuest($booking, int $hotelId): array
     {
-        $bookingsCount = Booking::where('hotel_id', $hotelId)
-            ->whereNull('user_id')
-            ->where('email', $booking->email)
-            ->count();
+        $bookingsQuery = Booking::where('hotel_id', $hotelId)->whereNull('user_id');
+
+        if ($booking->email) {
+            $bookingsQuery->where('email', $booking->email);
+        } else {
+            // email необязателен: гостя без email отличаем по телефону,
+            // иначе where('email', null) склеил бы всех таких гостей в одного.
+            $bookingsQuery->whereNull('email')->where('phone', $booking->phone);
+        }
+
+        $bookingsCount = $bookingsQuery->count();
  
         return [
             'id'             => null,
