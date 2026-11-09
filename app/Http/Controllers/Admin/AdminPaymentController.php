@@ -24,6 +24,7 @@ class AdminPaymentController extends Controller
             'total_price' => (float) $booking->total_price,
             'paid_amount' => $booking->paid_amount,
             'balance_due' => $booking->balance_due,
+            'payment_status' => $booking->payment_status,
         ]);
     }
 
@@ -62,7 +63,9 @@ class AdminPaymentController extends Controller
         return response()->json([
             'message' => 'Оплата зафиксирована',
             'data' => $this->format($payment->load('user:id,name')),
+            'paid_amount' => $booking->paid_amount,
             'balance_due' => $booking->balance_due,
+            'payment_status' => $booking->payment_status,
         ], 201);
     }
 
@@ -86,7 +89,9 @@ class AdminPaymentController extends Controller
         return response()->json([
             'message' => 'Платёж обновлён',
             'data' => $this->format($payment->fresh('user:id,name')),
+            'paid_amount' => $booking->paid_amount,
             'balance_due' => $booking->balance_due,
+            'payment_status' => $booking->payment_status,
         ]);
     }
 

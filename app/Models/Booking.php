@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -113,6 +114,16 @@ class Booking extends Model
      */
     public function getPaidAmountAttribute(): float
     {
+        // Список/календарь: сумма уже подгружена одним подзапросом (см. scopeWithPaidSum) — без N+1.
+        if (array_key_exists('paid_sum', $this->attributes)) {
+            return (float) $this->attributes['paid_sum'];
+        }
+
+        // Платежи уже загружены (карточка брони) — считаем в памяти.
+        if ($this->relationLoaded('payments')) {
+            return (float) $this->payments->where('status', 'completed')->sum('amount');
+        }
+
         return (float) $this->payments()->where('status', 'completed')->sum('amount');
     }
 
@@ -122,6 +133,26 @@ class Booking extends Model
     public function getBalanceDueAttribute(): float
     {
         return round((float) $this->total_price - $this->paid_amount, 2);
+    }
+
+    /**
+     * Статус оплаты: unpaid / prepaid / paid. Вычисляется по платежам, в БД не хранится.
+     */
+    public function getPaymentStatusAttribute(): string
+    {
+        return PaymentStatus::resolve((float) $this->total_price, $this->paid_amount)->value;
+    }
+
+    /**
+     * Подгружает сумму завершённых платежей одним подзапросом (атрибут paid_sum),
+     * чтобы paid_amount / balance_due / payment_status не делали запрос на каждую бронь.
+     */
+    public function scopeWithPaidSum($query)
+    {
+        return $query->withSum(
+            ['payments as paid_sum' => fn ($q) => $q->where('status', 'completed')],
+            'amount'
+        );
     }
 
     public function scopeOverlapping($query, $start, $end)

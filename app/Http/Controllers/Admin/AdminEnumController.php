@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 
 class AdminEnumController extends Controller
@@ -22,6 +23,9 @@ class AdminEnumController extends Controller
                     ['value' => 'checked_out', 'label' => 'Выселен',       'color' => '#b5b7b9'],
                     ['value' => 'cancelled',   'label' => 'Отменено',      'color' => '#EB5757'],
                 ],
+
+                // Статус оплаты брони (Booking::payment_status) — вычисляется по платежам
+                'payment_statuses' => PaymentStatus::options(),
 
                 // Источники бронирования (Booking::source)
                 'booking_sources' => [

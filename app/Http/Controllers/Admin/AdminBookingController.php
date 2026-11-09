@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Payment;
 use App\Models\Room;
 use App\Models\RoomPeriod;
 use App\Services\BookingPriceCalculator;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class AdminBookingController extends Controller
 {
@@ -36,8 +39,10 @@ class AdminBookingController extends Controller
             'user_id'          => 'nullable|exists:users,id',
             'first_name'       => 'required_without:user_id|string|max:100',
             'last_name'        => 'required_without:user_id|string|max:100',
-            'email'            => 'required_without:user_id|email',
-            'phone'            => 'nullable|string|max:30',
+            // email необязателен: если передан — проверяем формат, пустой/отсутствующий допустим
+            'email'            => 'nullable|email|max:255',
+            // телефон обязателен для нового гостя (когда нет user_id)
+            'phone'            => 'required_without:user_id|nullable|string|max:30',
             'country'          => 'nullable|string|max:100',
             'is_business_trip' => 'boolean',
             'special_requests' => 'nullable|string|max:1000',
@@ -48,15 +53,30 @@ class AdminBookingController extends Controller
             'source'           => 'nullable|string|in:site,booking.com,manual,phone',
             'status'           => 'nullable|string|in:booked,checked_in',
             'is_paid'          => 'boolean',
+            // Предоплата, вносимая вместе с созданием брони (бронь и платёж — в одной транзакции)
+            'prepayment'                  => 'nullable|array',
+            'prepayment.amount'           => 'required_with:prepayment|numeric|gt:0',
+            'prepayment.method'           => 'required_with:prepayment|in:cash,card,transfer,online,other',
+            'prepayment.operation_number' => 'nullable|string|max:100',
+            'prepayment.comment'          => 'nullable|string|max:255',
+            'prepayment.paid_at'          => 'nullable|date',
         ]);
+
+        $prepayment = $data['prepayment'] ?? null;
+        unset($data['prepayment']);
+
+        // Пустой email = «email не указан»
+        $data['email'] = $this->blankToNull($data['email'] ?? null);
+        $data['phone'] = $this->blankToNull($data['phone'] ?? null);
+
         // Если выбран существующий гость — подтягиваем его данные
         if (!empty($data['user_id'])) {
             $guest = \App\Models\User::findOrFail($data['user_id']);
             $nameParts = explode(' ', $guest->name, 2);
             $data['first_name'] = $data['first_name'] ?? $nameParts[0];
             $data['last_name']  = $data['last_name']  ?? ($nameParts[1] ?? '');
-            $data['email']      = $data['email']       ?? $guest->email;
-            $data['phone']      = $data['phone']       ?? $guest->phone;
+            $data['email']      = $data['email']       ?? $this->blankToNull($guest->email);
+            $data['phone']      = $data['phone']       ?? $this->blankToNull($guest->phone);
         }
         $room = Room::findOrFail($data['room_id']);
         $user = $request->user();
@@ -85,24 +105,48 @@ class AdminBookingController extends Controller
         $breakdown = $calculator->calculate($room, $plannedCheckIn, $plannedCheckOut);
         $tax = $breakdown['accommodation'] * env('BOOKING_TAX_RATE', 0.0);
 
-        $booking = Booking::create(array_merge($data, [
-            'hotel_id'         => $room->hotel_id,
-            'price_for_period' => $breakdown['accommodation'],
-            'tax'              => $tax,
-            'early_check_in_amount' => $breakdown['early_check_in'],
-            'late_check_out_amount' => $breakdown['late_check_out'],
-            'services_amount'  => 0,
-            'total_price'      => $breakdown['accommodation'] + $tax
-                + $breakdown['early_check_in'] + $breakdown['late_check_out'],
-            'planned_check_in_at'  => $plannedCheckIn,
-            'planned_check_out_at' => $plannedCheckOut,
-            'status'           => $data['status'] ?? 'booked',
-            'source'           => $data['source'] ?? 'manual',
-            'type'             => 'booking',
-        ]));
+        // Бронь и предоплата создаются атомарно: если платёж не записался — брони тоже не будет.
+        $booking = DB::transaction(function () use ($data, $room, $breakdown, $tax, $plannedCheckIn, $plannedCheckOut, $prepayment, $request) {
+            $booking = Booking::create(array_merge($data, [
+                'hotel_id'         => $room->hotel_id,
+                'price_for_period' => $breakdown['accommodation'],
+                'tax'              => $tax,
+                'early_check_in_amount' => $breakdown['early_check_in'],
+                'late_check_out_amount' => $breakdown['late_check_out'],
+                'services_amount'  => 0,
+                'total_price'      => $breakdown['accommodation'] + $tax
+                    + $breakdown['early_check_in'] + $breakdown['late_check_out'],
+                'planned_check_in_at'  => $plannedCheckIn,
+                'planned_check_out_at' => $plannedCheckOut,
+                'status'           => $data['status'] ?? 'booked',
+                'source'           => $data['source'] ?? 'manual',
+                'type'             => 'booking',
+            ]));
+
+            if ($prepayment) {
+                Payment::create([
+                    'booking_id'       => $booking->id,
+                    'amount'           => $prepayment['amount'],
+                    'method'           => $prepayment['method'],
+                    'status'           => 'completed',
+                    'paid_at'          => $prepayment['paid_at'] ?? now(),
+                    'user_id'          => $request->user()->id,
+                    'operation_number' => $prepayment['operation_number'] ?? null,
+                    'comment'          => $prepayment['comment'] ?? 'Предоплата',
+                ]);
+
+                // Как и в AdminPaymentController: is_paid = «оплачено полностью».
+                $booking->refresh();
+                $booking->is_paid = $booking->balance_due <= 0;
+                $booking->saveQuietly();
+            }
+
+            return $booking;
+        });
+
         return response()->json([
             'message' => 'Бронирование создано',
-            'data'    => $this->formatBooking($booking->load(['hotel', 'room']), true),
+            'data'    => $this->formatBooking($booking->load(['hotel', 'room', 'payments.user:id,name']), true),
         ], 201);
     }
 
@@ -121,7 +165,21 @@ class AdminBookingController extends Controller
             'planned_check_out_time' => 'nullable|date_format:H:i',
             'actual_check_in_at'  => 'nullable|date',
             'actual_check_out_at' => 'nullable|date',
+            // --- контакты гостя ---
+            // email необязателен (можно очистить, передав null/пустую строку); если есть — проверяем формат
+            'email' => 'sometimes|nullable|email|max:255',
+            // если phone передан, для брони без привязанного пользователя он не может быть пустым
+            'phone' => [
+                Rule::requiredIf(fn () => $request->has('phone') && !$booking->user_id),
+                'nullable', 'string', 'max:30',
+            ],
         ]);
+
+        foreach (['email', 'phone'] as $field) {
+            if (array_key_exists($field, $data)) {
+                $data[$field] = $this->blankToNull($data[$field]);
+            }
+        }
 
         $recalcDates = $request->hasAny(['start_date', 'end_date', 'planned_check_in_time', 'planned_check_out_time']);
 
@@ -168,6 +226,7 @@ class AdminBookingController extends Controller
         $isManager = $user->isHotelManager();
  
         $query = Booking::with(['hotel:id,title', 'room:id,title'])
+            ->withPaidSum()
             ->latest();
  
         if ($isManager) {
@@ -237,6 +296,7 @@ class AdminBookingController extends Controller
             ->whereNotIn('status', ['cancelled'])
             ->when($request->filled('source'), fn($q) => $q->where('source', $request->source))
             ->when($request->filled('is_paid'), fn($q) => $q->where('is_paid', (bool) $request->is_paid))
+            ->withPaidSum()
             ->get();
         $periods = RoomPeriod::whereIn('room_id', $rooms->pluck('id'))
             ->where('end_date', '>=', $start)
@@ -259,7 +319,10 @@ class AdminBookingController extends Controller
                 'end_date'       => $b->end_date->format('Y-m-d'),
                 'status'         => $b->status,
                 'is_paid'        => $b->is_paid,
+                'payment_status' => $b->payment_status,
                 'total_price'    => $b->total_price,
+                'paid_amount'    => $b->paid_amount,
+                'balance_due'    => $b->balance_due,
                 'color'          => $b->color,
                 'source'         => $b->source,
                 'guests'         => $b->guests,
@@ -285,6 +348,7 @@ class AdminBookingController extends Controller
             'booking_number' => $b->booking_number,
             'status'         => $b->status,
             'is_paid'        => (bool) $b->is_paid,
+            'payment_status' => $b->payment_status,
             'source'         => $b->source,
             'type'           => $b->type,
             'color'          => $b->color,
@@ -369,6 +433,14 @@ class AdminBookingController extends Controller
         $plannedCheckOut = Carbon::parse(Carbon::parse($endDate)->toDateString() . ' ' . $checkOutTime);
 
         return [$plannedCheckIn, $plannedCheckOut];
+    }
+
+    /** Пустую строку / пробелы превращает в null. */
+    protected function blankToNull(?string $value): ?string
+    {
+        $value = $value === null ? null : trim($value);
+
+        return $value === '' ? null : $value;
     }
 
     protected function authorizeHotel($user, int $hotelId): void
