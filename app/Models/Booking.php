@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\PaymentStatus;
+use App\Services\BookingPriceCalculator;
+use App\Services\NightlyPricing;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -51,7 +53,16 @@ class Booking extends Model
         'planned_check_out_at' => 'datetime',
         'actual_check_in_at' => 'datetime',
         'actual_check_out_at' => 'datetime',
+        // Снимок посуточной расшифровки проживания (см. NightlyPricing)
+        'price_breakdown' => 'array',
     ];
+
+    /**
+     * Не пересчитывать цену в модельных хуках: стоимость уже посчитана
+     * вызывающим кодом через BookingPriceCalculator::applyToBooking().
+     * Сбрасывается после сохранения.
+     */
+    public bool $skipAutoPricing = false;
 
     public function user()
     {
@@ -180,6 +191,48 @@ class Booking extends Model
             : $this->total_price;
     }
 
+    /**
+     * Посуточная расшифровка стоимости проживания, как она была посчитана при
+     * создании/изменении брони. У броней, созданных до появления тарифов по датам,
+     * снимка нет — тогда она собирается из price_for_period.
+     */
+    public function priceBreakdownLines(): array
+    {
+        $lines = $this->price_breakdown;
+
+        return !empty($lines)
+            ? $lines
+            : NightlyPricing::legacyLines(
+                $this->start_date?->toDateString(),
+                $this->end_date?->toDateString(),
+                $this->price_for_period
+            );
+    }
+
+    /**
+     * Ночи, цена которых уже зафиксирована в сохранённой брони (дата => цена).
+     * При изменении дат эти ночи не пересчитываются по текущим тарифам — иначе
+     * правка тарифа задним числом меняла бы цену уже созданной брони.
+     * Берётся состояние из БД, а не текущие несохранённые значения экземпляра.
+     */
+    public function lockedNights(): array
+    {
+        $raw = $this->getRawOriginal('price_breakdown');
+        $lines = is_string($raw) ? json_decode($raw, true) : null;
+
+        if (empty($lines)) {
+            $start = $this->getRawOriginal('start_date');
+            $end = $this->getRawOriginal('end_date');
+            $lines = NightlyPricing::legacyLines(
+                $start ? Carbon::parse($start)->toDateString() : null,
+                $end ? Carbon::parse($end)->toDateString() : null,
+                $this->getRawOriginal('price_for_period')
+            );
+        }
+
+        return NightlyPricing::expand($lines);
+    }
+
     public static function generateBookingNumber(): string
     {
         do {
@@ -191,6 +244,26 @@ class Booking extends Model
         return $bookingNumber;
     }
 
+    /**
+     * Расчёт цены для путей, где её не посчитал вызывающий код (например, админка Voyager):
+     * проживание по тарифам на период, налог — от проживания; доплаты и услуги
+     * берутся из уже заполненных полей брони.
+     */
+    protected static function autoPrice(Booking $booking, Room $room, array $lockedNights): void
+    {
+        $calculator = app(BookingPriceCalculator::class);
+        [$checkIn, $checkOut] = $calculator->plannedMoments($room, $booking->start_date, $booking->end_date);
+        $breakdown = $calculator->calculate($room, $checkIn, $checkOut, null, $lockedNights);
+
+        $booking->price_for_period = $breakdown['accommodation'];
+        $booking->price_breakdown = $breakdown['price_breakdown'];
+        $booking->tax = $breakdown['tax'];
+        $booking->total_price = $breakdown['accommodation'] + $breakdown['tax']
+            + ($booking->early_check_in_amount ?? 0)
+            + ($booking->late_check_out_amount ?? 0)
+            + ($booking->services_amount ?? 0);
+    }
+
     protected static function booted(): void
     {
         static::creating(function ($booking) {
@@ -200,18 +273,16 @@ class Booking extends Model
                 return;
             }
             $booking->hotel_id = $room->hotel_id;
-            $nights = Carbon::parse($booking->start_date)
-                ->diffInDays(Carbon::parse($booking->end_date));
-            $basePrice = $room->price * $nights;
-            $tax = $basePrice * env('BOOKING_TAX_RATE', 0);
-            $booking->price_for_period = $basePrice;
-            $booking->tax = $tax;
-            $booking->total_price = $basePrice + $tax
-                + ($booking->early_check_in_amount ?? 0)
-                + ($booking->late_check_out_amount ?? 0)
-                + ($booking->services_amount ?? 0);
+            // Цену уже посчитал вызывающий код (BookingPriceCalculator::applyToBooking) — не трогаем.
+            if ($booking->price_for_period !== null) {
+                return;
+            }
+            self::autoPrice($booking, $room, []);
         });
         static::updating(function ($booking) {
+            if ($booking->skipAutoPricing) {
+                return;
+            }
             if (
                 $booking->isDirty('room_id') ||
                 $booking->isDirty('start_date') ||
@@ -222,16 +293,9 @@ class Booking extends Model
                     return;
                 }
                 $booking->hotel_id = $room->hotel_id;
-                $nights = Carbon::parse($booking->start_date)
-                    ->diffInDays(Carbon::parse($booking->end_date));
-                $basePrice = $room->price * $nights;
-                $tax = $basePrice * env('BOOKING_TAX_RATE', 0);
-                $booking->price_for_period = $basePrice;
-                $booking->tax = $tax;
-                $booking->total_price = $basePrice + $tax
-                    + ($booking->early_check_in_amount ?? 0)
-                    + ($booking->late_check_out_amount ?? 0)
-                    + ($booking->services_amount ?? 0);
+                // Сменили номер — цены прежнего номера не переносим; иначе ночи,
+                // которые остались в брони, сохраняют уже зафиксированную цену.
+                self::autoPrice($booking, $room, $booking->isDirty('room_id') ? [] : $booking->lockedNights());
             }
         });
         static::saving(function ($booking) {
@@ -243,6 +307,9 @@ class Booking extends Model
             if ($request->has('is_business_trip')) {
                 $booking->is_business_trip = (int) $request->input('is_business_trip');
             }
+        });
+        static::saved(function ($booking) {
+            $booking->skipAutoPricing = false;
         });
     }
 }

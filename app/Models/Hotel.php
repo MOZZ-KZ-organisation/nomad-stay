@@ -40,6 +40,11 @@ class Hotel extends Model
         return $this->hasMany(RateRule::class);
     }
 
+    public function periodRates()
+    {
+        return $this->hasMany(PeriodRate::class);
+    }
+
     public function services()
     {
         return $this->hasMany(Service::class);

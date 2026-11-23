@@ -7,16 +7,20 @@ use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Service;
 use App\Services\BookingPriceCalculator;
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class BookingPriceController extends Controller
 {
+    /**
+     * GET /bookings/price-details
+     * Сколько будет стоить бронь и из чего складывается сумма — до сохранения.
+     * Считает тот же BookingPriceCalculator, что и создание брони, поэтому сумма
+     * в превью совпадает с сохранённой. Проживание считается по ночам (тарифы на
+     * период по датам или базовая цена номера); расшифровка — в price_breakdown.
+     */
     public function show(BookingPriceRequest $request, BookingPriceCalculator $calculator)
     {
-        $room = Room::findOrFail($request->room_id);
-        $start = Carbon::parse($request->start_date);
-        $end = Carbon::parse($request->end_date);
+        $room = Room::with('hotel')->findOrFail($request->room_id);
 
         $query = Booking::where('room_id', $room->id)
             ->whereIn('status', ['booked', 'checked_in'])
@@ -28,36 +32,49 @@ class BookingPriceController extends Controller
         $bookedCount = $query->count();
         $available = $bookedCount < $room->stock;
 
+        // Собственная бронь гостя (при изменении дат): уже посчитанные ночи сохраняют
+        // свою цену, а услуги брони входят в итог — как и при сохранении новых дат.
+        $existing = null;
+        if ($request->filled('booking_id')) {
+            $candidate = Booking::with('services')->find($request->booking_id);
+            if ($candidate && $candidate->user_id === $request->user()->id && $candidate->room_id === $room->id) {
+                $existing = $candidate;
+            }
+        }
+
         // Плановые дата+время заезда/выезда — время по умолчанию берём
         // стандартное для отеля, если фронт не передал arrival_time/departure_time.
-        $plannedCheckIn = Carbon::parse($start->toDateString() . ' ' . ($request->arrival_time ?? $room->hotel?->standard_check_in_time ?? '14:00'));
-        $plannedCheckOut = Carbon::parse($end->toDateString() . ' ' . ($request->departure_time ?? $room->hotel?->standard_check_out_time ?? '12:00'));
+        [$plannedCheckIn, $plannedCheckOut] = $calculator->plannedMoments(
+            $room,
+            $request->start_date,
+            $request->end_date,
+            $request->arrival_time,
+            $request->departure_time,
+            $existing
+        );
 
-        $servicesInput = $this->resolveServices($request->input('services', []), $room->hotel_id);
+        if ($request->has('services') || !$existing) {
+            $services = $this->resolveServices($request->input('services', []), $room->hotel_id);
+        } else {
+            $services = $existing->services->map(fn ($s) => ['price' => $s->price, 'quantity' => $s->quantity]);
+        }
 
-        $breakdown = $calculator->calculate($room, $plannedCheckIn, $plannedCheckOut, $servicesInput);
+        $breakdown = $calculator->calculate(
+            $room,
+            $plannedCheckIn,
+            $plannedCheckOut,
+            $services,
+            $existing ? $existing->lockedNights() : []
+        );
 
-        // tax считаем от суточной части (как и раньше), доплаты за
-        // ранний/поздний и услуги налогом на этом шаге не облагаем —
-        // при необходимости скорректируйте под правила вашего отеля.
-        $taxRate = env('BOOKING_TAX_RATE', 0.1);
-        $tax = round($breakdown['accommodation'] * $taxRate);
-        $totalPrice = $breakdown['total'] + $tax;
+        $payload = $calculator->previewPayload($room, $breakdown);
+        $payload['total_price'] = $available ? $payload['total_price'] : null;
 
-        return response()->json([
-            'available' => $available,
-            'room_id' => $room->id,
-            'nights' => $breakdown['nights'],
-            'price_per_night' => $room->price,
-            'price_for_period' => $breakdown['accommodation'],
-            'early_check_in' => $breakdown['early_check_in'],
-            'late_check_out' => $breakdown['late_check_out'],
-            'services' => $breakdown['services'],
-            'tax_rate' => $taxRate,
-            'tax' => $tax,
-            'total_price' => $available ? $totalPrice : null,
-            'cancellation_fee' => $room->hotel->cancellation_fee,
-        ]);
+        return response()->json(array_merge(
+            ['available' => $available],
+            $payload,
+            ['cancellation_fee' => $room->hotel->cancellation_fee]
+        ));
     }
 
     protected function resolveServices(array $items, int $hotelId): Collection

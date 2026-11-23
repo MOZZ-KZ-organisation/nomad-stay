@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\AdminRoomPeriodController;
 use App\Http\Controllers\Admin\AdminSupportController;
 use App\Http\Controllers\Admin\AdminRoomTransferController;
 use App\Http\Controllers\Admin\AdminRateRuleController;
+use App\Http\Controllers\Admin\AdminPeriodRateController;
 use App\Http\Controllers\Admin\AdminServiceController;
 use App\Http\Controllers\Admin\AdminBookingServiceController;
 use App\Http\Controllers\Admin\AdminPaymentController;
@@ -31,6 +32,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::patch('/notifications/read-all', [AdminDashboardController::class, 'markAllRead']);
     Route::patch('/notifications/{id}/read', [AdminDashboardController::class, 'markRead']);
     Route::get('/bookings/calendar', [AdminBookingController::class, 'calendar']);
+    // Должен идти до apiResource('/bookings'), иначе 'price-preview' попадёт в /bookings/{booking}
+    Route::get('/bookings/price-preview', [AdminBookingController::class, 'pricePreview']);
     Route::apiResource('/bookings', AdminBookingController::class);
     Route::get('/bookings/{id}/room-transfers', [AdminRoomTransferController::class, 'index']);
     Route::post('/bookings/{id}/room-transfers', [AdminRoomTransferController::class, 'store']);
@@ -41,6 +44,14 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::patch('/rate-rules/{id}', [AdminRateRuleController::class, 'update']);
     Route::delete('/rate-rules/{id}', [AdminRateRuleController::class, 'destroy']);
     Route::post('/rate-rules/{id}/restore', [AdminRateRuleController::class, 'restore']);
+
+    // Тарифы на период по датам («с 1 декабря по 15 января — 25 000 за ночь»), один тариф — на несколько номеров
+    Route::get('/period-rates', [AdminPeriodRateController::class, 'index']);
+    Route::post('/period-rates', [AdminPeriodRateController::class, 'store']);
+    Route::get('/period-rates/{id}', [AdminPeriodRateController::class, 'show']);
+    Route::patch('/period-rates/{id}', [AdminPeriodRateController::class, 'update']);
+    Route::delete('/period-rates/{id}', [AdminPeriodRateController::class, 'destroy']);
+    Route::post('/period-rates/{id}/restore', [AdminPeriodRateController::class, 'restore']);
 
     // Справочник дополнительных услуг отеля
     Route::get('/services', [AdminServiceController::class, 'index']);

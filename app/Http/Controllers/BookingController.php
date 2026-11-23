@@ -12,14 +12,14 @@ use App\Models\BookingService;
 use App\Models\Notification;
 use App\Models\Room;
 use App\Models\Service;
-use Carbon\Carbon;
+use App\Services\BookingPriceCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class BookingController extends Controller
 {
-    public function store(StoreBookingRequest $request)
+    public function store(StoreBookingRequest $request, BookingPriceCalculator $calculator)
     {
         $data = $request->validated();
         $room = Room::findOrFail($data['room_id']);
@@ -31,25 +31,34 @@ class BookingController extends Controller
         if ($bookedCount >= $room->stock) {
             return response()->json(['message' => 'No rooms left for selected dates'], 422);
         }
-        $nights = Carbon::parse($data['start_date'])->diffInDays(Carbon::parse($data['end_date']));
-        $basePrice = $room->price * $nights;
-        $tax = $basePrice * env('BOOKING_TAX_RATE', 0.0);
-        $totalPrice = $basePrice + $tax;
         $servicesInput = $data['services'] ?? [];
-        unset($data['services']);
-        $data += [
-            'user_id' => $request->user()->id,
-            'hotel_id' => $room->hotel_id,
-            'price_for_period' => $basePrice,
-            'tax' => $tax,
-            'total_price' => $totalPrice,
-            'status' => 'booked',
-            'type' => 'booking',
-            'source' => 'site'
-        ];
+        $departureTime = $data['departure_time'] ?? null;
+        unset($data['services'], $data['departure_time']);
 
-        $booking = DB::transaction(function () use ($data, $servicesInput, $room) {
-            $booking = Booking::create($data);
+        // Тот же расчёт, что и в /bookings/price-details: проживание по ночам с учётом
+        // тарифов на период, доплаты за ранний заезд/поздний выезд, налог. Поэтому сумма,
+        // показанная гостю перед бронированием, совпадает с сохранённой.
+        [$plannedCheckIn, $plannedCheckOut] = $calculator->plannedMoments(
+            $room,
+            $data['start_date'],
+            $data['end_date'],
+            $data['arrival_time'] ?? null,
+            $departureTime
+        );
+        $breakdown = $calculator->calculate($room, $plannedCheckIn, $plannedCheckOut);
+
+        $booking = DB::transaction(function () use ($data, $servicesInput, $room, $request, $calculator, $breakdown, $plannedCheckIn, $plannedCheckOut) {
+            $booking = new Booking(array_merge($data, [
+                'user_id' => $request->user()->id,
+                'hotel_id' => $room->hotel_id,
+                'services_amount' => 0,
+                'status' => 'booked',
+                'type' => 'booking',
+                'source' => 'site',
+            ]));
+            // Цена каждой ночи фиксируется в брони (снимок): изменение тарифов позже на неё не влияет.
+            $calculator->applyToBooking($booking, $breakdown, $plannedCheckIn, $plannedCheckOut);
+            $booking->save();
 
             if (!empty($servicesInput)) {
                 foreach ($servicesInput as $item) {
@@ -148,7 +157,7 @@ class BookingController extends Controller
         ]);
     }
 
-    public function updateDates(UpdateBookingDatesRequest $request, Booking $booking)
+    public function updateDates(UpdateBookingDatesRequest $request, Booking $booking, BookingPriceCalculator $calculator)
     {
         if ($booking->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Forbidden'], 403);
@@ -172,17 +181,23 @@ class BookingController extends Controller
                 'message' => 'Номер недоступен на выбранные даты'
             ], 422);
         }
-        $nights = Carbon::parse($startDate)->diffInDays(Carbon::parse($endDate));
-        $basePrice = $room->price * $nights;
-        $tax = $basePrice * env('BOOKING_TAX_RATE', 0.0);
-        $totalPrice = $basePrice + $tax;
-        $booking->update([
+        [$plannedCheckIn, $plannedCheckOut] = $calculator->plannedMoments(
+            $room,
+            $startDate,
+            $endDate,
+            null,
+            null,
+            $booking
+        );
+        // Ночи, которые остались в брони, сохраняют прежнюю цену; по текущим тарифам
+        // считаются только добавленные ночи.
+        $breakdown = $calculator->calculate($room, $plannedCheckIn, $plannedCheckOut, null, $booking->lockedNights());
+        $booking->fill([
             'start_date' => $startDate,
             'end_date' => $endDate,
-            'price_for_period' => $basePrice,
-            'tax' => $tax,
-            'total_price' => $totalPrice,
         ]);
+        $calculator->applyToBooking($booking, $breakdown, $plannedCheckIn, $plannedCheckOut);
+        $booking->save();
         $notification = Notification::create([
             'type' => 'booking_dates_updated',
             'title' => 'Даты брони изменены',

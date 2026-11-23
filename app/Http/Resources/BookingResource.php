@@ -19,6 +19,10 @@ class BookingResource extends JsonResource
             'end_date' => Carbon::parse($this->end_date)->format('d.m.Y'),
             'guests' => $this->guests,
             'price_for_period' => $this->price_for_period,
+            // Посуточная расшифровка проживания: по какой цене и тарифу посчитана каждая ночь
+            'price_breakdown' => $this->priceBreakdownLines(),
+            'early_check_in_amount' => (float) $this->early_check_in_amount,
+            'late_check_out_amount' => (float) $this->late_check_out_amount,
             'tax' => $this->tax,
             'services' => BookingServiceResource::collection($this->whenLoaded('services')),
             'services_amount' => (float) $this->services_amount,

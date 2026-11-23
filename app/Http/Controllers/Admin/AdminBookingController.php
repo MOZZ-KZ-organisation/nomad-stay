@@ -94,7 +94,7 @@ class AdminBookingController extends Controller
             return response()->json(['message' => 'Номер недоступен на выбранные даты'], 422);
         }
 
-        [$plannedCheckIn, $plannedCheckOut] = $this->resolvePlannedTimes(
+        [$plannedCheckIn, $plannedCheckOut] = $calculator->plannedMoments(
             $room,
             $data['start_date'],
             $data['end_date'],
@@ -102,26 +102,21 @@ class AdminBookingController extends Controller
             $data['planned_check_out_time'] ?? null
         );
 
+        // Проживание считается по ночам с учётом тарифов на период; расшифровка
+        // сохраняется в брони (price_breakdown), чтобы изменение тарифов её не трогало.
         $breakdown = $calculator->calculate($room, $plannedCheckIn, $plannedCheckOut);
-        $tax = $breakdown['accommodation'] * env('BOOKING_TAX_RATE', 0.0);
 
         // Бронь и предоплата создаются атомарно: если платёж не записался — брони тоже не будет.
-        $booking = DB::transaction(function () use ($data, $room, $breakdown, $tax, $plannedCheckIn, $plannedCheckOut, $prepayment, $request) {
-            $booking = Booking::create(array_merge($data, [
+        $booking = DB::transaction(function () use ($data, $room, $breakdown, $plannedCheckIn, $plannedCheckOut, $prepayment, $request, $calculator) {
+            $booking = new Booking(array_merge($data, [
                 'hotel_id'         => $room->hotel_id,
-                'price_for_period' => $breakdown['accommodation'],
-                'tax'              => $tax,
-                'early_check_in_amount' => $breakdown['early_check_in'],
-                'late_check_out_amount' => $breakdown['late_check_out'],
                 'services_amount'  => 0,
-                'total_price'      => $breakdown['accommodation'] + $tax
-                    + $breakdown['early_check_in'] + $breakdown['late_check_out'],
-                'planned_check_in_at'  => $plannedCheckIn,
-                'planned_check_out_at' => $plannedCheckOut,
                 'status'           => $data['status'] ?? 'booked',
                 'source'           => $data['source'] ?? 'manual',
                 'type'             => 'booking',
             ]));
+            $calculator->applyToBooking($booking, $breakdown, $plannedCheckIn, $plannedCheckOut);
+            $booking->save();
 
             if ($prepayment) {
                 Payment::create([
@@ -186,7 +181,7 @@ class AdminBookingController extends Controller
         $booking->fill($data);
 
         if ($recalcDates) {
-            [$plannedCheckIn, $plannedCheckOut] = $this->resolvePlannedTimes(
+            [$plannedCheckIn, $plannedCheckOut] = $calculator->plannedMoments(
                 $booking->room,
                 $booking->start_date,
                 $booking->end_date,
@@ -194,18 +189,17 @@ class AdminBookingController extends Controller
                 $request->input('planned_check_out_time'),
                 $booking
             );
-            $breakdown = $calculator->calculate($booking->room, $plannedCheckIn, $plannedCheckOut);
-            $tax = $breakdown['accommodation'] * env('BOOKING_TAX_RATE', 0.0);
-
-            $booking->planned_check_in_at = $plannedCheckIn;
-            $booking->planned_check_out_at = $plannedCheckOut;
-            $booking->price_for_period = $breakdown['accommodation'];
-            $booking->tax = $tax;
-            $booking->early_check_in_amount = $breakdown['early_check_in'];
-            $booking->late_check_out_amount = $breakdown['late_check_out'];
-            $booking->total_price = $breakdown['accommodation'] + $tax
-                + $breakdown['early_check_in'] + $breakdown['late_check_out']
-                + $booking->services_amount;
+            // Ночи, которые уже были в брони, сохраняют свою цену из снимка: правка или
+            // удаление тарифа задним числом не меняет цену созданной брони. По текущим
+            // тарифам считаются только новые ночи (если даты изменили).
+            $breakdown = $calculator->calculate(
+                $booking->room,
+                $plannedCheckIn,
+                $plannedCheckOut,
+                null,
+                $booking->lockedNights()
+            );
+            $calculator->applyToBooking($booking, $breakdown, $plannedCheckIn, $plannedCheckOut);
         }
 
         $booking->save();
@@ -214,6 +208,71 @@ class AdminBookingController extends Controller
             'message' => 'Бронирование обновлено',
             'data'    => $this->formatBooking($booking->fresh(['hotel', 'room']), true),
         ]);
+    }
+
+    /**
+     * GET /admin-api/bookings/price-preview
+     * Сколько будет стоить бронь и из чего складывается сумма — до сохранения.
+     * Считает тот же BookingPriceCalculator, что и создание/редактирование брони,
+     * поэтому сумма в превью совпадает с сохранённой.
+     *
+     * Для существующей брони передайте booking_id: уже оплаченные ночи сохранят свою
+     * цену из снимка, а доступность проверится без учёта самой брони.
+     */
+    public function pricePreview(Request $request, BookingPriceCalculator $calculator)
+    {
+        $data = $request->validate([
+            'room_id'    => 'required|exists:rooms,id',
+            'start_date' => ['required', 'date', Rule::when(!$request->filled('booking_id'), ['after_or_equal:today'])],
+            'end_date'   => 'required|date|after:start_date',
+            'booking_id' => 'nullable|exists:bookings,id',
+            'planned_check_in_time'  => 'nullable|date_format:H:i',
+            'planned_check_out_time' => 'nullable|date_format:H:i',
+            'arrival_time'           => 'nullable|date_format:H:i',
+        ]);
+
+        $room = Room::with('hotel')->findOrFail($data['room_id']);
+        $this->authorizeHotel($request->user(), $room->hotel_id);
+
+        $booking = null;
+        if (!empty($data['booking_id'])) {
+            $booking = Booking::with('services')->findOrFail($data['booking_id']);
+            $this->authorizeHotel($request->user(), $booking->hotel_id);
+        }
+
+        $bookedCount = Booking::where('room_id', $room->id)
+            ->whereIn('status', ['booked', 'checked_in'])
+            ->where('end_date', '>', $data['start_date'])
+            ->where('start_date', '<', $data['end_date'])
+            ->when($booking, fn ($q) => $q->where('id', '!=', $booking->id))
+            ->count();
+
+        [$plannedCheckIn, $plannedCheckOut] = $calculator->plannedMoments(
+            $room,
+            $data['start_date'],
+            $data['end_date'],
+            $data['planned_check_in_time'] ?? $data['arrival_time'] ?? null,
+            $data['planned_check_out_time'] ?? null,
+            $booking
+        );
+
+        $sameRoom = $booking && $booking->room_id === $room->id;
+        $breakdown = $calculator->calculate(
+            $room,
+            $plannedCheckIn,
+            $plannedCheckOut,
+            $sameRoom ? $booking->services->map(fn ($s) => ['price' => $s->price, 'quantity' => $s->quantity]) : null,
+            $sameRoom ? $booking->lockedNights() : []
+        );
+
+        return response()->json(array_merge(
+            ['available' => $bookedCount < $room->stock],
+            $calculator->previewPayload($room, $breakdown),
+            [
+                'planned_check_in_at'  => $plannedCheckIn->format('Y-m-d H:i'),
+                'planned_check_out_at' => $plannedCheckOut->format('Y-m-d H:i'),
+            ]
+        ));
     }
 
     /**
@@ -385,6 +444,8 @@ class AdminBookingController extends Controller
             'created_at' => $b->created_at?->format('d.m.Y H:i'),
         ];
         if ($full) {
+            // Посуточная расшифровка проживания: по какой цене и тарифу посчитана каждая ночь
+            $data['price_breakdown'] = $b->priceBreakdownLines();
             $data['user'] = $b->user ? [
                 'id'    => $b->user->id,
                 'name'  => $b->user->name,
@@ -411,28 +472,6 @@ class AdminBookingController extends Controller
             }
         }
         return $data;
-    }
-
-    /**
-     * Собирает плановые дату+время заезда/выезда из даты брони + времени
-     * (переданного или стандартного времени отеля).
-     */
-    protected function resolvePlannedTimes(
-        Room $room,
-        $startDate,
-        $endDate,
-        ?string $checkInTime,
-        ?string $checkOutTime,
-        ?Booking $existing = null
-    ): array {
-        $hotel = $room->hotel;
-        $checkInTime  = $checkInTime  ?? ($existing?->planned_check_in_at?->format('H:i')) ?? $hotel?->standard_check_in_time ?? '14:00';
-        $checkOutTime = $checkOutTime ?? ($existing?->planned_check_out_at?->format('H:i')) ?? $hotel?->standard_check_out_time ?? '12:00';
-
-        $plannedCheckIn  = Carbon::parse(Carbon::parse($startDate)->toDateString() . ' ' . $checkInTime);
-        $plannedCheckOut = Carbon::parse(Carbon::parse($endDate)->toDateString() . ' ' . $checkOutTime);
-
-        return [$plannedCheckIn, $plannedCheckOut];
     }
 
     /** Пустую строку / пробелы превращает в null. */
