@@ -13,6 +13,7 @@ class Room extends Model
 
     public function hotel(){ return $this->belongsTo(Hotel::class); }
     public function images(){ return $this->hasMany(RoomImage::class); }
+    public function periodRates(){ return $this->belongsToMany(PeriodRate::class, 'period_rate_room'); }
     public function scopeFilterByHotel($query)
     {
         if (request()->has('hotel_id')) {

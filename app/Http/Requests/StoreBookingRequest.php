@@ -26,6 +26,8 @@ class StoreBookingRequest extends FormRequest
             'is_business_trip' => 'nullable|boolean',
             'special_requests' => 'nullable|string|max:100',
             'arrival_time' => 'nullable|date_format:H:i',
+            // Время выезда — как и в /bookings/price-details, влияет на доплату за поздний выезд
+            'departure_time' => 'nullable|date_format:H:i',
             'services' => 'nullable|array',
             'services.*.service_id' => 'required|integer|exists:services,id',
             'services.*.quantity' => 'required|integer|min:1',
