@@ -59,7 +59,13 @@ class AdminDashboardController extends Controller
      */
     public function notifications(Request $request)
     {
-        $notifications = Notification::with('booking')
+        $user = $request->user();
+        $hotelId = $request->filled('hotel_id') ? (int) $request->hotel_id : null;
+
+        // Менеджер видит только уведомления своего отеля; администратор — все
+        // (или одного отеля через ?hotel_id=).
+        $notifications = Notification::visibleTo($user, $hotelId)
+            ->with('booking')
             ->latest()
             ->paginate($request->get('per_page', 20));
 
@@ -78,7 +84,7 @@ class AdminDashboardController extends Controller
                 'total'        => $notifications->total(),
                 'current_page' => $notifications->currentPage(),
                 'last_page'    => $notifications->lastPage(),
-                'unread_count' => Notification::where('is_read', false)->count(),
+                'unread_count' => Notification::visibleTo($user, $hotelId)->where('is_read', false)->count(),
             ],
         ]);
     }
@@ -89,7 +95,8 @@ class AdminDashboardController extends Controller
      */
     public function markRead(Request $request, $id)
     {
-        $notification = Notification::findOrFail($id);
+        // Чужое уведомление (другого отеля) — 404, как будто его нет.
+        $notification = Notification::visibleTo($request->user())->findOrFail($id);
         $notification->update(['is_read' => true]);
         return response()->json(['message' => 'Прочитано']);
     }
@@ -98,9 +105,11 @@ class AdminDashboardController extends Controller
      * PATCH /admin-api/notifications/read-all
      * Пометить все уведомления как прочитанные.
      */
-    public function markAllRead()
+    public function markAllRead(Request $request)
     {
-        Notification::where('is_read', false)->update(['is_read' => true]);
+        // Только уведомления, которые видит этот пользователь: менеджер не может
+        // «прочитать» уведомления других отелей.
+        Notification::visibleTo($request->user())->where('is_read', false)->update(['is_read' => true]);
         return response()->json(['message' => 'Все прочитаны']);
     }
 }

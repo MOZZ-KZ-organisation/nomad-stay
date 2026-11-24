@@ -12,7 +12,7 @@ class Hotel extends Model
     protected $fillable = [
         'manager_id', 'title','slug','description','address','city_id',
         'latitude','longitude','stars','is_active','min_price', 'cancellation_fee',
-        'type', 'email',
+        'type', 'email', 'phone',
         'standard_check_in_time', 'standard_check_out_time',
     ];
     protected $appends = ['location'];
