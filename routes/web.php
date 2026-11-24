@@ -19,10 +19,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/calendar', [BookingCalendarController::class, 'index'])
             ->name('admin.bookings.calendar');
         Route::get('/notifications', function () {
-            return Notification::latest()->take(15)->get();
+            return Notification::visibleTo(auth()->user())->latest()->take(15)->get();
         });
         Route::post('/notifications/mark-read', function () {
-            Notification::where('is_read', false)->update([
+            Notification::visibleTo(auth()->user())->where('is_read', false)->update([
                 'is_read' => true
             ]);
             return response()->json(['success' => true]);

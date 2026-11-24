@@ -94,6 +94,7 @@ class BookingController extends Controller
             'type' => 'booking_created',
             'title' => 'Новая бронь',
             'booking_id' => $booking->id,
+            'hotel_id' => $booking->hotel_id,
             'source' => $booking->source
         ]);
         broadcast(new NewNotification($notification))->toOthers();
@@ -148,6 +149,7 @@ class BookingController extends Controller
             'type' => 'booking_cancelled',
             'title' => 'Отменена бронь',
             'booking_id' => $booking->id,
+            'hotel_id' => $booking->hotel_id,
             'source' => $booking->source
         ]);
         broadcast(new NewNotification($notification))->toOthers();
@@ -202,6 +204,7 @@ class BookingController extends Controller
             'type' => 'booking_dates_updated',
             'title' => 'Даты брони изменены',
             'booking_id' => $booking->id,
+            'hotel_id' => $booking->hotel_id,
             'source' => $booking->source
         ]);
         broadcast(new NewNotification($notification))->toOthers();
